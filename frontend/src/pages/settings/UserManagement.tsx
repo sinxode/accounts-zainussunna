@@ -50,8 +50,7 @@ export const UserManagement: React.FC = () => {
     const toastId = toast.loading('Creating user account...');
 
     try {
-      // Create a separate, non-persistent client to prevent overwriting the current owner's session
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '');
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       const tempClient = createClient(supabaseUrl, supabaseAnonKey, {
         auth: { persistSession: false }

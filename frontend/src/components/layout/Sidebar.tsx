@@ -22,6 +22,7 @@ import { useUIStore } from '../../store/useUIStore';
 import styles from './Sidebar.module.scss';
 import { useWindowSize } from '../../hooks/useWindowSize';
 import { Button } from '../ui/Button';
+import logoImg from '../../assets/logo.jpg';
 
 interface NavItem {
   title: string;
@@ -82,7 +83,7 @@ export const Sidebar: React.FC = () => {
       >
         <div className={styles.logoArea}>
           <Link to="/" className={styles.logo}>
-            <div className={styles.logoIcon}>Z</div>
+            <img src={logoImg} alt="ZLS Logo" className={styles.logoIcon} />
             <AnimatePresence>
               {(isMobile || !isSidebarCollapsed) && (
                 <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className={styles.logoContent}>

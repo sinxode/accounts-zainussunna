@@ -84,12 +84,8 @@
 .logoIcon {
   width: 42px;
   height: 42px;
-  background-color: $primary;
-  color: white;
   border-radius: 14px;
-  @include flex-center;
-  font-size: 1.35rem;
-  font-weight: 800;
+  object-fit: cover;
   box-shadow: 0 8px 16px rgba(30, 58, 95, 0.2);
 
   @include mobile {
