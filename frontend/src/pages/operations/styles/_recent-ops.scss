@@ -1,0 +1,98 @@
+.recentOpsCard {
+  background-color: var(--bg-primary);
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  height: 100%;
+}
+
+.cardHeader {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  @include flex-between;
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.opsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.opItem {
+  @include flex-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color $transition-fast;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: var(--bg-secondary);
+  }
+}
+
+.opInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.opIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  @include flex-center;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+}
+
+// Standalone modifier classes exported as CSS Module keys
+.deposit { color: var(--success); background-color: var(--success-soft); border-color: rgba(16, 185, 129, 0.1); }
+.withdrawal { color: var(--danger); background-color: var(--danger-soft); border-color: rgba(239, 68, 68, 0.1); }
+.transfer { color: var(--info); background-color: var(--info-soft); border-color: rgba(59, 130, 246, 0.1); }
+.loan { color: var(--primary); background-color: var(--primary-soft); border-color: rgba(30, 58, 95, 0.1); }
+.recovery { color: var(--success); background-color: var(--success-soft); border-color: rgba(16, 185, 129, 0.1); }
+.bulk { color: var(--primary); background-color: var(--primary-soft); border-color: rgba(124, 58, 237, 0.1); }
+.distribution { color: #f59e0b; background-color: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.1); }
+.quick { color: #6366f1; background-color: rgba(99, 102, 241, 0.05); border-color: rgba(99, 102, 241, 0.1); }
+
+.opDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.opTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.opSub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.opAmount {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  padding: 4px 8px;
+  border-radius: 8px;
+}

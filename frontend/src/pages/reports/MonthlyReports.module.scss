@@ -1,0 +1,192 @@
+@import '../../styles/design-system/mixins';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  @include flex-between;
+}
+
+.exportBtn {
+  @include flex-center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  color: $text-muted;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: $text-primary;
+  }
+}
+
+.periodCard {
+  width: 100%;
+}
+
+.periodSelectors {
+  display: flex;
+  gap: 1.5rem;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.selectorItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+
+  label {
+    @include label-text;
+  }
+
+  select {
+    background: $bg-primary;
+    border: 1px solid $border-color;
+    padding: 0.625rem 1rem;
+    border-radius: 8px;
+    color: $text-primary;
+    font-size: 0.9375rem;
+
+    &:focus {
+      border-color: $primary;
+    }
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+
+  @include tablet {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  @include mobile-sm {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.summaryVisuals {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1.5rem;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.netCard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.netValue {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.netDesc {
+  color: $text-muted;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+.highlightGrid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 1.5rem;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hLabel {
+  @include label-text;
+  color: $text-muted;
+}
+
+.hValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.hMeta {
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+.hDivider {
+  width: 1px;
+  height: 40px;
+  background: $border-color;
+
+  @include tablet {
+    width: 100%;
+    height: 1px;
+  }
+
+  @include mobile {
+    width: 100%;
+    height: 1px;
+  }
+}
+
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem;
+}
+
+.loadingBox {
+  padding: 1rem 2rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}

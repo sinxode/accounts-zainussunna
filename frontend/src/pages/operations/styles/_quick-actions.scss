@@ -1,0 +1,118 @@
+.actionGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+
+  @include laptop {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.actionCard {
+  background-color: var(--bg-primary);
+  border-radius: 24px;
+  padding: 24px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  transition: all $transition-base;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+
+  &:hover {
+    border-color: rgba(30, 58, 95, 0.25);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-4px);
+
+    .actionIcon {
+      transform: scale(1.08);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @include mobile {
+    padding: 12px !important;
+    border-radius: 20px !important;
+    min-height: 100px !important;
+    height: 100px !important;
+    max-height: 100px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 10px !important;
+    box-sizing: border-box;
+  }
+}
+
+.actionContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.actionIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  @include flex-center;
+  margin-bottom: 12px;
+  transition: transform $transition-fast;
+  flex-shrink: 0;
+
+  &.success { background-color: var(--success-soft); color: var(--success); }
+  &.danger { background-color: var(--danger-soft); color: var(--danger); }
+  &.warning { background-color: var(--warning-soft); color: var(--warning); }
+  &.primary { background-color: var(--primary-soft); color: var(--primary); }
+  &.neutral { background-color: var(--neutral-soft); color: var(--neutral); }
+
+  @include mobile {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    margin-bottom: 0 !important;
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.actionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+
+  @include mobile {
+    font-size: 13.5px !important;
+    font-weight: 600;
+    margin-bottom: 0 !important;
+    line-height: 1.2;
+  }
+}
+
+.actionDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+
+  @include mobile {
+    display: none !important;
+  }
+}

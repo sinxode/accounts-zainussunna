@@ -1,0 +1,102 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.hero {
+  @include glass-card($opacity: 0.1);
+  padding: 3rem;
+  border-radius: 32px;
+  background-color: white;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-md;
+}
+
+.scoreArea {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  
+  @include mobile { flex-direction: column; gap: 2rem; text-align: center; }
+}
+
+.radialProgress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.scoreInfo {
+  .score { font-size: 3rem; font-weight: 800; color: $primary; letter-spacing: -0.05em; }
+  .total { font-size: 1.5rem; color: $text-muted; font-weight: 700; }
+}
+
+.narrative {
+  h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: $text-primary; }
+  p { color: $text-secondary; font-size: 1rem; line-height: 1.6; max-width: 500px; }
+}
+
+.healthGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  
+  @include tablet { grid-template-columns: 1fr 1fr; }
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.healthCard {
+  border: 1px solid $border-color;
+}
+
+.hHeader {
+  @include flex-between;
+  margin-bottom: 1.5rem;
+}
+
+.hIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  @include flex-center;
+  
+  &.success { background-color: $success-soft; color: $success; }
+  &.warning { background-color: $warning-soft; color: $warning; }
+  &.danger { background-color: $danger-soft; color: $danger; }
+}
+
+.hValue { font-size: 2.5rem; font-weight: 800; color: $text-primary; line-height: 1; margin-bottom: 0.5rem; display: block; }
+.hLabel { @include label-text; font-size: 0.75rem; color: $text-muted; }
+
+.logList {
+  display: flex;
+  flex-direction: column;
+}
+
+.logRow {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid $border-color;
+  
+  &:last-child { border-bottom: none; }
+}
+
+.logDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  &.success { background-color: $success; }
+  &.warning { background-color: $warning; }
+  &.danger { background-color: $danger; box-shadow: 0 0 8px $danger; }
+}
+
+.logTime { font-size: 0.8125rem; font-weight: 700; color: $text-muted; width: 80px; }
+.logEvent { flex: 1; font-weight: 600; color: $text-primary; }
+.logEntity { font-size: 0.8125rem; font-family: monospace; font-weight: 700; color: $primary; }

@@ -1,0 +1,33 @@
+.historyTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.historyItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: -16px;
+    width: 2px;
+    background-color: var(--border-color);
+  }
+}
+
+.historyIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  @include flex-center;
+  flex-shrink: 0;
+  z-index: 1;
+
+  &.primary { background-color: var(--primary-soft); color: var(--primary); }
+}

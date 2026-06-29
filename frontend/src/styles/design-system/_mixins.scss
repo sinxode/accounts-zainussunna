@@ -1,0 +1,85 @@
+@import "./variables";
+@import "./layout";
+@import "./animations";
+@import "./typography";
+
+@mixin custom-scrollbar($width: 6px, $thumb-color: rgba(0, 0, 0, 0.1), $track-color: transparent) {
+  &::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: 10px;
+    
+    &:hover {
+      background: $thumb-color; // Or use a separate hover color variable
+    }
+  }
+}
+
+@mixin overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 250ms ease-in-out;
+  z-index: 1000;
+  pointer-events: none;
+  &.isOpen {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@mixin drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  max-width: 90vw;
+  background-color: #FFFFFF;
+  z-index: 1001;
+  transform: translateX(100%);
+  transition: transform 250ms ease-in-out;
+  display: flex;
+  flex-direction: column;
+  &.isOpen {
+    transform: translateX(0);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+  }
+}
+
+@mixin drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+  h2 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+}
+
+@mixin drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+@mixin section-title {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+  text-transform: uppercase;
+}
+

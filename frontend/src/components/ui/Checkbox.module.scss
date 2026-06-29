@@ -1,0 +1,54 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.input {
+  // Hide the native checkbox, but keep it interactive
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid $border-color;
+  background-color: white;
+  @include flex-center;
+  pointer-events: none;
+  transition: $transition-fast;
+  z-index: 1;
+}
+
+.checkIcon {
+  color: white;
+  opacity: 0;
+  transition: $transition-fast;
+}
+
+// State changes based on input check
+.input:checked + .checkbox {
+  background-color: $primary;
+  border-color: $primary;
+
+  .checkIcon {
+    opacity: 1;
+  }
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $text-secondary;
+}

@@ -1,0 +1,10 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/mixins';
+
+.summaryNote {
+  padding: 16px;
+  background-color: $bg-tertiary;
+  border-radius: 12px;
+  border: 1px solid $border-color;
+  margin-top: 16px;
+}

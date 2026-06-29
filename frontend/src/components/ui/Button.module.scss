@@ -1,0 +1,126 @@
+@import '../../styles/design-system/mixins';
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  font-weight: 600;
+  transition: 150ms ease;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  min-height: 48px;
+  width: auto;
+
+  @include mobile {
+    min-height: 40px;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem !important;
+    border-radius: 12px;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.primary {
+  background-color: var(--primary);
+  color: white;
+  &:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.secondary {
+  background-color: white;
+  border-color: var(--border-color);
+  color: var(--text-primary);
+  &:hover:not(:disabled) {
+    background-color: var(--bg-tertiary);
+    border-color: var(--text-muted);
+  }
+}
+
+.soft {
+  background-color: var(--primary-soft);
+  color: var(--primary);
+  &:hover:not(:disabled) {
+    background-color: var(--primary-soft);
+  }
+}
+
+.danger {
+  background-color: var(--danger);
+  color: white;
+  &:hover:not(:disabled) {
+    background-color: darken(#dc2626, 5%);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.success {
+  background-color: var(--success);
+  color: white;
+  &:hover:not(:disabled) {
+    background-color: darken(#10b981, 5%);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.ghost {
+  background-color: transparent;
+  color: var(--text-secondary);
+  &:hover:not(:disabled) {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+}
+
+.sm { padding: 0.75rem 1.25rem; font-size: 0.875rem; }
+.md { padding: 0.75rem 1.5rem; font-size: 1rem; }
+.lg { padding: 1rem 2rem; font-size: 1.125rem; }
+
+.fullWidth { width: 100%; flex: 1; }
+
+.loader {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: rotate 0.6s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.iconLeft, .iconRight {
+  display: flex;
+  align-items: center;
+}
+
+.iconOnly {
+  min-height: 38px !important;
+  width: 38px !important;
+  padding: 0 !important;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+
+  .iconLeft, .iconRight {
+    margin: 0;
+  }
+
+  @include mobile {
+    min-height: 28px !important;
+    width: 28px !important;
+  }
+}
+

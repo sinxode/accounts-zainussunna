@@ -1,0 +1,14 @@
+.analyticsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.analyticsItem {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-color: var(--bg-tertiary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}

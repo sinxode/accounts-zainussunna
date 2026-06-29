@@ -1,0 +1,131 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.filterCard {
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.filters {
+  @include flex-between;
+  gap: 2rem;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+}
+
+.searchBox {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  
+  svg {
+    position: absolute;
+    left: 1rem;
+    color: $text-muted;
+  }
+
+  input {
+    width: 100%;
+    background-color: $bg-tertiary;
+    border: 1px solid transparent;
+    padding: 0.625rem 1rem 0.625rem 2.75rem;
+    border-radius: 12px;
+    font-size: 0.9375rem;
+    transition: $transition-fast;
+    
+    &:focus {
+      background-color: white;
+      border-color: $primary;
+    }
+  }
+}
+
+.filterActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.datePicker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: white;
+  border: 1px solid $border-color;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: $text-primary;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: $text-muted;
+  }
+}
+
+.tableCard {
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.txId {
+  font-family: monospace;
+  font-weight: 700;
+  color: $primary;
+  font-size: 0.8125rem;
+  background-color: $primary-soft;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.studentCell {
+  display: flex;
+  flex-direction: column;
+}
+
+.sName {
+  font-weight: 700;
+  color: $text-primary;
+
+  @include mobile {
+    max-width: 140px;
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
+.sEnr {
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+.amount {
+  font-weight: 800;
+  font-size: 1rem;
+  white-space: nowrap;
+  display: inline-block;
+  min-width: 5ch; /* Ensure enough space for typical amounts */
+  text-align: right;
+}
+
+.reversedTx {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.balance {
+  font-weight: 700;
+  color: $text-secondary;
+}

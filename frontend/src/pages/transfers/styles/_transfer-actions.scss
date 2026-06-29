@@ -1,0 +1,73 @@
+.actionsSection {
+  width: 100%;
+}
+
+.actionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.actionCard {
+  background-color: var(--bg-primary);
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  transition: all $transition-base;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+
+  &:hover {
+    border-color: rgba(30, 58, 95, 0.25);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+
+    .actionIcon {
+      transform: scale(1.05);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.actionIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  @include flex-center;
+  margin-bottom: 2px;
+  transition: transform $transition-fast;
+  flex-shrink: 0;
+
+  &.success { background-color: var(--success-soft); color: var(--success); }
+  &.danger { background-color: var(--danger-soft); color: var(--danger); }
+  &.warning { background-color: var(--warning-soft); color: var(--warning); }
+  &.primary { background-color: var(--primary-soft); color: var(--primary); }
+  &.neutral { background-color: var(--neutral-soft); color: var(--neutral); }
+}
+
+.actionTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1px;
+  letter-spacing: -0.01em;
+}
+
+.actionDesc {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}

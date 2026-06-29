@@ -1,0 +1,257 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
+
+.navBar {
+  @include flex-between;
+  margin-bottom: 1.5rem;
+}
+
+.backLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 700;
+  color: $text-secondary;
+  transition: $transition-fast;
+  
+  &:hover {
+    color: $primary;
+    transform: translateX(-4px);
+  }
+}
+
+.navActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 2.5rem;
+  align-items: flex-start;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.headerSection {
+  @include flex-between;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 28px;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.25rem;
+  }
+}
+
+.txInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.iconArea {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  @include flex-center;
+  background-color: $primary-soft;
+  color: $primary;
+  flex-shrink: 0;
+}
+
+.title {
+  @include h2;
+  font-size: 1.5rem;
+  margin: 0;
+  color: $text-primary;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.idCode {
+  font-family: monospace;
+  font-weight: 700;
+  color: $text-muted;
+  font-size: 0.875rem;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: $border-color;
+}
+
+.amountDisplay {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  
+  @include mobile {
+    text-align: left;
+  }
+}
+
+.label {
+  @include label-text;
+  color: $text-muted;
+  margin-bottom: 0.25rem;
+}
+
+.value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.infoCard {
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.infoList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.infoRow {
+  @include flex-between;
+  font-size: 0.875rem;
+  
+  span { color: $text-muted; font-weight: 600; }
+  strong { color: $text-primary; }
+}
+
+.sCell, .linkCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  svg { color: $text-muted; }
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.reversalCard {
+  border: 1px solid $border-color;
+  background-color: white;
+  
+  .integrityBox {
+    background-color: $bg-secondary;
+    padding: 1.25rem;
+    border-radius: 16px;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    border: 1px solid color-mix(in srgb, var(--primary), transparent 90%);
+    
+    svg { color: $primary; flex-shrink: 0; margin-top: 0.125rem; }
+    p { font-size: 0.8125rem; color: $text-secondary; line-height: 1.5; margin: 0; }
+  }
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.tlItem {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.tlIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  @include flex-center;
+  background-color: white;
+  box-shadow: $shadow-sm;
+  border: 1px solid $border-color;
+  flex-shrink: 0;
+
+  &.success { color: $success; }
+  &.info { color: $info; }
+}
+
+.tlLine {
+  position: absolute;
+  top: 32px;
+  left: 15px;
+  bottom: -24px;
+  width: 2px;
+  background-color: $bg-tertiary;
+  z-index: 0;
+}
+
+.tlContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.tlAction {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.tlMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: $text-muted;
+  font-weight: 600;
+}
+
+.tlDot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: $text-muted;
+}

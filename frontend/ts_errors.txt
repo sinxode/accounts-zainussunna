@@ -1,0 +1,5 @@
+src/lib/globalSearchService.ts(7,11): error TS6133: 'lowerQuery' is declared but its value is never read.
+src/pages/borrowers/BorrowerProfile.tsx(26,9): error TS6133: 'id' is declared but its value is never read.
+src/pages/events/EventWorkspace.tsx(27,9): error TS6133: 'id' is declared but its value is never read.
+src/pages/settings/AdministrationDashboard.tsx(34,9): error TS6133: 'setActiveModal' is declared but its value is never read.
+src/pages/students/StudentProfile.tsx(33,9): error TS6133: 'id' is declared but its value is never read.

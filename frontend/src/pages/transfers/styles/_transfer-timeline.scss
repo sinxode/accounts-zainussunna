@@ -1,0 +1,72 @@
+.feedContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feedItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: -16px;
+    width: 2px;
+    background-color: var(--border-color);
+  }
+}
+
+.feedIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  @include flex-center;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.timelineContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 16px;
+}
+
+.timelineItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  position: relative;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: -20px;
+    width: 2px;
+    background-color: var(--border-color);
+  }
+}
+
+.timelineIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  @include flex-center;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+// Standalone status modifier classes exported as CSS Module keys
+.success { background-color: var(--success-soft); color: var(--success); }
+.danger { background-color: var(--danger-soft); color: var(--danger); }
+.warning { background-color: var(--warning-soft); color: var(--warning); }
+.info { background-color: var(--info-soft); color: var(--info); }
+.primary { background-color: var(--primary-soft); color: var(--primary); }
+.neutral { background-color: var(--neutral-soft); color: var(--neutral); }

@@ -1,0 +1,157 @@
+@import '../../styles/design-system/mixins';
+@import '../../styles/design-system/variables';
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  @include card-base;
+  padding: $card-gap;
+  
+  @include mobile {
+    padding: 12px !important;
+    border-radius: 20px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 8px !important;
+    height: 90px !important;
+    min-height: 90px !important;
+    max-height: 90px !important;
+    box-sizing: border-box;
+  }
+  
+  @include mobile-sm {
+    height: 80px !important;
+    min-height: 80px !important;
+    max-height: 80px !important;
+    padding: 10px !important;
+    gap: 6px !important;
+  }
+}
+
+.header {
+  @include flex-between;
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  @include flex-center;
+  
+  &.primary { background: $primary-soft; color: $primary; }
+  &.success { background: $success-soft; color: $success; }
+  &.warning { background: $warning-soft; color: $warning; }
+  &.error, &.danger { background: $danger-soft; color: $danger; }
+  &.info { background: $info-soft; color: $info; }
+  &.neutral { background: $bg-tertiary; color: $text-secondary; }
+  
+  @include mobile {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+  
+  @include mobile-sm {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+.trend {
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+
+  &.positive {
+    background: $success-soft;
+    color: $success;
+  }
+
+  &.negative {
+    background: $danger-soft;
+    color: $danger;
+  }
+  
+  @include mobile {
+    font-size: 10px;
+    padding: 0.125rem 0.5rem;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  @include label-text;
+  color: $text-muted;
+  margin-bottom: 0.25rem;
+  
+  @include mobile {
+    font-size: 10px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  @include mobile-sm {
+    font-size: 9px;
+  }
+}
+
+.value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $text-primary;
+  letter-spacing: -0.02em;
+  
+  @include mobile {
+    font-size: 1.4rem;
+    line-height: 1.2;
+  }
+  
+  @include mobile-sm {
+    font-size: 1.25rem;
+  }
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: $text-secondary;
+  margin-top: 0.25rem;
+  
+  @include mobile {
+    display: none;
+  }
+}
+
+@include mobile {
+  .card {
+    .header {
+      order: 2;
+      flex-shrink: 0;
+    }
+    .content {
+      flex: 1;
+      order: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+  }
+}

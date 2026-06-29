@@ -1,0 +1,227 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.healthGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.healthCard {
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+  transition: $transition-fast;
+  
+  &:hover { border-color: $primary; transform: translateY(-2px); }
+
+  @include mobile {
+    padding: 1.25rem !important;
+  }
+}
+
+.hHeader {
+  @include flex-between;
+  margin-bottom: 1.5rem;
+
+  @include mobile {
+    margin-bottom: 1rem;
+  }
+}
+
+.hIcon { color: $text-muted; }
+
+.hStatus {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  &.optimal { background-color: $success; box-shadow: 0 0 8px $success; }
+  &.warning { background-color: $warning; box-shadow: 0 0 8px $warning; }
+}
+
+.hInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hLabel { font-weight: 700; font-size: 0.9375rem; color: $text-primary; }
+
+.hMeta {
+  @include flex-between;
+  .latency { font-size: 0.75rem; color: $text-muted; font-weight: 600; }
+}
+
+.mainLayout {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 2rem;
+  align-items: flex-start;
+  
+  @include tablet { grid-template-columns: 1fr; }
+}
+
+.leftColumn, .rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.section { width: 100%; }
+
+.backupCard {
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.bHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.bTitleArea { flex: 1; }
+.bTitle { font-weight: 800; font-size: 1rem; color: $text-primary; }
+.bSubtitle { font-size: 0.8125rem; color: $text-muted; }
+
+.bStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  padding: 1.25rem;
+  background-color: $bg-tertiary;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.bStat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  span { font-size: 0.7rem; @include label-text; color: $text-muted; }
+  strong { font-size: 0.9375rem; color: $text-primary; }
+}
+
+.bActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.diagList {
+  display: flex;
+  flex-direction: column;
+}
+
+.diagRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid $border-color;
+  
+  &:last-child { border-bottom: none; }
+
+  @include mobile {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    align-items: flex-start;
+
+    svg {
+      order: 1;
+    }
+
+    [class*='badge'] {
+      order: 3;
+    }
+  }
+}
+
+.diagEvent {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $text-primary;
+
+  @include mobile {
+    width: 100%;
+    font-size: 0.8125rem;
+  }
+}
+
+.diagTime {
+  font-size: 0.8125rem;
+  color: $text-muted;
+  font-weight: 600;
+
+  @include mobile {
+    order: 2;
+    margin-right: auto;
+  }
+}
+
+.resourceStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.resourceCard { border: 1px solid $border-color; }
+.rLabel { font-size: 0.8125rem; font-weight: 700; color: $text-secondary; }
+.rVal { font-size: 0.8125rem; font-weight: 800; color: $primary; }
+
+.progressBase {
+  height: 6px;
+  background-color: $bg-tertiary;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: $primary;
+  
+  &.databaseFill {
+    width: 42%;
+  }
+  
+  &.apiFill {
+    width: 12%;
+    background-color: $success;
+  }
+}
+
+.maintenanceCard {
+  background-color: $warning-soft;
+  border: 1px solid $warning-soft;
+  
+  h4 { font-weight: 700; color: $text-primary; }
+  p { font-size: 0.875rem; color: $text-secondary; line-height: 1.5; }
+}
+
+.mIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  @include flex-center;
+  margin-bottom: 1rem;
+  
+  &.warning { background-color: $warning-soft; color: $warning; }
+}

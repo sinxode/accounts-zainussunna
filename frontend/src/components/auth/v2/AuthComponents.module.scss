@@ -1,0 +1,278 @@
+@import '../../../styles/design-system/variables';
+@import '../../../styles/design-system/layout';
+
+.card {
+  background-color: white;
+  border-radius: 24px;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-md;
+  padding: 3rem;
+  width: 100%;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.logo {
+  width: 44px;
+  height: 44px;
+  background-color: $primary;
+  color: white;
+  border-radius: 12px;
+  @include flex-center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 8px 16px rgba(30, 58, 95, 0.2);
+}
+
+.title {
+  @include h2;
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: $text-primary;
+}
+
+.subtitle {
+  color: $text-secondary;
+  font-size: 0.9375rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: $text-primary;
+  @include label-text;
+  letter-spacing: 0.05em;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .icon {
+    position: absolute;
+    left: 1.25rem;
+    color: $text-muted;
+    display: flex;
+    align-items: center;
+  }
+
+  .input {
+    width: 100%;
+    background-color: $bg-tertiary;
+    border: 1px solid transparent;
+    padding: 1rem 1.25rem 1rem 3.25rem;
+    border-radius: 16px;
+    font-size: 1rem;
+    color: $text-primary;
+    transition: $transition-fast;
+    
+    &::placeholder { color: $text-muted; opacity: 0.6; }
+    
+    &:focus {
+      background-color: white;
+      border-color: $primary;
+      box-shadow: 0 0 0 4px $primary-soft;
+    }
+  }
+
+  &.hasError .input {
+    border-color: $danger;
+    &:focus { box-shadow: 0 0 0 4px $danger-soft; }
+  }
+}
+
+.toggleBtn {
+  position: absolute;
+  right: 1.25rem;
+  color: $text-muted;
+  &:hover { color: $text-primary; }
+}
+
+.linkBtn {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: $primary;
+  &:hover { text-decoration: underline; }
+}
+
+.submitBtn {
+  width: 100%;
+  background-color: $primary;
+  color: white;
+  padding: 1.125rem;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1rem;
+  @include flex-center;
+  gap: 0.75rem;
+  transition: $transition-fast;
+  box-shadow: 0 8px 24px rgba(30, 58, 95, 0.2);
+  margin-top: 1rem;
+
+  &:hover:not(:disabled) {
+    background-color: $primary-hover;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(30, 58, 95, 0.3);
+  }
+
+  &:active:not(:disabled) { transform: translateY(0); }
+  &:disabled { opacity: 0.7; cursor: not-allowed; }
+}
+
+.loaderArea {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  
+  &.error { background-color: $danger-soft; color: $danger; border: 1px solid $danger-soft; }
+  &.success { background-color: $success-soft; color: $success; border: 1px solid $success-soft; }
+}
+
+.strengthMeter {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.track {
+  flex: 1;
+  height: 4px;
+  background-color: $bg-tertiary;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+  &.weak { background-color: $danger; }
+  &.medium { background-color: $warning; }
+  &.strong { background-color: $success; }
+}
+
+.strengthText {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: $text-muted;
+  text-transform: uppercase;
+  min-width: 60px;
+  text-align: right;
+}
+
+.errorText {
+  font-size: 0.75rem;
+  color: $danger;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.centerContent {
+  text-align: center;
+}
+
+.successIconWrapper {
+  color: $success;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+  
+  svg {
+    margin: 0 auto;
+  }
+}
+
+.dangerIconWrapper {
+  color: $danger;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+  
+  svg {
+    margin: 0 auto;
+  }
+}
+
+.infoIconWrapper {
+  color: $primary;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+  
+  svg {
+    margin: 0 auto;
+  }
+}
+
+.description {
+  color: $text-secondary;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.buttonColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.footerLinkWrapper {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.backToLoginLink {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: $primary;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: color 0.2s ease;
+  text-decoration: none;
+  
+  &:hover {
+    color: $primary-hover;
+    text-decoration: underline;
+  }
+}
+

@@ -1,0 +1,41 @@
+@import '../../styles/design-system/mixins';
+.header {
+  @include flex-between;
+  margin-bottom: 2.5rem;
+  gap: 1.5rem;
+  
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+  }
+}
+
+.content {
+  flex: 1;
+}
+
+.title {
+  @include h1;
+  color: $text-primary;
+  margin-bottom: 0.5rem;
+  
+
+}
+
+.subtitle {
+  @include body-text;
+  color: $text-secondary;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  @include mobile {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+}

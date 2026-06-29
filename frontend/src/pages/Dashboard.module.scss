@@ -1,0 +1,766 @@
+@import '../styles/design-system/variables';
+@import '../styles/design-system/layout';
+@import '../styles/design-system/mixins';
+@import '../styles/design-system/typography';
+
+.dashboardGrid {
+  display: flex;
+  flex-direction: column;
+  gap: $section-gap;
+  animation: fadeIn $transition-base;
+}
+
+// Hero Welcome Section
+.welcomeBanner {
+  background: linear-gradient(135deg, #1e3a5f 0%, #0d1e33 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: $radius-card;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -10px rgba(15, 29, 48, 0.3);
+
+  @include tablet {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+}
+
+.welcomeText {
+  h2 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.35rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  p {
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  @include mobile {
+    h2 {
+      font-size: 1.6rem;
+    }
+    p {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+.systemBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.5rem 1rem;
+  border-radius: $radius-button;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+.pulseDot {
+  width: 8px;
+  height: 8px;
+  background-color: $success;
+  border-radius: 50%;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: $success;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+// Financial Stats Overhaul
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: $card-gap;
+
+  @include laptop {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  @include tablet {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  @include mobile-sm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.secondaryStatsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $card-gap;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  @include mobile-sm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+// Glassmorphism Card Style Overrides
+.statCardGlow {
+  background: white;
+  border: 1px solid $border-color;
+  border-radius: $radius-card;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all $transition-base;
+  box-shadow: $shadow-soft;
+
+  @include mobile {
+    padding: 1.25rem 1.5rem;
+    border-radius: 16px;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-hover;
+    border-color: rgba(30, 58, 95, 0.3);
+  }
+
+  &.success {
+    background: linear-gradient(180deg, white 60%, rgba(16, 185, 129, 0.02) 100%);
+    &:hover { border-color: rgba(16, 185, 129, 0.4); }
+  }
+
+  &.danger {
+    background: linear-gradient(180deg, white 60%, rgba(239, 68, 68, 0.02) 100%);
+    &:hover { border-color: rgba(239, 68, 68, 0.4); }
+  }
+
+  &.primary {
+    background: linear-gradient(180deg, white 60%, rgba(30, 58, 95, 0.02) 100%);
+    &:hover { border-color: rgba(30, 58, 95, 0.4); }
+  }
+}
+
+.statCardHeader {
+  @include flex-between;
+  margin-bottom: 1rem;
+
+  @include mobile {
+    margin-bottom: 0.5rem;
+    gap: 0.25rem;
+  }
+}
+
+.statBadgeText {
+  font-size: 0.65rem;
+  font-weight: 700;
+  
+  @include mobile {
+    font-size: 0.55rem;
+    letter-spacing: -0.01em;
+  }
+}
+
+.statIconContainer {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  @include flex-center;
+  flex-shrink: 0;
+
+  @include mobile {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    svg {
+      width: 14px !important;
+      height: 14px !important;
+    }
+  }
+
+  &.success { background-color: $success-soft; color: $success; }
+  &.danger { background-color: $danger-soft; color: $danger; }
+  &.primary { background-color: $primary-soft; color: $primary; }
+  &.neutral { background-color: $bg-tertiary; color: $text-secondary; }
+  &.warning { background-color: $warning-soft; color: $warning; }
+}
+
+.statCardContent {
+  .statLabel {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: $text-muted;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+    display: block;
+
+    @include mobile {
+      font-size: 0.575rem;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.125rem;
+    }
+  }
+  .statValue {
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: $text-primary;
+    letter-spacing: -0.03em;
+
+    @include mobile {
+      font-size: 1.35rem;
+      line-height: 1.1;
+    }
+  }
+}
+
+// Chart Card Section
+.chartCard {
+  background: white;
+  border: 1px solid $border-color;
+  border-radius: $radius-card;
+  padding: 1.75rem;
+  box-shadow: $shadow-soft;
+}
+
+.chartHeader {
+  @include flex-between;
+  margin-bottom: 1.5rem;
+}
+
+.chartTitle {
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: $text-primary;
+  }
+  p {
+    font-size: 0.8rem;
+    color: $text-muted;
+  }
+}
+
+.chartLegend {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: $text-secondary;
+  font-weight: 500;
+
+  .legendDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    
+    &.credits { background-color: $success; }
+    &.debits { background-color: $danger; }
+  }
+}
+
+.svgChartContainer {
+  width: 100%;
+  aspect-ratio: 8 / 2;
+  height: auto;
+  position: relative;
+
+  @include mobile {
+    aspect-ratio: 8 / 3; // slightly taller on mobile
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    display: block;
+  }
+}
+
+// Main Layout Grid
+.mainLayout {
+  display: grid;
+  grid-template-columns: 1.8fr 1.2fr;
+  gap: $card-gap;
+  align-items: flex-start;
+
+  @include laptop {
+    grid-template-columns: 1.7fr 1.3fr;
+  }
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.leftColumn, .rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: $section-gap;
+}
+
+.section {
+  width: 100%;
+}
+
+.sectionHeader {
+  @include flex-between;
+  margin-bottom: 1.25rem;
+}
+
+.sectionTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: $text-secondary;
+  letter-spacing: 0.06em;
+}
+
+.opsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $element-gap;
+
+  @include laptop {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include tablet {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include mobile-sm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+// Custom Quick Action Overrides
+.actionCard {
+  background: white;
+  border: 1px solid $border-color;
+  border-radius: $radius-card;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all $transition-base;
+  box-shadow: $shadow-soft;
+  text-align: left;
+  min-height: 120px; // Action cards min height: 120px
+
+  @include mobile {
+    padding: 1rem 1.25rem;
+    gap: 0.75rem;
+    min-height: 80px;
+    border-radius: 16px;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-hover;
+    border-color: rgba(30, 58, 95, 0.25);
+
+    .actionIcon {
+      transform: scale(1.08);
+    }
+  }
+}
+
+.actionIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  @include flex-center;
+  flex-shrink: 0;
+  transition: transform $transition-fast;
+
+  @include mobile {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    svg {
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
+
+  &.success { background-color: $success-soft; color: $success; }
+  &.danger { background-color: $danger-soft; color: $danger; }
+  &.primary { background-color: $primary-soft; color: $primary; }
+  &.neutral { background-color: $neutral-soft; color: $neutral; }
+  &.warning { background-color: $warning-soft; color: $warning; }
+}
+
+.actionInfo {
+  flex: 1;
+  h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: 0.125rem;
+
+    @include mobile {
+      font-size: 0.8rem;
+    }
+  }
+  p {
+    font-size: 0.775rem;
+    color: $text-secondary;
+    line-height: 1.3;
+
+    @include mobile {
+      font-size: 0.65rem;
+    }
+  }
+}
+
+// Recent Activity Timeline Layout
+.opsList {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+.opItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid $border-color;
+  transition: background-color $transition-fast;
+  position: relative;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: $bg-secondary;
+  }
+}
+
+.opIconCircle {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  @include flex-center;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+
+  &.success { background-color: $success-soft; color: $success; border-color: rgba(16, 185, 129, 0.15); }
+  &.danger { background-color: $danger-soft; color: $danger; border-color: rgba(239, 68, 68, 0.15); }
+  &.warning { background-color: $warning-soft; color: $warning; border-color: rgba(245, 158, 11, 0.15); }
+  &.primary { background-color: $primary-soft; color: $primary; border-color: rgba(30, 58, 95, 0.15); }
+}
+
+.opDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.opStudent {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.opMeta {
+  font-size: 0.75rem;
+  color: $text-muted;
+  span {
+    color: $text-secondary;
+    font-weight: 500;
+  }
+}
+
+.opAmountBadge {
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+
+  &.credit {
+    background-color: $success-soft;
+    color: $success;
+  }
+
+  &.debit {
+    background-color: $danger-soft;
+    color: $danger;
+  }
+}
+
+// Critical Monitoring Overhaul
+.monitorPanel {
+  background: white;
+  border: 1px solid $border-color;
+  border-radius: $radius-card;
+  padding: 1.5rem;
+  box-shadow: $shadow-soft;
+}
+
+.monitorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.monitorTitleSection {
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  p {
+    font-size: 0.775rem;
+    color: $text-muted;
+    margin-top: 2px;
+  }
+}
+
+.monitorStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.monitorCard {
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $danger;
+    background-color: white;
+    box-shadow: $shadow-sm;
+    transform: translateX(3px);
+  }
+}
+
+.monitorCardTop {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mLetterAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: $danger-soft;
+  color: $danger;
+  @include flex-center;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.mStudentInfo {
+  flex: 1;
+  .mName {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: $text-primary;
+  }
+  .mEnrolment {
+    font-size: 0.725rem;
+    color: $text-muted;
+  }
+}
+
+.mBalance {
+  text-align: right;
+  .mBalanceValue {
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+}
+
+// Progress visual representation of balance
+.mHealthMeter {
+  width: 100%;
+  height: 5px;
+  background-color: $border-color;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.mHealthFill {
+  height: 100%;
+  border-radius: 99px;
+  &.negative {
+    background-color: $danger;
+    width: 100%;
+  }
+  &.low {
+    background-color: $warning;
+    width: 25%;
+  }
+}
+
+// Smart Insights Overhaul
+.insightsStack {
+  display: flex;
+  flex-direction: column;
+  gap: $element-gap;
+}
+
+.insightVisualCard {
+  background: white;
+  border: 1px solid $border-color;
+  border-radius: $radius-card;
+  padding: 1.5rem;
+  box-shadow: $shadow-soft;
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-hover;
+    border-color: rgba(30, 58, 95, 0.2);
+  }
+}
+
+.circularMeter {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  @include flex-center;
+  flex-shrink: 0;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+}
+
+.circularMeterBg {
+  fill: none;
+  stroke: $bg-tertiary;
+}
+
+.circularMeterProgress {
+  fill: none;
+  stroke: $primary;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s ease-in-out;
+}
+
+.circularMeterText {
+  position: absolute;
+  font-size: 0.775rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.insightInfo {
+  flex: 1;
+  h4 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: $text-muted;
+    letter-spacing: 0.05em;
+  }
+  .insightDisplay {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 0.125rem 0;
+  }
+  .insightValue {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: $text-primary;
+    letter-spacing: -0.02em;
+  }
+  .insightDesc {
+    font-size: 0.775rem;
+    color: $text-secondary;
+  }
+}
+
+.insightIconBox {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  @include flex-center;
+  flex-shrink: 0;
+
+  &.warning { background-color: $warning-soft; color: $warning; }
+  &.success { background-color: $success-soft; color: $success; }
+}
+
+@include mobile {
+  .chartCard,
+  .secondaryStatsRow,
+  .thresholdsSection {
+    display: none !important;
+  }
+}

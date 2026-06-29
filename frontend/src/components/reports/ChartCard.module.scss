@@ -1,0 +1,14 @@
+@import '../../styles/design-system/mixins';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $element-gap;
+  min-height: 300px; /* Fix for recharts warning */
+}
+
+.title {
+  @include label-text;
+  color: $text-muted;
+  margin-bottom: 0.5rem;
+}

@@ -1,0 +1,66 @@
+@import '../../styles/design-system/mixins';
+
+.wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid $border-color;
+  border-radius: 16px;
+  box-shadow: $shadow-lg;
+  z-index: 100;
+  overflow: hidden;
+  max-height: 280px;
+  overflow-y: auto;
+  @include custom-scrollbar;
+  padding: 0.5rem;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  transition: $transition-fast;
+  border-radius: 10px;
+  text-align: left;
+  
+  &:hover {
+    background: var(--primary-soft);
+    .avatar { background: white; }
+  }
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: $bg-tertiary;
+  color: $primary;
+  @include flex-center;
+  font-weight: 700;
+  font-size: 0.8125rem;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.name { font-weight: 600; font-size: 0.875rem; }
+.enr { font-size: 0.75rem; color: $text-muted; }
+
+.noResults {
+  padding: 1rem;
+  color: $text-muted;
+  font-size: 0.875rem;
+  text-align: center;
+}

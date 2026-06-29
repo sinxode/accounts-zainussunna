@@ -1,0 +1,133 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dropzone {
+  border: 2px dashed $border-color;
+  background-color: $bg-secondary;
+  @include flex-center;
+  text-align: center;
+  transition: $transition-fast;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $primary;
+    background-color: white;
+  }
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+  
+  h3 { margin-bottom: 0.5rem; }
+  p { color: $text-muted; font-size: 0.875rem; }
+}
+
+.iconArea {
+  width: 80px;
+  height: 80px;
+  background-color: white;
+  border-radius: 24px;
+  @include flex-center;
+  color: $primary;
+  box-shadow: $shadow-sm;
+  margin-bottom: 2rem;
+}
+
+.previewView {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: slideUp 0.4s ease-out;
+}
+
+.fileHeader {
+  @include flex-between;
+  background-color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 20px;
+  border: 1px solid $border-color;
+}
+
+.fileInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  h4 { font-weight: 700; color: $text-primary; }
+  span { font-size: 0.75rem; color: $text-muted; font-weight: 600; }
+}
+
+.removeBtn {
+  color: $text-muted;
+  padding: 0.5rem;
+  border-radius: 10px;
+  &:hover { background-color: $bg-tertiary; color: $danger; }
+}
+
+.validationRow {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background-color: white;
+  padding: 1.5rem 2rem;
+  border-radius: 24px;
+  border: 1px solid $border-color;
+}
+
+.vItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  
+  span { @include label-text; font-size: 0.65rem; color: $text-muted; }
+  strong { font-size: 1.25rem; color: $text-primary; }
+}
+
+.vDivider {
+  width: 1px;
+  height: 40px;
+  background-color: $border-color;
+}
+
+.tableCard {
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.guide {
+  background-color: $bg-tertiary;
+  padding: 1.5rem;
+  border-radius: 24px;
+}
+
+.guideGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  
+  @include tablet { grid-template-columns: 1fr; }
+}
+
+.gItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  
+  p { font-size: 0.875rem; color: $text-secondary; line-height: 1.5; }
+}

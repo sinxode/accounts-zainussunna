@@ -1,0 +1,37 @@
+@import '../../styles/design-system/mixins';
+.container {
+  @include flex-center;
+  flex-direction: column;
+  padding: 4rem 2rem;
+  text-align: center;
+  background-color: white;
+  border-radius: $radius-card;
+  border: 1px solid $border-color;
+}
+
+.iconWrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: $radius-full;
+  background-color: $bg-tertiary;
+  color: $text-muted;
+  @include flex-center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  @include h3;
+  color: $text-primary;
+  margin-bottom: 0.5rem;
+}
+
+.description {
+  @include body-text;
+  color: $text-secondary;
+  max-width: 400px;
+  margin-bottom: 2rem;
+}
+
+.button {
+  min-width: 160px;
+}

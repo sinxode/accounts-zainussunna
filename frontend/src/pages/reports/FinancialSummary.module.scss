@@ -1,0 +1,89 @@
+@import "../../styles/design-system/variables";
+@import "../../styles/design-system/mixins";
+@import "../../styles/design-system/typography";
+
+.reportsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: $section-gap;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $card-gap;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  @include mobile-sm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.chartsLayout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: $card-gap;
+  align-items: flex-start;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mainChart {
+  display: flex;
+  flex-direction: column;
+  gap: $card-gap;
+}
+
+.sideColumn {
+  display: flex;
+  flex-direction: column;
+  gap: $card-gap;
+}
+
+.sectionTitle {
+  @include label-sm;
+  color: $text-secondary;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: $element-gap;
+}
+
+.progressContainer {
+  width: 100%;
+  background-color: $bg-secondary;
+  height: 6px;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.progressBar {
+  height: 100%;
+  border-radius: 9999px;
+  
+  &.income {
+    background-color: $success;
+    width: 75%;
+  }
+  
+  &.expense {
+    background-color: $danger;
+    width: 60%;
+  }
+}

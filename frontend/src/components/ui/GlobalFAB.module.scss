@@ -1,0 +1,117 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
+
+.wrapper {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: $z-index-notification;
+  display: none; // hidden by default (desktop/tablet/laptop)
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.trigger {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background-color: $primary;
+  color: white;
+  @include flex-center;
+  box-shadow: 0 12px 32px rgba(30, 58, 95, 0.4);
+  transition: $transition-fast;
+  border: none;
+  cursor: pointer;
+  
+  &:hover {
+    transform: scale(1.05) translateY(-2px);
+    background-color: $primary-hover;
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: white;
+  border: 1px solid $border-color;
+  padding: 0.5rem 1rem;
+  border-radius: 14px;
+  box-shadow: $shadow-md;
+  transition: $transition-fast;
+  border: none;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: $primary;
+    transform: translateX(-4px);
+    
+    .label { color: $text-primary; }
+  }
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: $text-secondary;
+  white-space: nowrap;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  @include flex-center;
+}
+
+.success .icon { background-color: $success-soft; color: $success; }
+.danger .icon { background-color: $danger-soft; color: $danger; }
+.warning .icon { background-color: $warning-soft; color: $warning; }
+.primary .icon { background-color: $primary-soft; color: $primary; }
+.info .icon { background-color: $info-soft; color: $info; }
+
+@include mobile {
+  .wrapper {
+    display: flex; // show on mobile only
+    bottom: calc(64px + 16px + env(safe-area-inset-bottom)); // elevated to avoid overlapping bottom navigation (64px height)
+    right: 1rem;
+  }
+  
+  .trigger {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+  }
+  
+  .menu {
+    gap: 0.5rem;
+  }
+  
+  .actionBtn {
+    padding: 0.5rem 0.75rem;
+    border-radius: 12px;
+    
+    .label {
+      font-size: 0.8rem;
+    }
+    
+    .icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+    }
+  }
+}

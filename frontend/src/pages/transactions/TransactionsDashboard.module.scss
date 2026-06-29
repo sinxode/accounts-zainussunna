@@ -1,0 +1,232 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.mainLayout {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 1.5rem;
+  align-items: flex-start;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.leftColumn, .rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section {
+  width: 100%;
+}
+
+.movementGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.movementCard {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.mLabel {
+  @include label-text;
+  font-size: 0.65rem;
+  color: $text-muted;
+  margin-bottom: 0.25rem;
+}
+
+.mValue {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: $text-primary;
+  letter-spacing: -0.02em;
+}
+
+.mBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: $success-soft;
+  color: $success;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  width: max-content;
+  margin-top: 0.5rem;
+}
+
+.mDesc {
+  font-size: 0.75rem;
+  color: $text-muted;
+  margin-top: 0.5rem;
+}
+
+.typeGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 24px;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.typeItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.typeHeader {
+  @include flex-between;
+}
+
+.typeLabel {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.typeVal {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: $text-muted;
+}
+
+.progressBase {
+  height: 8px;
+  background-color: $bg-tertiary;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 4px;
+
+  &.success { background-color: $success; }
+  &.warning { background-color: $warning; }
+  &.danger { background-color: $danger; }
+  &.primary { background-color: $primary; }
+}
+
+.warningStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warningCard {
+  border-left: 4px solid $danger;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: $shadow-sm;
+}
+
+.wHeader {
+  @include flex-between;
+}
+
+.wTitle {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: $text-primary;
+}
+
+.wTime {
+  font-size: 0.7rem;
+  color: $text-muted;
+  font-weight: 600;
+}
+
+.wDesc {
+  font-size: 0.8125rem;
+  color: $text-secondary;
+  line-height: 1.4;
+}
+
+.insightsStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.insightItem {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.iIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  @include flex-center;
+  flex-shrink: 0;
+  
+  &.primary { background-color: $primary-soft; color: $primary; }
+  &.success { background-color: $success-soft; color: $success; }
+  &.warning { background-color: $warning-soft; color: $warning; }
+}
+
+.iContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.iLabel {
+  @include label-text;
+  font-size: 0.65rem;
+  color: $text-muted;
+}
+
+.iValue {
+  font-size: 1rem;
+  color: $text-primary;
+}
+
+.iDesc {
+  font-size: 0.8125rem;
+  color: $text-secondary;
+}

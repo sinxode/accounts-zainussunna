@@ -1,0 +1,55 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/mixins';
+
+.settings {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section {
+  .label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    display: block;
+  }
+}
+
+.optionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.formatBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: $bg-secondary;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  transition: $transition-fast;
+  cursor: pointer;
+
+  svg { color: $text-muted; transition: $transition-fast; }
+  span { font-size: 0.875rem; font-weight: 600; color: $text-secondary; }
+
+  &:hover {
+    border-color: $border-color;
+    svg { color: $text-primary; }
+  }
+
+  &.active {
+    border-color: $primary;
+    background-color: $primary-soft;
+    svg { color: $primary; }
+    span { color: $primary; }
+  }
+}

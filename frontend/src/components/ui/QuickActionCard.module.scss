@@ -1,0 +1,79 @@
+@import '../../styles/design-system/mixins';
+.card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-height: 120px;
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  @include flex-center;
+  flex-shrink: 0;
+  
+  &.primary { background-color: $primary-soft; color: $primary; }
+  &.success { background-color: $success-soft; color: $success; }
+  &.warning { background-color: $warning-soft; color: $warning; }
+  &.danger { background-color: $danger-soft; color: $danger; }
+  &.info { background-color: $info-soft; color: $info; }
+  &.neutral { background-color: $bg-tertiary; color: $text-secondary; }
+}
+
+.info {
+  flex: 1;
+}
+
+.label {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: 0.125rem;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: $text-secondary;
+}
+
+.shortcut {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: $text-muted;
+  background-color: $bg-tertiary;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+}
+
+@include mobile {
+  .card {
+    min-height: 100px !important;
+    height: 100px !important;
+    max-height: 100px !important;
+    gap: 10px !important;
+    padding: 12px !important;
+    border-radius: 20px !important;
+  }
+  .iconWrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  .label {
+    font-size: 0.875rem !important;
+    font-weight: 600;
+    line-height: 1.2;
+    margin: 0;
+  }
+  .description {
+    display: none !important;
+  }
+  .shortcut {
+    display: none !important;
+  }
+}

@@ -1,0 +1,142 @@
+@import '../../styles/design-system/mixins';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  @include flex-between;
+}
+
+.tableHeader {
+  margin-bottom: 1.5rem;
+}
+
+.searchWrapper {
+  position: relative;
+  max-width: 450px;
+
+  .searchIcon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-muted;
+  }
+
+  input {
+    width: 100%;
+    background: $bg-secondary;
+    border: 1px solid $border-color;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    border-radius: 10px;
+    color: $text-primary;
+    font-size: 0.9375rem;
+
+    &:focus {
+      border-color: $primary;
+    }
+  }
+}
+
+.timeCell,
+.userCell,
+.entityCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.userCell {
+  font-weight: 500;
+  color: $text-primary;
+}
+
+.entityCell {
+  color: $primary;
+  font-family: monospace;
+}
+
+.viewBtn {
+  @include flex-center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  color: $text-muted;
+  font-size: 0.8125rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background: $bg-secondary;
+    color: $text-primary;
+  }
+}
+
+.inspectView {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.inspectGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inspectItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    @include label-text;
+  }
+
+  strong {
+    font-size: 1.125rem;
+  }
+
+  code {
+    font-size: 0.8125rem;
+    color: $primary;
+  }
+}
+
+.jsonView {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.jsonSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  label {
+    @include label-text;
+  }
+
+  pre {
+    background: #000;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    color: #10b981;
+    overflow-x: auto;
+    max-height: 300px;
+  }
+}

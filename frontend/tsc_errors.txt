@@ -1,0 +1,75 @@
+src/components/batches/CreateBatchDrawerV2.tsx(8,1): error TS6133: 'StudentSearch' is declared but its value is never read.
+src/components/presets/PresetCard.tsx(8,1): error TS6133: 'clsx' is declared but its value is never read.
+src/components/ui/CommandPalette.tsx(3,29): error TS6133: 'CommandIcon' is declared but its value is never read.
+src/components/ui/CommandPalette.tsx(4,28): error TS2307: Cannot find module '../store/useUIStore' or its corresponding type declarations.
+src/components/ui/CommandPalette.tsx(5,37): error TS2307: Cannot find module '../lib/globalSearchService' or its corresponding type declarations.
+src/components/ui/StudentSearch.tsx(2,32): error TS2307: Cannot find module '../lib/services' or its corresponding type declarations.
+src/components/ui/StudentSearch.tsx(26,37): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/components/ui/StudentSearch.tsx(48,26): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/pages/auth/v2/AccessDenied.tsx(3,28): error TS2307: Cannot find module '../../components/auth/v2/AuthLayout' or its corresponding type declarations.
+src/pages/auth/v2/AccessDenied.tsx(4,26): error TS2307: Cannot find module '../../components/auth/v2/AuthComponents' or its corresponding type declarations.
+src/pages/auth/v2/ForgotPassword.tsx(3,28): error TS2307: Cannot find module '../../components/auth/v2/AuthLayout' or its corresponding type declarations.
+src/pages/auth/v2/ForgotPassword.tsx(4,60): error TS2307: Cannot find module '../../components/auth/v2/AuthComponents' or its corresponding type declarations.
+src/pages/auth/v2/ForgotPassword.tsx(30,26): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/auth/v2/Login.tsx(5,28): error TS2307: Cannot find module '../../components/auth/v2/AuthLayout' or its corresponding type declarations.
+src/pages/auth/v2/Login.tsx(6,75): error TS2307: Cannot find module '../../components/auth/v2/AuthComponents' or its corresponding type declarations.
+src/pages/auth/v2/Login.tsx(50,24): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/auth/v2/Login.tsx(59,24): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/auth/v2/NotFound.tsx(3,28): error TS2307: Cannot find module '../../components/auth/v2/AuthLayout' or its corresponding type declarations.
+src/pages/auth/v2/NotFound.tsx(4,26): error TS2307: Cannot find module '../../components/auth/v2/AuthComponents' or its corresponding type declarations.
+src/pages/auth/v2/ResetPassword.tsx(3,28): error TS2307: Cannot find module '../../components/auth/v2/AuthLayout' or its corresponding type declarations.
+src/pages/auth/v2/ResetPassword.tsx(4,64): error TS2307: Cannot find module '../../components/auth/v2/AuthComponents' or its corresponding type declarations.
+src/pages/auth/v2/ResetPassword.tsx(31,26): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/auth/v2/ResetPassword.tsx(40,26): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/pages/batches/BatchManagementV2.tsx(8,29): error TS2307: Cannot find module '../../../components/batches/BatchCardV2' or its corresponding type declarations.
+src/pages/batches/BatchManagementV2.tsx(9,37): error TS2307: Cannot find module '../../../components/batches/CreateBatchDrawerV2' or its corresponding type declarations.
+src/pages/batches/BatchManagementV2.tsx(25,39): error TS2367: This comparison appears to be unintentional because the types '"Active"' and '"Archived"' have no overlap.
+src/pages/Dashboard.tsx(2,31): error TS2307: Cannot find module '../../components/ui/PageContainer' or its corresponding type declarations.
+src/pages/Dashboard.tsx(3,28): error TS2307: Cannot find module '../../components/ui/PageHeader' or its corresponding type declarations.
+src/pages/Dashboard.tsx(4,24): error TS2307: Cannot find module '../../components/ui/Button' or its corresponding type declarations.
+src/pages/Dashboard.tsx(6,33): error TS2307: Cannot find module '../../components/ui/QuickActionCard' or its corresponding type declarations.
+src/pages/Dashboard.tsx(7,22): error TS2307: Cannot find module '../../components/ui/Card' or its corresponding type declarations.
+src/pages/Dashboard.tsx(9,26): error TS2307: Cannot find module '../../components/ui/StatCard' or its corresponding type declarations.
+src/pages/Login.tsx(3,26): error TS2307: Cannot find module '../../lib/supabase' or its corresponding type declarations.
+src/pages/Login.tsx(4,22): error TS2307: Cannot find module '../../components/ui/Card' or its corresponding type declarations.
+src/pages/operations-center/OperationsCenterV3.tsx(1,17): error TS6133: 'useState' is declared but its value is never read.
+src/pages/Operations.deprecated.tsx(6,31): error TS2307: Cannot find module '../../components/ui/PageContainer' or its corresponding type declarations.
+src/pages/Operations.deprecated.tsx(7,28): error TS2307: Cannot find module '../../components/ui/PageHeader' or its corresponding type declarations.
+src/pages/Operations.deprecated.tsx(8,22): error TS2307: Cannot find module '../../components/ui/Card' or its corresponding type declarations.
+src/pages/Operations.deprecated.tsx(9,26): error TS2307: Cannot find module '../../components/ui/StatCard' or its corresponding type declarations.
+src/pages/Operations.deprecated.tsx(10,33): error TS2307: Cannot find module '../../components/ui/QuickActionCard' or its corresponding type declarations.
+src/pages/Operations.deprecated.tsx(11,24): error TS2307: Cannot find module '../../components/ui/Button' or its corresponding type declarations.
+src/pages/Operations.deprecated.tsx(12,28): error TS2307: Cannot find module '../../store/useUIStore' or its corresponding type declarations.
+src/pages/reports/Analytics.tsx(8,27): error TS2307: Cannot find module '../../../components/reports/ChartCard' or its corresponding type declarations.
+src/pages/reports/FinancialSummary.tsx(8,27): error TS2307: Cannot find module '../../../components/reports/ChartCard' or its corresponding type declarations.
+src/pages/reports/MonthlyReports.tsx(16,27): error TS2307: Cannot find module '../../../components/reports/ChartCard' or its corresponding type declarations.
+src/pages/reports/StudentReports.tsx(18,27): error TS2307: Cannot find module '../../../components/reports/ChartCard' or its corresponding type declarations.
+src/pages/reports/StudentReports.tsx(68,34): error TS2339: Property 'id' does not exist on type 'never'.
+src/pages/reports/StudentReports.tsx(68,47): error TS2339: Property 'id' does not exist on type 'never'.
+src/pages/reports/StudentReports.tsx(68,54): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/reports/StudentReports.tsx(68,64): error TS2339: Property 'enrolment_no' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(49,7): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(50,7): error TS2339: Property 'enrolment_no' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(55,37): error TS2339: Property 'status' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(56,41): error TS2339: Property 'health_status' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(56,70): error TS2339: Property 'health_status' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(57,42): error TS2339: Property 'health_status' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(58,62): error TS2339: Property 'current_balance' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(111,55): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(113,56): error TS2339: Property 'name' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(114,62): error TS2339: Property 'enrolment_no' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(122,59): error TS2339: Property 'current_balance' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(123,25): error TS2339: Property 'current_balance' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(130,54): error TS2339: Property 'health_status' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(131,24): error TS2339: Property 'health_status' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(137,36): error TS2339: Property 'last_transaction_date' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(138,32): error TS2339: Property 'last_transaction_date' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(145,72): error TS2339: Property 'id' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(146,75): error TS2339: Property 'id' does not exist on type 'never'.
+src/pages/students/AllStudents.tsx(147,68): error TS2339: Property 'id' does not exist on type 'never'.
+src/pages/transactions/TransactionDetails.tsx(14,10): error TS2305: Module '"../../lib/services"' has no exported member 'transactionService'.
+src/pages/transactions/TransactionExplorer.tsx(19,10): error TS2305: Module '"../../lib/services"' has no exported member 'transactionService'.
+src/pages/transactions/TransactionExplorer.tsx(123,19): error TS18046: 'transactions' is of type 'unknown'.
+src/pages/transfers/InternalTransfersV2.tsx(9,40): error TS2307: Cannot find module '../../../components/transfers/TransfersExplorerTable' or its corresponding type declarations.
+src/pages/transfers/InternalTransfersV2.tsx(10,37): error TS2307: Cannot find module '../../../components/transfers/NewTransferDrawerV2' or its corresponding type declarations.
+src/pages/transfers/InternalTransfersV2.tsx(14,10): error TS6133: 'isRepaymentDrawerOpen' is declared but its value is never read.

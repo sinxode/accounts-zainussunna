@@ -1,0 +1,140 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
+
+.wrapper {
+  display: flex;
+  height: 100vh;
+  background-color: white;
+}
+
+.sidebar {
+  width: 320px;
+  background-color: $bg-secondary;
+  border-right: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  padding: 3rem 2rem;
+  
+  @include tablet { display: none; }
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: 800;
+  color: $primary;
+  margin-bottom: 4rem;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex: 1;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  opacity: 0.4;
+  transition: $transition-fast;
+  
+  &.active { opacity: 1; .stepIcon { background-color: $primary; color: white; } }
+  &.completed { opacity: 0.8; .stepIcon { background-color: $success; color: white; } }
+}
+
+.stepIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: white;
+  border: 1px solid $border-color;
+  @include flex-center;
+  color: $text-muted;
+}
+
+.stepTitle { font-weight: 700; font-size: 0.9375rem; color: $text-primary; }
+
+.main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding-top: 15vh;
+  overflow-y: auto;
+}
+
+.content {
+  width: 100%;
+  max-width: 480px;
+  padding: 0 2rem 4rem;
+}
+
+.pane {
+  animation: slideUp 0.4s ease-out;
+  
+  &.centered {
+    text-align: center;
+  }
+}
+
+.title { @include h1; font-size: 2rem; margin-bottom: 1rem; }
+.subtitle { color: $text-secondary; margin-bottom: 3rem; line-height: 1.6; }
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.infoBox {
+  padding: 1rem;
+  background-color: $bg-tertiary;
+  border-radius: 16px;
+  display: flex;
+  gap: 1rem;
+  color: $primary;
+  
+  p { font-size: 0.8125rem; line-height: 1.5; font-weight: 600; }
+}
+
+.successIcon {
+  width: 80px;
+  height: 80px;
+  background-color: $success-soft;
+  color: $success;
+  border-radius: 24px;
+  @include flex-center;
+  margin: 0 auto 2rem;
+}
+
+.readyCard {
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  margin-bottom: 3rem;
+}
+
+.readyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.rItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: left;
+  
+  span { @include label-text; font-size: 0.65rem; color: $text-muted; }
+  strong { font-size: 1rem; color: $text-primary; }
+}
+
+.footer {
+  margin-top: auto;
+  @include flex-center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: $text-muted;
+  font-weight: 700;
+}

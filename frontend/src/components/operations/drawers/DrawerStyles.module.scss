@@ -1,0 +1,753 @@
+@import '../../../styles/design-system/mixins';
+
+.drawerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.balancePreview {
+  padding: 1.25rem;
+  background: linear-gradient(135deg, $bg-secondary 0%, rgba(245, 245, 245, 0.4) 100%);
+  border-radius: 16px;
+  border: 1px solid $border-color;
+  margin-top: 1.5rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.previewLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  color: $text-muted;
+  margin-bottom: 1rem;
+}
+
+.previewRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.previewLabelText {
+  color: $text-secondary;
+}
+
+.previewValue {
+  font-weight: 600;
+  color: $text-primary;
+  
+  &.negative { color: $danger !important; }
+  &.positive { color: $success !important; }
+}
+
+.afterRow {
+  border-top: 1px solid color-mix(in srgb, var(--border-color), transparent 50%);
+  &.success { color: $success; }
+  &.danger { color: $danger; }
+}
+
+.impactRow {
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid $border-color;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: $text-primary;
+  
+  .impactValue {
+    &.success { color: $success; }
+    &.danger { color: $danger; }
+  }
+}
+
+.selectedStudent {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background-color: $bg-primary;
+  border-radius: 16px;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $primary-soft;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    background-color: $primary;
+    color: white;
+    border-radius: 50%;
+    @include flex-center;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    .name {
+      font-weight: 600;
+      color: $text-primary;
+      @include truncate;
+    }
+
+    .enr {
+      font-size: 0.75rem;
+      color: $text-muted;
+    }
+  }
+}
+
+.statusGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  
+  .statusLabel {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text-secondary;
+  }
+  
+  .statusToggle {
+    display: flex;
+    gap: 0.25rem;
+    background-color: $bg-tertiary;
+    padding: 0.35rem;
+    border-radius: 14px;
+    border: 1px solid $border-color;
+    
+    button {
+      flex: 1;
+      border-radius: 10px !important;
+      min-height: 36px !important;
+      font-size: 0.8125rem !important;
+      transition: all 0.2s ease;
+    }
+  }
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  @include label-sm;
+  color: $text-muted;
+  margin-bottom: 1rem;
+}
+
+.stepCircle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: $primary-soft;
+  color: $primary;
+  @include flex-center;
+  font-size: 10px;
+}
+
+.loanImpact {
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+  border-radius: 20px;
+  background: linear-gradient(135deg, $primary 0%, #11253e 100%);
+  color: white;
+  box-shadow: $shadow-md;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  
+  .impactLabel {
+    @include label-text;
+    font-size: 10px;
+    opacity: 0.7;
+    margin-bottom: 0.25rem;
+  }
+  
+  .impactAmount {
+    font-size: 1.75rem;
+    font-weight: 800;
+  }
+  
+  .impactMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .metaRow {
+    @include flex-between;
+    font-size: 0.75rem;
+    
+    span { opacity: 0.7; }
+    strong { font-weight: 700; }
+  }
+}
+
+.infoBox {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 16px;
+  background-color: rgba(30, 58, 95, 0.03);
+  border: 1px solid rgba(30, 58, 95, 0.1);
+  align-items: flex-start;
+  
+  svg { color: $primary; flex-shrink: 0; margin-top: 2px; }
+  p { font-size: 0.75rem; color: $text-secondary; line-height: 1.5; font-weight: 500; margin: 0; }
+}
+
+.selectionArea {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  
+  .listHeader {
+    @include flex-between;
+    padding: 0 0.5rem;
+    @include label-sm;
+    font-size: 10px;
+    color: $text-muted;
+  }
+}
+
+.participantList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+  @include custom-scrollbar;
+
+  @include mobile {
+    max-height: 42vh; // prevents pushing header/footer offscreen on mobile
+  }
+}
+
+.participantItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: white;
+  border: 1px solid $border-color;
+  border-radius: 16px;
+  transition: all $transition-fast;
+  
+  &:hover {
+    border-color: rgba(30, 58, 95, 0.2);
+    box-shadow: $shadow-sm;
+  }
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+}
+
+.pInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.pAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: $primary-soft;
+  color: $primary;
+  @include flex-center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.pDetails {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  
+  .pName {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: $text-primary;
+    @include truncate;
+  }
+  
+  .pEnr {
+    font-size: 0.7rem;
+    color: $text-muted;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+}
+
+.pControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  
+  @include mobile {
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px dashed $border-color;
+    padding-top: 8px;
+    gap: 10px;
+  }
+}
+
+.pSelect {
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 0 6px;
+  height: 32px;
+  font-size: 11px;
+  font-weight: 600;
+  color: $text-primary;
+  outline: none;
+  transition: all $transition-fast;
+  width: 96px;
+  cursor: pointer;
+
+  &:focus {
+    border-color: $primary;
+    background-color: white;
+  }
+
+  @include mobile {
+    flex: 1;
+    width: auto;
+  }
+}
+
+.pInput {
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 0 6px;
+  height: 32px;
+  font-size: 11px;
+  font-weight: 700;
+  color: $text-primary;
+  outline: none;
+  transition: all $transition-fast;
+  width: 76px;
+  text-align: right;
+
+  &:focus {
+    border-color: $primary;
+    background-color: white;
+    box-shadow: 0 0 0 3px $primary-soft;
+  }
+
+  @include mobile {
+    flex: 1;
+    width: auto;
+  }
+}
+
+.removeBtn {
+  color: $danger;
+  background-color: transparent;
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  @include flex-center;
+  transition: all $transition-fast;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    background-color: $danger-soft;
+  }
+}
+
+.formGrid2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.emptyState {
+  padding: 2.5rem 1.5rem;
+  border: 2px dashed $border-color;
+  border-radius: 20px;
+  @include flex-center;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+  background: $bg-secondary;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: $primary-soft;
+    background: #ffffff;
+  }
+  
+  .emptyIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: white;
+    box-shadow: $shadow-sm;
+    @include flex-center;
+    color: $text-muted;
+  }
+  
+  .emptyTitle {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text-secondary;
+  }
+  
+  .emptyDesc {
+    font-size: 0.75rem;
+    color: $text-muted;
+    max-width: 200px;
+  }
+}
+
+.actionBlockBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background-color: #ffffff;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  box-shadow: $shadow-sm;
+
+  &:hover {
+    border-color: $primary;
+    background-color: $primary-soft;
+
+    .actionIcon {
+      color: $primary;
+    }
+  }
+
+  .actionIcon {
+    color: $text-muted;
+    transition: color 0.2s ease;
+  }
+
+  .actionLabel {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $primary;
+  }
+
+  .actionSub {
+    font-size: 0.65rem;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+}
+
+.configSection {
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: $shadow-sm;
+
+  .sectionTitle {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $text-muted;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.reviewGradientCard {
+  background: linear-gradient(135deg, #1e3a5f 0%, #11253e 100%);
+  color: #ffffff !important;
+  border-radius: 16px;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: $shadow-md;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 96px; height: 96px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    filter: blur(12px);
+    pointer-events: none;
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 0.25rem 0.5rem;
+    border-radius: 100px;
+    width: fit-content;
+  }
+
+  .title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    color: #ffffff !important;
+    @include truncate;
+  }
+
+  .meta {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #ffffff !important;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      opacity: 0.9;
+      color: #ffffff !important;
+      
+      svg {
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+.validationList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.validationItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  
+  &.danger {
+    background-color: $danger-soft;
+    border: 1px solid color-mix(in srgb, var(--danger), transparent 90%);
+    color: $danger;
+  }
+  
+  &.success {
+    background-color: $bg-secondary;
+    border: 1px solid $border-color;
+    color: $text-secondary;
+  }
+}
+
+.successState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  text-align: center;
+
+  .iconCircle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: $success-soft;
+    color: $success;
+    @include flex-center;
+    margin-bottom: 1rem;
+  }
+
+  .title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $primary;
+    margin-bottom: 0.25rem;
+  }
+
+  .desc {
+    font-size: 0.75rem;
+    color: $text-muted;
+    max-width: 280px;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+  }
+}
+
+.summaryStrip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+
+  .statsGroup {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+
+    .label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: $text-muted;
+    }
+
+    .value {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: $primary;
+      line-height: 1;
+
+      &.positive { color: $success; }
+      &.negative { color: $danger; }
+    }
+  }
+
+  .divider {
+    width: 1px;
+    height: 24px;
+    background-color: $border-color;
+  }
+}
+
+.stepIndicator {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .progressLabel {
+    color: $primary;
+    font-weight: 700;
+  }
+
+  .stepLabel {
+    color: $text-secondary;
+    font-weight: 700;
+  }
+
+  .barContainer {
+    display: flex;
+    gap: 0.35rem;
+    height: 4px;
+    width: 100%;
+    background-color: $border-color;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .barSegment {
+    height: 100%;
+    flex: 1;
+    border-radius: 999px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: $bg-tertiary;
+
+    &.active {
+      background-color: $primary;
+    }
+  }
+}
+
+.batchSelectItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.125rem;
+  padding: 0.65rem 0.75rem;
+  background-color: #ffffff;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: $primary;
+    background-color: $primary-soft;
+  }
+}

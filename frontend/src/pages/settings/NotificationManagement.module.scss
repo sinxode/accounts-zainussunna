@@ -1,0 +1,150 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.summaryCard {
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.summaryGrid {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 0.5rem;
+  
+  @include mobile { flex-direction: column; align-items: flex-start; }
+}
+
+.sumItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  strong { font-size: 1.5rem; color: $text-primary; }
+}
+
+.sumDivider {
+  width: 1px;
+  height: 40px;
+  background-color: $border-color;
+  @include mobile { display: none; }
+}
+
+.healthStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: $success;
+  
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: $success;
+    box-shadow: 0 0 8px $success;
+  }
+}
+
+.tabsRow {
+  @include flex-between;
+  gap: 2rem;
+  
+  @include mobile { flex-direction: column; align-items: stretch; }
+}
+
+.tabs {
+  display: flex;
+  background-color: $bg-tertiary;
+  padding: 0.25rem;
+  border-radius: 12px;
+  gap: 0.25rem;
+}
+
+.tab {
+  padding: 0.5rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: $text-muted;
+  transition: $transition-fast;
+  
+  &.active {
+    background-color: white;
+    color: $primary;
+    box-shadow: $shadow-sm;
+  }
+  
+  &:hover:not(.active) { color: $text-primary; }
+}
+
+.searchBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 320px;
+  width: 100%;
+  
+  @include mobile { max-width: none; }
+  
+  svg {
+    position: absolute;
+    left: 0.875rem;
+    color: $text-muted;
+  }
+
+  input {
+    width: 100%;
+    background-color: $bg-tertiary;
+    border: 1px solid transparent;
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    &:focus { background-color: white; border-color: $primary; }
+  }
+}
+
+.tableCard {
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.titleCell {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.iconArea {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  @include flex-center;
+  flex-shrink: 0;
+  
+  &.danger { background-color: $danger-soft; color: $danger; }
+  &.warning { background-color: $warning-soft; color: $warning; }
+  &.info { background-color: $primary-soft; color: $primary; }
+}
+
+.titleText {
+  font-weight: 700;
+  color: $text-primary;
+  font-size: 0.875rem;
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.moreBtn {
+  color: $text-muted;
+  &:hover { color: $text-primary; }
+}

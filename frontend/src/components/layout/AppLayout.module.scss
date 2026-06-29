@@ -1,0 +1,59 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
+
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: $bg-secondary;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: padding-left 250ms ease-in-out;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  @include desktop {
+    padding-left: 316px; // 300px + 16px gap
+  }
+
+  @include laptop {
+    padding-left: 316px; // 300px + 16px gap
+  }
+  
+  @include tablet {
+    padding-left: 316px; // Default expanded state
+  }
+
+  @include mobile {
+    padding-left: 0;
+    padding-bottom: calc(64px + 16px + env(safe-area-inset-bottom)); // Space for BottomActionBar + FAB
+  }
+}
+
+.mainWithCollapsedSidebar {
+  @include desktop { padding-left: 106px; }
+  @include laptop { padding-left: 106px; }
+  @include tablet { padding-left: 106px; }
+}
+
+.content {
+  flex: 1;
+  @include container;
+  padding: 2rem 2.5rem 4rem 2.5rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  
+  @include mobile {
+    padding: 1.25rem 1.25rem calc(5rem + env(safe-area-inset-bottom)) 1.25rem;
+  }
+}
+
+.pageContainer {
+  width: 100%;
+}

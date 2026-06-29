@@ -1,0 +1,171 @@
+@import '../../styles/design-system/mixins';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $section-gap;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $card-gap;
+
+  @include tablet {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.filters {
+  @include flex-between;
+  gap: $card-gap;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $element-gap;
+  }
+}
+
+.searchBox {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  
+  .searchIcon {
+    position: absolute;
+    left: 1rem;
+    color: $text-muted;
+  }
+
+  input {
+    width: 100%;
+    background-color: $bg-tertiary;
+    border: 1px solid transparent;
+    padding: 0.5rem 1rem 0.5rem 2.75rem;
+    border-radius: 12px;
+    font-size: 0.9375rem;
+    transition: $transition-fast;
+    
+    &:focus {
+      background-color: white;
+      border-color: $primary;
+    }
+  }
+}
+
+.filterActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.tableCard {
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.studentInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, $primary, $info);
+  color: white;
+  @include flex-center;
+  font-weight: 700;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-weight: 600;
+  color: $text-primary;
+
+  @include mobile {
+    max-width: 105px;
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
+.enrollment {
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+.balance {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  @include mobile {
+    gap: 0.125rem;
+  }
+
+  button {
+    color: $text-muted;
+    padding: 0.35rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+
+    @include mobile {
+      padding: 0.25rem;
+    }
+
+    &:hover {
+      background: $bg-secondary;
+      color: $primary;
+    }
+
+    &.deleteBtn {
+      color: $danger;
+      &:hover {
+        background-color: rgba($danger, 0.1);
+      }
+    }
+  }
+}
+
+// Styles for the mobile card view
+.studentCard {
+  background-color: $bg-secondary;
+  border-radius: $radius-card - 8px;
+  padding: $element-gap;
+  display: flex;
+  flex-direction: column;
+  gap: $element-gap;
+  border: 1px solid $border-color;
+}
+
+.cardRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.loading {
+  padding: 4rem;
+}

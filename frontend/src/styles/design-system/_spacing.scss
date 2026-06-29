@@ -1,0 +1,9 @@
+// ZLS V2 Spacing System - Desktop
+$section-gap: var(--section-gap, 32px);
+$card-gap: var(--card-gap, 24px);
+$element-gap: var(--element-gap, 16px);
+
+// ZLS Mobile Compact Spacing System
+$section-gap-mobile: var(--section-gap-mobile, 24px);
+$card-gap-mobile: var(--card-gap-mobile, 16px);
+$element-gap-mobile: var(--element-gap-mobile, 12px);

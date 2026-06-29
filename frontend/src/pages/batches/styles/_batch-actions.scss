@@ -1,0 +1,124 @@
+.quickAccessStrip {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.stripHeader {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.stripGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fabContainer {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.fabMenu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  &.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+}
+
+.fabItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    .fabLabel {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .fabIcon {
+      background-color: var(--primary);
+      color: white;
+      transform: scale(1.1);
+    }
+  }
+}
+
+.fabLabel {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-color);
+}
+
+.fabIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--bg-primary);
+  color: var(--primary);
+  @include flex-center;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-color);
+}
+
+.fabMain {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  @include flex-center;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  &:hover {
+    transform: scale(1.05);
+    background-color: var(--primary-dark);
+  }
+
+  &.open {
+    transform: rotate(45deg);
+    background-color: var(--danger);
+  }
+}

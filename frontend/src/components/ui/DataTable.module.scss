@@ -1,0 +1,221 @@
+@import '../../styles/design-system/mixins';
+@import '../../styles/design-system/variables';
+
+.wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+  
+  thead th {
+    padding: $element-gap $card-gap;
+    background-color: white;
+    @include label-text;
+    color: $text-muted;
+    border-bottom: 1px solid $border-color;
+    text-align: left;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  tbody tr {
+    height: 60px;
+  }
+
+  td {
+    padding: $element-gap $card-gap;
+    font-size: 0.9rem;
+    color: $text-primary;
+    border-bottom: 1px solid $border-color;
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  .clickable {
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &:hover {
+      background-color: $bg-secondary;
+    }
+  }
+}
+
+.emptyCell {
+  text-align: center;
+  padding: 4rem 2rem !important;
+  color: $text-muted;
+}
+
+.skeletonRow {
+  td {
+    padding: 1rem 1.5rem;
+  }
+}
+
+.skeleton {
+  height: 1rem;
+  width: 100%;
+  background: linear-gradient(90deg, $bg-tertiary 25%, $border-color 50%, $bg-tertiary 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// Card view for mobile - DISABLED per spec - keep tables on mobile
+.cardView {
+  display: none;
+}
+
+@include mobile {
+  .table {
+    display: table !important;
+    min-width: 500px;
+
+    thead th {
+      padding: 12px 16px !important;
+      font-size: 11px !important;
+
+      &:not(:first-child) {
+        &[style*="text-align: right"],
+        &[style*="text-align: center"] {
+          width: 1% !important;
+          white-space: nowrap !important;
+        }
+      }
+    }
+
+    tbody tr {
+      height: 44px !important;
+    }
+
+    td {
+      padding: 12px 16px !important;
+      font-size: 12px !important;
+
+      &:not(:first-child) {
+        &[style*="text-align: right"],
+        &[style*="text-align: center"] {
+          width: 1% !important;
+          white-space: nowrap !important;
+        }
+      }
+    }
+
+    thead th:first-child,
+    tbody td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 11;
+      background-color: var(--bg-primary) !important;
+      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08);
+      width: 160px !important;
+      max-width: 160px !important;
+      white-space: normal !important;
+      word-break: break-word !important;
+    }
+
+    tbody tr.clickable:hover td:first-child {
+      background-color: var(--bg-secondary) !important;
+    }
+  }
+
+  .cardView {
+    display: none !important;
+  }
+}
+
+// Mobile Card Styles (kept for reference but not used per spec)
+.mobileCard {
+  background-color: white;
+  border: 1px solid $border-color;
+  border-radius: 24px !important;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: $shadow-soft;
+  cursor: pointer;
+  transition: transform $transition-fast, box-shadow $transition-fast;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:hover {
+    box-shadow: $shadow-sm;
+  }
+}
+
+.mobileCardRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed $bg-tertiary;
+  padding-bottom: 8px;
+
+  &:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.mobileCardLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: $text-muted;
+}
+
+.mobileCardValue {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $text-primary;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobileCardAction {
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  border-top: 1px solid $border-color;
+  padding-top: 8px;
+}
+
+// Responsive column visibility rules
+.hideOnMobile {
+  @include mobile {
+    display: none !important;
+  }
+}
+
+.hideOnTablet {
+  @include tablet {
+    display: none !important;
+  }
+  @include mobile {
+    display: none !important;
+  }
+}
+

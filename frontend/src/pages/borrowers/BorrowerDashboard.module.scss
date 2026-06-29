@@ -1,0 +1,227 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  @include mobile-sm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.mainLayout {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 1.5rem;
+  align-items: flex-start;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.leftColumn, .rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.section {
+  width: 100%;
+}
+
+.listCard {
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.listHeader {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid $border-color;
+  background-color: $bg-secondary;
+}
+
+.searchBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  
+  svg {
+    position: absolute;
+    left: 0.875rem;
+    color: $text-muted;
+  }
+
+  input {
+    background-color: white;
+    border: 1px solid $border-color;
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    width: 240px;
+    transition: $transition-fast;
+    
+    &:focus {
+      border-color: $primary;
+      width: 280px;
+    }
+  }
+}
+
+.borrowerInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 700;
+
+  span {
+    @include mobile {
+      max-width: 110px;
+      white-space: normal;
+      word-break: break-word;
+    }
+  }
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: $bg-tertiary;
+  color: $primary;
+  @include flex-center;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.overdueCard {
+  border: 1px solid $danger;
+  background-color: $danger-soft;
+}
+
+.overdueList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.overdueRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background-color: white;
+  border-radius: 14px;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.oInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.oName {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: $text-primary;
+}
+
+.oDays {
+  font-size: 0.75rem;
+  color: $danger;
+  font-weight: 600;
+}
+
+.oAmount {
+  font-weight: 800;
+  font-size: 0.875rem;
+  color: $text-primary;
+}
+
+.oRisk {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+
+.oAction {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.insightsStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.insightItem {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+}
+
+.iIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  @include flex-center;
+  flex-shrink: 0;
+  
+  &.danger { background-color: $danger-soft; color: $danger; }
+  &.success { background-color: $success-soft; color: $success; }
+  &.primary { background-color: $info-soft; color: $info; }
+}
+
+.iContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.iLabel {
+  @include label-text;
+  font-size: 0.65rem;
+  color: $text-muted;
+}
+
+.iValue {
+  font-size: 1rem;
+  color: $text-primary;
+}
+
+.iDesc {
+  font-size: 0.8125rem;
+  color: $text-secondary;
+}

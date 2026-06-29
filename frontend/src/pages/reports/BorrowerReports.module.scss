@@ -1,0 +1,56 @@
+@import '../../styles/design-system/mixins';
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  @include flex-between;
+}
+
+.exportBtn {
+  @include flex-center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  color: $text-muted;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: $text-primary;
+  }
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+
+  @include tablet {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  @include mobile-sm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.tableCard {
+  width: 100%;
+
+  h3 {
+    margin-bottom: 1.5rem;
+  }
+}

@@ -1,0 +1,89 @@
+@import '../../styles/design-system/mixins';
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: calc(#{$element-gap} / 2);
+  width: 100%;
+}
+
+.label {
+  @include label-text;
+  color: $text-secondary;
+}
+
+.wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.field {
+  width: 100%;
+  background-color: $bg-tertiary;
+  border: 1px solid $border-color;
+  border-radius: $radius-input;
+  padding: 0.75rem 1.25rem;
+  min-height: 48px; // Desktop minimum height
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: $text-primary;
+  transition: all $transition-fast;
+  display: flex;
+  align-items: center;
+  
+  @include mobile {
+    min-height: 40px;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  &.lg {
+    padding: 1.25rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 16px;
+    min-height: 56px;
+  }
+
+  &::placeholder {
+    color: $text-muted;
+  }
+  
+  &:focus {
+    background-color: white;
+    border-color: $primary;
+    box-shadow: 0 0 0 4px $primary-soft;
+  }
+}
+textarea.field {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.withIcon {
+  padding-left: 3rem;
+}
+
+.icon {
+  position: absolute;
+  left: 1.25rem;
+  color: $text-muted;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.hasError {
+  .field {
+    border-color: $danger;
+    &:focus {
+      box-shadow: 0 0 0 4px $danger-soft;
+    }
+  }
+}
+
+.errorText {
+  font-size: 0.75rem;
+  color: $danger;
+  font-weight: 500;
+}

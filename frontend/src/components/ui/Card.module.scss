@@ -1,0 +1,45 @@
+@import '../../styles/design-system/mixins';
+.card {
+  background-color: white;
+  border-radius: $radius-card;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-soft;
+  overflow: hidden;
+  transition: $transition-base;
+}
+
+.interactive {
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-hover;
+    border-color: $text-secondary;
+  }
+}
+
+.padding-none { padding: 0; }
+.padding-sm { 
+  padding: $element-gap; 
+  @include mobile {
+    padding: $element-gap-mobile;
+  }
+}
+.padding-md { 
+  padding: $card-gap; 
+  @include mobile {
+    padding: $card-gap-mobile;
+  }
+}
+.padding-lg { 
+  padding: $section-gap; 
+  @include mobile {
+    padding: $section-gap-mobile;
+  }
+}
+.padding-xl { 
+  padding: 48px; 
+  @include mobile {
+    padding: 16px;
+  }
+}

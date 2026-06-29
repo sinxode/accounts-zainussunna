@@ -1,0 +1,143 @@
+@import '../../styles/design-system/mixins';
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  @include flex-between;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: $bg-secondary;
+  @include flex-center;
+  font-weight: 700;
+  color: $primary;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+.roleBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  span {
+    text-transform: capitalize;
+  }
+}
+
+.loading {
+  padding: 3rem;
+}
+
+.roleSelect {
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  color: $text-primary;
+  font-size: 0.875rem;
+  width: 100%;
+  max-width: 200px;
+  
+  &:focus { border-color: $primary; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0.5rem 0;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: $text-secondary;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border-radius: 6px;
+    border: 1px solid $border-color;
+    background: $bg-secondary;
+    color: $text-primary;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: $primary;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba($primary, 0.15);
+    }
+  }
+}
+
+.passwordWrapper {
+  position: relative;
+  width: 100%;
+
+  input {
+    padding-right: 2.5rem;
+  }
+}
+
+.toggleBtn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    color: $text-secondary;
+  }
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}

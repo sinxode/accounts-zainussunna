@@ -1,0 +1,106 @@
+@import '../../styles/design-system/mixins';
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.sectionDesc {
+  font-size: 0.875rem;
+  color: $text-muted;
+  margin-bottom: 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: $text-muted;
+  }
+}
+
+.inputAction {
+  display: flex;
+  gap: 0.5rem;
+
+  input {
+    flex: 1;
+    background: $bg-primary;
+    border: 1px solid $border-color;
+    padding: 0.625rem 1rem;
+    border-radius: 8px;
+    color: $text-primary;
+    font-size: 0.9375rem;
+    
+    &:focus { border-color: $primary; }
+  }
+
+  button {
+    @include flex-center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: $primary-soft;
+    color: $primary;
+    transition: all 0.2s;
+
+    &:hover { background: $primary; color: white; }
+  }
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: $text-muted;
+  font-style: italic;
+}
+
+.infoFooter {
+  @include flex-center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--text-muted), transparent 97%);
+  border-radius: 12px;
+  color: $text-muted;
+  font-size: 0.875rem;
+}
