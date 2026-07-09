@@ -56,8 +56,6 @@ export const ExternalLoanDrawer: React.FC<{ onClose: () => void; initialBorrower
       queryClient.invalidateQueries({ queryKey: ['recentOperations'] });
       queryClient.invalidateQueries({ queryKey: ['todaySummary'] });
       queryClient.invalidateQueries({ queryKey: ['systemNotifications'] });
-      toast.success('External loan recorded successfully');
-      onClose();
     },
     onError: (error: any) => {
       toast.error(`Error: ${error.message}`);
@@ -74,12 +72,21 @@ export const ExternalLoanDrawer: React.FC<{ onClose: () => void; initialBorrower
     setResetKey(prev => prev + 1);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (shouldClose: boolean = true) => {
     if (isNewBorrower && !newName) return toast.error('Please enter borrower name');
     if (!isNewBorrower && !selectedBorrower) return toast.error('Please select a borrower');
     if (!amount || parseFloat(amount) <= 0) return toast.error('Please enter a valid amount');
     
-    loanMutation.mutate();
+    loanMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast.success('External loan recorded successfully');
+        if (shouldClose) {
+          onClose();
+        } else {
+          handleClear();
+        }
+      }
+    });
   };
 
   return (
@@ -89,7 +96,26 @@ export const ExternalLoanDrawer: React.FC<{ onClose: () => void; initialBorrower
       icon={<Landmark className="text-white" />}
       onClose={onClose}
       onClear={handleClear}
-      footer={<Button variant="primary" onClick={handleSubmit} loading={loanMutation.isPending} fullWidth>Confirm & Issue Loan</Button>}
+      footer={
+        <div className="flex w-full gap-2">
+          <Button 
+            variant="secondary" 
+            onClick={() => handleSubmit(false)} 
+            loading={loanMutation.isPending} 
+            className="flex-1"
+          >
+            Save & Next
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={() => handleSubmit(true)} 
+            loading={loanMutation.isPending} 
+            className="flex-1"
+          >
+            Save & Close
+          </Button>
+        </div>
+      }
     >
       <div className={styles.drawerContent}>
         {/* Step 1: Identity Selection */}

@@ -9,6 +9,7 @@ import { DrawerManager } from '../operations/drawers/DrawerManager';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
 import styles from './AppLayout.module.scss';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
+import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 import { useUIStore } from '../../store/useUIStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { clsx } from 'clsx';
@@ -16,6 +17,7 @@ import { BottomActionBar } from './BottomActionBar';
 
 export const AppLayout: React.FC = () => {
   useKeyboardShortcuts();
+  useRealtimeSync();
   const location = useLocation();
   const outlet = useOutlet();
   const { isSidebarCollapsed, confirmationConfig, closeConfirmation } = useUIStore();

@@ -5,10 +5,12 @@ import { Card } from '../components/ui/Card';
 import { Lock, Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import styles from './Login.module.scss';
 import toast from 'react-hot-toast';
+import logoImg from '../assets/logo_dark.png';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -19,6 +21,9 @@ export const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // Save rememberMe configuration so custom storage driver knows how to persist the Supabase session
+    localStorage.setItem('zls-remember-me', rememberMe ? 'true' : 'false');
 
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -39,7 +44,7 @@ export const Login: React.FC = () => {
       <div className={styles.blob} />
       <Card className={styles.card} padding="xl">
         <div className={styles.header}>
-          <div className={styles.logo}>Z</div>
+          <img src={logoImg} alt="ZLS Logo" className={styles.logo} />
           <h1 className={styles.title}>Welcome to ZLS</h1>
           <p className={styles.subtitle}>Log in to your academy control center</p>
         </div>
@@ -84,7 +89,12 @@ export const Login: React.FC = () => {
           </div>
 
           <div className={styles.rememberMe}>
-            <input type="checkbox" id="remember" />
+            <input 
+              type="checkbox" 
+              id="remember" 
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
             <label htmlFor="remember">Remember this device</label>
           </div>
 

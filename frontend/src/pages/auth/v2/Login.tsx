@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 export const LoginV2: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -18,6 +19,9 @@ export const LoginV2: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    // Save rememberMe configuration so custom storage driver knows how to persist the Supabase session
+    localStorage.setItem('zls-remember-me', rememberMe ? 'true' : 'false');
 
     try {
       const { error: authErr } = await supabase.auth.signInWithPassword({ email, password });
@@ -60,7 +64,12 @@ export const LoginV2: React.FC = () => {
             required
           />
 
-          <Checkbox label="Remember this device" id="remember" />
+          <Checkbox 
+            label="Remember this device" 
+            id="remember" 
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+          />
 
           <AuthButton type="submit" loading={loading}>
             Sign In

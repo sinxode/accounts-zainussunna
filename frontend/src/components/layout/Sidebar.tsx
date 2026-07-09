@@ -22,7 +22,7 @@ import { useUIStore } from '../../store/useUIStore';
 import styles from './Sidebar.module.scss';
 import { useWindowSize } from '../../hooks/useWindowSize';
 import { Button } from '../ui/Button';
-import logoImg from '../../assets/logo.jpg';
+import logoImg from '../../assets/logo_dark.png';
 
 interface NavItem {
   title: string;

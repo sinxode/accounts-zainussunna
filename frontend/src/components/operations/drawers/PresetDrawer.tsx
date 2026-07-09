@@ -104,7 +104,7 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
     }
   });
 
-  const handleSubmit = async (runAfter = false) => {
+  const handleSubmit = async (runAfter = false, shouldClose = true) => {
     if (!name) return toast.error('Preset name is required');
     
     const configuration = {
@@ -129,10 +129,13 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
       await createMutation.mutateAsync(presetData);
       
       if (runAfter) {
-        // Pass the constructed preset data directly to the bulk drawer
         openDrawer('bulk', { preset: presetData });
       } else {
-        onClose();
+        if (shouldClose) {
+          onClose();
+        } else {
+          handleClear();
+        }
       }
     } catch (err) {
       // Error handled by mutation
@@ -157,14 +160,24 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
       onClose={onClose}
       onClear={handleClear}
       footer={
-        <Button 
-          variant="primary" 
-          onClick={() => handleSubmit(false)} 
-          loading={createMutation.isPending} 
-          fullWidth
-        >
-          Create Preset
-        </Button>
+        <div className="flex w-full gap-2">
+          <Button 
+            variant="secondary" 
+            onClick={() => handleSubmit(false, false)} 
+            loading={createMutation.isPending} 
+            className="flex-1"
+          >
+            Save & Next
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={() => handleSubmit(false, true)} 
+            loading={createMutation.isPending} 
+            className="flex-1"
+          >
+            Save & Close
+          </Button>
+        </div>
       }
     >
       <div className={styles.presetDrawer}>

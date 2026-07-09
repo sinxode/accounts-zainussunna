@@ -9,6 +9,7 @@ import {
 import { clsx } from 'clsx';
 import { motion } from 'framer-motion';
 import styles from './AuthComponents.module.scss';
+import logoImg from '../../../assets/logo_dark.png';
 
 interface AuthCardProps {
   children: React.ReactNode;
@@ -24,7 +25,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ children, title, subtitle })
     transition={{ duration: 0.25 }}
   >
     <header className={styles.header}>
-      <div className={styles.logo}>Z</div>
+      <img src={logoImg} alt="ZLS Logo" className={styles.logo} />
       <h2 className={styles.title}>{title}</h2>
       <p className={styles.subtitle}>{subtitle}</p>
     </header>

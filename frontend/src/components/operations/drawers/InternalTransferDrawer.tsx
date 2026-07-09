@@ -28,8 +28,6 @@ export const InternalTransferDrawer: React.FC<{ isOpen?: boolean; onClose: () =>
       queryClient.invalidateQueries({ queryKey: ['recentOperations'] });
       queryClient.invalidateQueries({ queryKey: ['todaySummary'] });
       queryClient.invalidateQueries({ queryKey: ['studentsSummary'] });
-      toast.success('Transfer processed successfully');
-      onClose();
     },
     onError: (error: any) => {
       toast.error(`Failed to process transfer: ${error.message}`);
@@ -44,7 +42,7 @@ export const InternalTransferDrawer: React.FC<{ isOpen?: boolean; onClose: () =>
     setResetKey(prev => prev + 1);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = (shouldClose: boolean = true) => {
     if (!fromStudent || !toStudent || !amount || parseFloat(amount) <= 0) {
       toast.error('Please select both students and enter a valid amount');
       return;
@@ -61,13 +59,22 @@ export const InternalTransferDrawer: React.FC<{ isOpen?: boolean; onClose: () =>
     const transferAmount = parseFloat(amount);
     const operationId = crypto.randomUUID();
 
-    await createMutation.mutateAsync({
+    createMutation.mutate({
       from_student_id: fromStudent.id,
       to_student_id: toStudent.id,
       amount: transferAmount,
       purpose: `Transfer: ${purpose || 'Internal Funds'}`,
       operation_id: operationId,
       created_by: user.id
+    }, {
+      onSuccess: () => {
+        toast.success('Transfer processed successfully');
+        if (shouldClose) {
+          onClose();
+        } else {
+          handleClear();
+        }
+      }
     });
   };
 
@@ -83,7 +90,26 @@ export const InternalTransferDrawer: React.FC<{ isOpen?: boolean; onClose: () =>
       isOpen={isOpen}
       onClose={onClose}
       onClear={handleClear}
-      footer={<Button variant="primary" onClick={handleSubmit} loading={createMutation.isPending} fullWidth>Process Transfer</Button>}
+      footer={
+        <div className="flex w-full gap-2">
+          <Button 
+            variant="secondary" 
+            onClick={() => handleSubmit(false)} 
+            loading={createMutation.isPending} 
+            className="flex-1"
+          >
+            Save & Next
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={() => handleSubmit(true)} 
+            loading={createMutation.isPending} 
+            className="flex-1"
+          >
+            Save & Close
+          </Button>
+        </div>
+      }
     >
       <div className="flex flex-col gap-6">
         <StudentSearch key={`lender-${resetKey}`} label="Lender (From)" placeholder="Search student..." onSelect={setFromStudent} />

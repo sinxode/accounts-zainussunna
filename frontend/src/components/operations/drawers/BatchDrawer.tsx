@@ -20,17 +20,19 @@ export const BatchDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const queryClient = useQueryClient();
   const openConfirmation = useUIStore(state => state.openConfirmation);
 
+  const clearForm = () => {
+    setName('');
+    setDescription('');
+    setSelectedStudents([]);
+  };
+
   const handleClear = () => {
     openConfirmation({
       title: 'Reset Form?',
       message: 'Are you sure you want to reset the form? All entered details and selected students will be cleared.',
       confirmLabel: 'Reset',
       variant: 'warning',
-      onConfirm: () => {
-        setName('');
-        setDescription('');
-        setSelectedStudents([]);
-      }
+      onConfirm: clearForm
     });
   };
 
@@ -50,8 +52,6 @@ export const BatchDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['batches'] });
-      toast.success('Batch created successfully');
-      onClose();
     },
     onError: (error: any) => {
       toast.error(`Error: ${error.message}`);
@@ -70,10 +70,19 @@ export const BatchDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setSelectedStudents(selectedStudents.filter(s => s.id !== id));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (shouldClose: boolean = true) => {
     if (!name) return toast.error('Batch name is required');
     if (selectedStudents.length === 0) return toast.error('Add students to the batch');
-    createMutation.mutate();
+    createMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast.success('Batch created successfully');
+        if (shouldClose) {
+          onClose();
+        } else {
+          clearForm();
+        }
+      }
+    });
   };
 
   return (
@@ -83,7 +92,26 @@ export const BatchDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       icon={<UsersRound className="text-white" />}
       onClose={onClose}
       onClear={handleClear}
-      footer={<Button variant="primary" onClick={handleSubmit} loading={createMutation.isPending} fullWidth>Create Batch Profile</Button>}
+      footer={
+        <div className="flex w-full gap-2">
+          <Button 
+            variant="secondary" 
+            onClick={() => handleSubmit(false)} 
+            loading={createMutation.isPending} 
+            className="flex-1"
+          >
+            Save & Next
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={() => handleSubmit(true)} 
+            loading={createMutation.isPending} 
+            className="flex-1"
+          >
+            Save & Close
+          </Button>
+        </div>
+      }
     >
       <div className={styles.drawerContent}>
         {/* Section 1: Configuration */}

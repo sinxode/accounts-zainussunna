@@ -384,12 +384,6 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
       subtitle={step === 'success' ? "All ledger entries recorded" : "Multi-student ledger processing"}
       icon={step === 'success' ? <CheckCircle2 className="text-success" /> : <Copy className="text-white" />}
       onClose={onClose}
-      onCancel={
-        step === 'participants' || step === 'review'
-          ? () => setStep(step === 'review' ? 'participants' : 'configure')
-          : onClose
-      }
-      cancelText={step === 'participants' || step === 'review' ? "Back" : "Cancel"}
       onClear={step === 'success' ? undefined : () => {
         openConfirmation({
           title: 'Clear Participants?',
@@ -414,26 +408,46 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
             New Bulk Operation
           </Button>
         ) : step !== 'review' ? (
-          <Button 
-            variant="primary" 
-            onClick={() => setStep(step === 'configure' ? 'participants' : 'review')}
-            disabled={step === 'participants' && participants.length === 0}
-            icon={<ChevronRight size={18} />}
-            iconPosition="right"
-            fullWidth
-          >
-            Next Step
-          </Button>
+          <div className="flex w-full gap-2">
+            {step !== 'configure' && (
+              <Button
+                variant="secondary"
+                onClick={() => setStep('configure')}
+                className="flex-1"
+              >
+                Back
+              </Button>
+            )}
+            <Button 
+              variant="primary" 
+              onClick={() => setStep(step === 'configure' ? 'participants' : 'review')}
+              disabled={step === 'participants' && participants.length === 0}
+              icon={<ChevronRight size={18} />}
+              iconPosition="right"
+              className="flex-1"
+            >
+              Next Step
+            </Button>
+          </div>
         ) : (
-          <Button 
-            variant="primary" 
-            onClick={handleProcess} 
-            loading={bulkMutation.isPending}
-            icon={<PlayCircle size={18} />}
-            fullWidth
-          >
-            Process Bulk
-          </Button>
+          <div className="flex w-full gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => setStep('participants')}
+              className="flex-1"
+            >
+              Back
+            </Button>
+            <Button 
+              variant="primary" 
+              onClick={handleProcess} 
+              loading={bulkMutation.isPending}
+              icon={<PlayCircle size={18} />}
+              className="flex-1"
+            >
+              Process Bulk
+            </Button>
+          </div>
         )
       }
     >

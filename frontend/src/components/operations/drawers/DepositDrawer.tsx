@@ -39,8 +39,6 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recentOperations'] });
       queryClient.invalidateQueries({ queryKey: ['todaySummary'] });
-      toast.success('Deposit processed successfully');
-      onClose();
     },
     onError: (error: any) => {
       toast.error(`Failed to process deposit: ${error.message}`);
@@ -55,7 +53,7 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
     setResetKey(prev => prev + 1);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (shouldClose: boolean = true) => {
     if (!selectedStudent || !amount || parseFloat(amount) <= 0) {
       toast.error('Please select a student and enter a valid amount');
       return;
@@ -73,6 +71,15 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
       purpose: purpose || 'Deposit',
       transaction_date: new Date().toISOString(),
       created_by: user.id
+    }, {
+      onSuccess: () => {
+        toast.success('Deposit processed successfully');
+        if (shouldClose) {
+          onClose();
+        } else {
+          handleClear();
+        }
+      }
     });
   };
 
@@ -87,7 +94,26 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
       icon={<ArrowDownCircle className="text-success" />}
       onClose={onClose}
       onClear={handleClear}
-      footer={<Button variant="primary" onClick={handleSubmit} loading={createMutation.isPending} fullWidth>Process Deposit</Button>}
+      footer={
+        <div className="flex w-full gap-2">
+          <Button 
+            variant="secondary" 
+            onClick={() => handleSubmit(false)} 
+            loading={createMutation.isPending} 
+            className="flex-1"
+          >
+            Save & Next
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={() => handleSubmit(true)} 
+            loading={createMutation.isPending} 
+            className="flex-1"
+          >
+            Save & Close
+          </Button>
+        </div>
+      }
     >
       <div className={styles.drawerContent}>
         {initialStudentId ? (

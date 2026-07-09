@@ -12,8 +12,6 @@ interface DrawerLayoutProps {
   onClear?: () => void;
   children: React.ReactNode;
   footer?: React.ReactNode;
-  cancelText?: string;
-  onCancel?: () => void;
 }
 
 export const DrawerLayout: React.FC<DrawerLayoutProps> = ({ 
@@ -24,9 +22,7 @@ export const DrawerLayout: React.FC<DrawerLayoutProps> = ({
   onClose, 
   onClear,
   children, 
-  footer,
-  cancelText,
-  onCancel
+  footer
 }) => {
   const footerContent = (
     <div className="flex w-full items-center gap-2">
@@ -35,17 +31,10 @@ export const DrawerLayout: React.FC<DrawerLayoutProps> = ({
           variant="danger" 
           onClick={onClear} 
           icon={<Trash2 size={16} />}
-          className="px-2.5 flex items-center justify-center shrink-0"
+          className="flex items-center justify-center shrink-0"
         />
       )}
       <div className="flex w-full gap-2 items-center">
-        <Button 
-          variant="ghost" 
-          onClick={onCancel || onClose} 
-          className="flex-1 border border-border" 
-        >
-          {cancelText || 'Cancel'}
-        </Button>
         {footer ? (
           footer
         ) : (

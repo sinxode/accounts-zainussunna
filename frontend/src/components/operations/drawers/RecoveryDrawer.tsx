@@ -62,18 +62,25 @@ export const RecoveryDrawer: React.FC<{ onClose: () => void; initialBorrowerId?:
       queryClient.invalidateQueries({ queryKey: ['recentOperations'] });
       queryClient.invalidateQueries({ queryKey: ['todaySummary'] });
       queryClient.invalidateQueries({ queryKey: ['systemNotifications'] });
-      toast.success('Recovery recorded successfully');
-      onClose();
     },
     onError: (err: any) => {
       toast.error(err.message);
     }
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = (shouldClose: boolean = true) => {
     if (!selectedBorrower) return toast.error('Please select a borrower');
     if (recoveryAmount <= 0) return toast.error('Please enter a valid recovery amount');
-    recoveryMutation.mutate();
+    recoveryMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast.success('Recovery recorded successfully');
+        if (shouldClose) {
+          onClose();
+        } else {
+          handleClear();
+        }
+      }
+    });
   };
 
   return (
@@ -83,7 +90,26 @@ export const RecoveryDrawer: React.FC<{ onClose: () => void; initialBorrowerId?:
       icon={<RefreshCcw className="text-success" />}
       onClose={onClose}
       onClear={handleClear}
-      footer={<Button variant="primary" fullWidth onClick={handleSubmit} loading={recoveryMutation.isPending}>Confirm Recovery</Button>}
+      footer={
+        <div className="flex w-full gap-2">
+          <Button 
+            variant="secondary" 
+            onClick={() => handleSubmit(false)} 
+            loading={recoveryMutation.isPending} 
+            className="flex-1"
+          >
+            Save & Next
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={() => handleSubmit(true)} 
+            loading={recoveryMutation.isPending} 
+            className="flex-1"
+          >
+            Save & Close
+          </Button>
+        </div>
+      }
     >
       <div className={styles.drawerContent}>
         {/* Step 1: Borrower Selection */}

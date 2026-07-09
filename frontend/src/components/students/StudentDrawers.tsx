@@ -13,8 +13,11 @@ export const AddStudentDrawer: React.FC<{ onClose: () => void }> = ({ onClose })
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: '', enrolment_no: '', status: 'active' as 'active' | 'archived' });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleClear = () => {
+    setForm({ name: '', enrolment_no: '', status: 'active' });
+  };
+
+  const handleSubmit = async (shouldClose: boolean = true) => {
     if (!form.name || !form.enrolment_no) {
       toast.error('Please fill all required fields');
       return;
@@ -26,7 +29,11 @@ export const AddStudentDrawer: React.FC<{ onClose: () => void }> = ({ onClose })
       if (error) throw error;
       toast.success('Student added successfully');
       queryClient.invalidateQueries({ queryKey: ['studentsSummary'] });
-      onClose();
+      if (shouldClose) {
+        onClose();
+      } else {
+        handleClear();
+      }
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -40,17 +47,35 @@ export const AddStudentDrawer: React.FC<{ onClose: () => void }> = ({ onClose })
       subtitle="Register a new student in the ledger system"
       icon={<UserPlus className="text-white" />}
       onClose={onClose}
+      onClear={handleClear}
       footer={
-        <Button 
-          variant="primary" 
-          loading={loading} 
-          onClick={handleSubmit}
-        >
-          Save Student
-        </Button>
+        <div className="flex w-full gap-2">
+          <Button 
+            variant="secondary" 
+            onClick={() => handleSubmit(false)} 
+            loading={loading} 
+            className="flex-1"
+          >
+            Save & Next
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={() => handleSubmit(true)} 
+            loading={loading} 
+            className="flex-1"
+          >
+            Save & Close
+          </Button>
+        </div>
       }
     >
-      <form className={styles.drawerContent} onSubmit={handleSubmit}>
+      <form 
+        className={styles.drawerContent} 
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(true);
+        }}
+      >
         <Input 
           label="Full Name" 
           placeholder="e.g. Abdullah bin Ahmed"

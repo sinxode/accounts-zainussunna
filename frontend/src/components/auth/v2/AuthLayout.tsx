@@ -10,6 +10,7 @@ import {
 import { motion } from 'framer-motion';
 import styles from './AuthLayout.module.scss';
 import { clsx } from 'clsx';
+import logoImg from '../../../assets/logo_light.png';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -31,7 +32,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
       <aside className={styles.brandingPanel}>
         <div className={styles.brandingContent}>
           <div className={styles.brandHeader}>
-            <div className={styles.logo}>Z</div>
+            <img src={logoImg} alt="ZLS Logo" className={styles.logo} />
             <div className={styles.brandText}>
               <h1 className={styles.brandTitle}>ZLS</h1>
               <span className={styles.brandTagline}>Financial Operations Platform</span>
