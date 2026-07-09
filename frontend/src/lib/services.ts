@@ -533,6 +533,14 @@ export const transactionService = {
     if (error) throw error;
     return data;
   },
+  createBulk: async (transactions: any[]) => {
+    const { data, error } = await supabase
+      .from('transactions')
+      .insert(transactions)
+      .select();
+    if (error) throw error;
+    return data;
+  },
   createInternalTransferAtomic: async (params: { 
     from_student_id: string; 
     to_student_id: string; 

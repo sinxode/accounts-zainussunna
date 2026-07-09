@@ -151,11 +151,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   }, [participants]);
 
   const bulkMutation = useMutation({
-    mutationFn: async (data: any[]) => {
-      for (const tx of data) {
-        await transactionService.create(tx);
-      }
-    },
+    mutationFn: transactionService.createBulk,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recentOperations'] });
       queryClient.invalidateQueries({ queryKey: ['todaySummary'] });
@@ -227,6 +223,10 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   };
 
   const handleProcess = () => {
+    if (!user) {
+      toast.error('You must be logged in to perform this action');
+      return;
+    }
     if (!operationName) return toast.error('Operation name is required');
     if (participants.length === 0) return toast.error('Add at least one participant');
     if (participants.some(p => p.amount <= 0)) return toast.error('All amounts must be greater than 0');
@@ -240,7 +240,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
       amount: p.amount,
       purpose: p.purpose || operationName,
       transaction_date: new Date(operationDate).toISOString(),
-      created_by: user?.id
+      created_by: user.id
     }));
 
     bulkMutation.mutate(payload);
@@ -583,10 +583,22 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                   <div key={p.id} className={styles.participantItem}>
                     <div className={styles.pInfo}>
                       <div className={styles.pAvatar}>
-                        {p.name.charAt(0)}
+                        {(() => {
+                          const parts = p.name.trim().split(/\s+/);
+                          return parts.length > 1 
+                            ? (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase()
+                            : parts[0].charAt(0).toUpperCase();
+                        })()}
                       </div>
                       <div className={styles.pDetails}>
-                        <div className={styles.pName}>{p.name}</div>
+                        <div className={styles.pName}>
+                          {p.name}
+                          {p.name.trim().split(/\s+/)[1] && (
+                            <span className="ml-1.5 text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/80 font-normal">
+                              {p.name.trim().split(/\s+/)[1]}
+                            </span>
+                          )}
+                        </div>
                         <div className={styles.pEnr}>{p.enrolment_no}</div>
                       </div>
                     </div>
