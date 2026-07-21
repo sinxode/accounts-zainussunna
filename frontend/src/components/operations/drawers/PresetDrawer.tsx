@@ -454,6 +454,7 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
                 onChange={e => setNotes(e.target.value)}
                 rows={2}
                 className="resize-none"
+              />
             </div>
           </div>
         </div>
