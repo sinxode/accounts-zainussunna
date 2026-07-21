@@ -252,32 +252,17 @@ $max-page-width: 1440px;
 
 // -- Sidebar Responsive --
 @mixin sidebar-responsive {
-  @include desktop {
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    bottom: 16px;
-    width: 300px;
-    border-radius: 32px;
-    box-shadow: $shadow-lg;
-    border: 1px solid $border-color;
-    z-index: $z-index-sidebar;
-  }
-  
-  @include tablet {
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    bottom: 16px;
-    width: 300px;
-    border-radius: 32px;
-    box-shadow: $shadow-lg;
-    border: 1px solid $border-color;
-    z-index: $z-index-sidebar;
-  }
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  bottom: 16px;
+  width: 300px;
+  border-radius: 32px;
+  box-shadow: $shadow-lg;
+  border: 1px solid $border-color;
+  z-index: $z-index-sidebar;
   
   @include mobile {
-    position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
