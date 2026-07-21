@@ -26,7 +26,6 @@ import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { formatSmartPurpose } from '../../../lib/utils';
 import styles from './DrawerStyles.module.scss';
 import { useOperationsDrawer } from './OperationsDrawerContext';
-import { useUIStore } from '../../../store/useUIStore';
 
 type Step = 'configure' | 'participants' | 'review' | 'success';
 
@@ -695,33 +694,27 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
         {step === 'participants' && (
           <div className="flex flex-col gap-3">
             {/* Global Operation Parameters Summary Bar */}
-            <div className="bg-secondary/40 border border-border rounded-xl p-3 flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-foreground overflow-hidden">
-                <span className="text-muted shrink-0">{activeLoadedPreset ? `Preset (${activeLoadedPreset.name}):` : 'Global Default:'}</span>
-                <span className="font-bold text-primary shrink-0">₹{globalAmount || '0'}</span>
-                <span>•</span>
-                <span className={globalType === 'withdrawal' ? 'text-danger font-bold shrink-0' : 'text-success font-bold shrink-0'}>
+            <div className={styles.globalParamsBar}>
+              <div className={styles.paramsTitle}>
+                <span className="text-muted font-normal shrink-0">{activeLoadedPreset ? `Preset (${activeLoadedPreset.name}):` : 'Global Default:'}</span>
+                <span className="font-extrabold text-foreground text-sm shrink-0">₹{globalAmount || '0'}</span>
+                <span className={clsx(styles.paramBadge, globalType === 'withdrawal' ? styles.debit : styles.credit)}>
                   {globalType === 'withdrawal' ? 'Debit (-)' : 'Credit (+)'}
                 </span>
                 {globalPurpose && (
-                  <>
-                    <span>•</span>
-                    <span className="text-muted truncate max-w-[140px]">{globalPurpose}</span>
-                  </>
+                  <span className="text-muted truncate max-w-[130px] font-normal hidden sm:inline">{globalPurpose}</span>
                 )}
               </div>
-              <div className="flex items-center gap-1.5 shrink-0">
+              <div className={styles.paramInputs}>
                 <input
                   type="number"
                   placeholder="Sync ₹"
                   value={globalAmount}
                   onChange={e => handleSyncGlobalAmountToAll(e.target.value)}
-                  className="w-20 text-xs p-1 rounded-lg border border-border bg-white text-right font-medium"
                 />
                 <select
                   value={globalType}
                   onChange={e => handleSyncGlobalTypeToAll(e.target.value as any)}
-                  className="text-xs p-1 rounded-lg border border-border bg-white font-medium"
                 >
                   <option value="deposit">Credit (+)</option>
                   <option value="withdrawal">Debit (-)</option>

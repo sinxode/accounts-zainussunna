@@ -9,7 +9,6 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../../contexts/AuthContext';
 import { batchService } from '../../../lib/services';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useUIStore } from '../../../store/useUIStore';
 
 export const BatchDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [name, setName] = useState('');

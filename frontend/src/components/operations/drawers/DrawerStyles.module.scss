@@ -445,43 +445,202 @@
 
 .actionBlockBtn {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.25rem;
-  padding: 0.75rem;
-  background-color: #ffffff;
-  border: 1px solid $border-color;
-  border-radius: 12px;
+  flex-direction: flex-col;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 0.5rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 14px;
   cursor: pointer;
-  text-align: left;
-  transition: all 0.2s ease;
-  box-shadow: $shadow-sm;
+  text-align: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(30, 58, 95, 0.05) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
 
   &:hover {
-    border-color: $primary;
-    background-color: $primary-soft;
+    border-color: rgba(30, 58, 95, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(30, 58, 95, 0.08);
+
+    &::before {
+      opacity: 1;
+    }
 
     .actionIcon {
       color: $primary;
+      transform: scale(1.1);
     }
   }
 
+  &:active {
+    transform: translateY(0);
+  }
+
   .actionIcon {
-    color: $text-muted;
-    transition: color 0.2s ease;
+    color: $primary;
+    transition: all 0.2s ease;
   }
 
   .actionLabel {
     font-size: 0.75rem;
     font-weight: 700;
-    color: $primary;
+    color: $text-primary;
+    letter-spacing: -0.01em;
   }
 
   .actionSub {
     font-size: 0.65rem;
     color: $text-muted;
     text-transform: uppercase;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
+  }
+}
+
+.globalParamsBar {
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(241, 245, 249, 0.9) 100%);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 58, 95, 0.12);
+  border-radius: 16px;
+  padding: 0.875rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+
+  .paramsTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $text-primary;
+  }
+
+  .paramBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+
+    &.credit {
+      background-color: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    &.debit {
+      background-color: rgba(225, 29, 72, 0.12);
+      color: #e11d48;
+      border: 1px solid rgba(225, 29, 72, 0.2);
+    }
+  }
+
+  .paramInputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    input {
+      width: 80px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.35rem 0.6rem;
+      border-radius: 10px;
+      border: 1px solid rgba(30, 58, 95, 0.18);
+      background-color: #ffffff;
+      color: $text-primary;
+      text-align: right;
+      outline: none;
+      transition: all 0.2s ease;
+
+      &:focus {
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+      }
+    }
+
+    select {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.35rem 0.5rem;
+      border-radius: 10px;
+      border: 1px solid rgba(30, 58, 95, 0.18);
+      background-color: #ffffff;
+      color: $text-primary;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:focus {
+        border-color: $primary;
+      }
+    }
+  }
+}
+
+.quickPresetBar {
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.4) 0%, rgba(253, 230, 138, 0.3) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 14px;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.05);
+
+  .zapIcon {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: #f59e0b;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+  }
+
+  .presetLabel {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #92400e;
+    white-space: nowrap;
+  }
+
+  select {
+    flex: 1;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.65rem;
+    border-radius: 10px;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    background-color: #ffffff;
+    color: #78350f;
+    outline: none;
+    cursor: pointer;
+
+    &:focus {
+      border-color: #d97706;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+    }
   }
 }
 

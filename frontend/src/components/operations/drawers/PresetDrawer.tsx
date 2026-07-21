@@ -19,7 +19,8 @@ import {
   ShoppingBag,
   Award,
   PiggyBank,
-  Sliders
+  Sliders,
+  Users
 } from 'lucide-react';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
@@ -300,36 +301,45 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
 
           <div className="flex flex-col gap-3">
             {/* Target Mode Selector */}
-            <div className="flex bg-secondary/50 p-1 rounded-xl gap-1 border border-border">
+            <div className="flex bg-slate-100 p-1.5 rounded-2xl gap-1 border border-slate-200/80 shadow-inner">
               <button
                 type="button"
                 onClick={() => setTargetMode('batch')}
                 className={clsx(
-                  "flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center",
-                  targetMode === 'batch' ? "bg-primary text-white shadow-sm" : "text-muted hover:text-foreground"
+                  "flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer",
+                  targetMode === 'batch' 
+                    ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]" 
+                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-200/50"
                 )}
               >
-                Dynamic Batch
+                <Layers size={13} />
+                <span>Dynamic Batch</span>
               </button>
               <button
                 type="button"
                 onClick={() => setTargetMode('fixed')}
                 className={clsx(
-                  "flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center",
-                  targetMode === 'fixed' ? "bg-primary text-white shadow-sm" : "text-muted hover:text-foreground"
+                  "flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer",
+                  targetMode === 'fixed' 
+                    ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]" 
+                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-200/50"
                 )}
               >
-                Fixed List
+                <Users size={13} />
+                <span>Fixed List</span>
               </button>
               <button
                 type="button"
                 onClick={() => setTargetMode('shortcut')}
                 className={clsx(
-                  "flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center",
-                  targetMode === 'shortcut' ? "bg-primary text-white shadow-sm" : "text-muted hover:text-foreground"
+                  "flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer",
+                  targetMode === 'shortcut' 
+                    ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]" 
+                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-200/50"
                 )}
               >
-                Quick Shortcut
+                <Zap size={13} />
+                <span>Quick Shortcut</span>
               </button>
             </div>
 

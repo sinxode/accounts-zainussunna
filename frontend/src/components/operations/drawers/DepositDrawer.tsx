@@ -124,11 +124,12 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
     >
       <div className={styles.drawerContent}>
         {presets && presets.length > 0 && (
-          <div className="flex items-center gap-2 mb-1 p-2 bg-secondary/50 border border-border rounded-xl">
-            <Zap size={14} className="text-amber-500 fill-amber-500 shrink-0" />
-            <span className="text-xs font-semibold text-muted shrink-0">Quick Preset:</span>
+          <div className={styles.quickPresetBar}>
+            <div className={styles.zapIcon}>
+              <Zap size={14} />
+            </div>
+            <span className={styles.presetLabel}>Quick Preset:</span>
             <select
-              className="text-xs bg-white border border-border rounded-lg px-2 py-1 text-foreground flex-1 font-medium"
               onChange={(e) => {
                 const pr = presets.find(p => p.id === e.target.value);
                 if (pr) {
@@ -141,7 +142,7 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
               }}
               defaultValue=""
             >
-              <option value="" disabled>Select a Preset to Pre-fill...</option>
+              <option value="" disabled>Select Preset to Pre-fill...</option>
               {presets.map(p => (
                 <option key={p.id} value={p.id}>{p.name} (₹{p.configuration?.amount ?? p.amount ?? 0})</option>
               ))}
