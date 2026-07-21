@@ -454,10 +454,10 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
                 onChange={e => setNotes(e.target.value)}
                 rows={2}
                 className="resize-none"
-              />
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
         {/* Section 3: Live Preview */}
         <section className={styles.section}>
