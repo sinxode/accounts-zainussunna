@@ -63,7 +63,6 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const openConfirmation = useUIStore(state => state.openConfirmation);
 
   // Load saved batches for selection
   const { data: batches, isLoading: isBatchesLoading } = useQuery({
@@ -470,15 +469,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
       subtitle={step === 'success' ? "All ledger entries recorded" : "Multi-student ledger processing"}
       icon={step === 'success' ? <CheckCircle2 className="text-success" /> : <Copy className="text-white" />}
       onClose={onClose}
-      onClear={step === 'success' ? undefined : () => {
-        openConfirmation({
-          title: 'Clear Participants?',
-          message: 'Are you sure you want to remove all students from this bulk workspace?',
-          confirmLabel: 'Clear All',
-          variant: 'danger',
-          onConfirm: () => setParticipants([])
-        });
-      }}
+      onClear={step === 'success' ? undefined : () => setParticipants([])}
       footer={
         step === 'success' ? (
           <Button 

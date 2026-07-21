@@ -18,7 +18,6 @@ export const BatchDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const openConfirmation = useUIStore(state => state.openConfirmation);
 
   const clearForm = () => {
     setName('');
@@ -27,13 +26,7 @@ export const BatchDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   const handleClear = () => {
-    openConfirmation({
-      title: 'Reset Form?',
-      message: 'Are you sure you want to reset the form? All entered details and selected students will be cleared.',
-      confirmLabel: 'Reset',
-      variant: 'warning',
-      onConfirm: clearForm
-    });
+    clearForm();
   };
 
   const createMutation = useMutation({
