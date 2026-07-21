@@ -49,14 +49,16 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   const [globalPurpose, setGlobalPurpose] = useState(
     formatSmartPurpose(drawerData?.preset?.configuration?.purpose || drawerData?.preset?.purpose || '')
   );
+  const [globalAmount, setGlobalAmount] = useState<string>(
+    drawerData?.preset?.configuration?.amount ?? drawerData?.preset?.amount ? String(drawerData?.preset?.configuration?.amount ?? drawerData?.preset?.amount) : ''
+  );
+  const [globalType, setGlobalType] = useState<'deposit' | 'withdrawal'>(
+    drawerData?.preset?.configuration?.type || drawerData?.preset?.transaction_type || 'deposit'
+  );
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [isSavingPreset, setIsSavingPreset] = useState(false);
   const [showBatchSelect, setShowBatchSelect] = useState(false);
   const [showPresetSelect, setShowPresetSelect] = useState(false);
-  const [showSplitTool, setShowSplitTool] = useState(false);
-  const [splitTotalInput, setSplitTotalInput] = useState('');
-  const [showAdjustTool, setShowAdjustTool] = useState(false);
-  const [adjustAmountInput, setAdjustAmountInput] = useState('');
   const [activeLoadedPreset, setActiveLoadedPreset] = useState<any>(drawerData?.preset || null);
   
   const { user } = useAuth();
@@ -179,16 +181,6 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     }
   });
 
-  const presetDefaultAmount = useMemo(() => {
-    if (!activeLoadedPreset) return 0;
-    return activeLoadedPreset.configuration?.amount ?? activeLoadedPreset.amount ?? 0;
-  }, [activeLoadedPreset]);
-
-  const presetDefaultType = useMemo(() => {
-    if (!activeLoadedPreset) return 'deposit';
-    return activeLoadedPreset.configuration?.type || activeLoadedPreset.transaction_type || 'deposit';
-  }, [activeLoadedPreset]);
-
   const handleApplyPreset = async (preset: any) => {
     setActiveLoadedPreset(preset);
     if (!operationName) setOperationName(preset.name);
@@ -196,14 +188,21 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     const formattedPurp = formatSmartPurpose(config?.purpose || preset.purpose || '');
     if (formattedPurp) setGlobalPurpose(formattedPurp);
 
+    const prAmt = config?.amount ?? preset.amount;
+    if (prAmt) setGlobalAmount(String(prAmt));
+    const prType = config?.type || preset.transaction_type || 'deposit';
+    setGlobalType(prType);
+
+    const numericAmount = prAmt ? parseFloat(String(prAmt)) : 0;
+
     if (config?.participants && Array.isArray(config.participants)) {
       const restored = config.participants.map((p: any) => ({
         id: crypto.randomUUID(),
         student_id: p.student_id,
         name: p.name || 'Student',
         enrolment_no: p.enrolment_no || 'N/A',
-        amount: p.amount || config.amount || 0,
-        type: (p.type || config.type || 'deposit') as 'deposit' | 'withdrawal',
+        amount: p.amount || numericAmount || 0,
+        type: (p.type || prType) as 'deposit' | 'withdrawal',
         purpose: formattedPurp || '',
         notes: ''
       }));
@@ -218,8 +217,8 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
             student_id: student.id,
             name: student.name,
             enrolment_no: student.enrolment_no,
-            amount: config.amount || 0,
-            type: (config.type || 'deposit') as 'deposit' | 'withdrawal',
+            amount: numericAmount || 0,
+            type: prType as 'deposit' | 'withdrawal',
             purpose: formattedPurp || '',
             notes: ''
           }));
@@ -233,36 +232,19 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     toast.success(`Loaded preset "${preset.name}"`);
   };
 
-  const handleApplyPresetAmountToAll = () => {
-    if (!presetDefaultAmount) return;
-    setParticipants(participants.map(p => ({ ...p, amount: presetDefaultAmount, type: presetDefaultType })));
-    toast.success(`Applied default amount (₹${presetDefaultAmount}) to all students`);
+  const handleSyncGlobalAmountToAll = (newAmountStr: string) => {
+    setGlobalAmount(newAmountStr);
+    const numericAmount = parseFloat(newAmountStr);
+    if (!isNaN(numericAmount) && participants.length > 0) {
+      setParticipants(participants.map(p => ({ ...p, amount: numericAmount })));
+    }
   };
 
-  const handleEqualSplitSubmit = () => {
-    const totalVal = parseFloat(splitTotalInput);
-    if (isNaN(totalVal) || totalVal <= 0) {
-      return toast.error('Please enter a valid total amount');
+  const handleSyncGlobalTypeToAll = (newType: 'deposit' | 'withdrawal') => {
+    setGlobalType(newType);
+    if (participants.length > 0) {
+      setParticipants(participants.map(p => ({ ...p, type: newType })));
     }
-    if (participants.length === 0) {
-      return toast.error('No participating students to split among');
-    }
-    const perPerson = Math.round(totalVal / participants.length);
-    setParticipants(participants.map(p => ({ ...p, amount: perPerson })));
-    toast.success(`Split ₹${totalVal.toLocaleString()} equally: ₹${perPerson.toLocaleString()} per student`);
-    setShowSplitTool(false);
-    setSplitTotalInput('');
-  };
-
-  const handleBulkAdjustSubmit = () => {
-    const delta = parseFloat(adjustAmountInput);
-    if (isNaN(delta) || delta === 0) {
-      return toast.error('Please enter a valid adjustment amount');
-    }
-    setParticipants(participants.map(p => ({ ...p, amount: Math.max(0, p.amount + delta) })));
-    toast.success(`Adjusted all amounts by ₹${delta > 0 ? '+' : ''}${delta}`);
-    setShowAdjustTool(false);
-    setAdjustAmountInput('');
   };
 
   const handleAddParticipant = (student: any) => {
@@ -271,14 +253,16 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
       return;
     }
 
+    const numericGlobalAmount = parseFloat(globalAmount) || 0;
+
     const newParticipant: Participant = {
       id: crypto.randomUUID(),
       student_id: student.id,
       name: student.name,
       enrolment_no: student.enrolment_no,
-      amount: presetDefaultAmount,
-      type: presetDefaultType,
-      purpose: globalPurpose || drawerData?.preset?.configuration?.purpose || '',
+      amount: numericGlobalAmount,
+      type: globalType,
+      purpose: globalPurpose || '',
       notes: ''
     };
 
@@ -580,12 +564,35 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
         {step === 'configure' && (
           <div className="flex flex-col gap-3">
             <div className={styles.configSection}>
-              <h3 className={styles.sectionTitle}><Save size={13} className="text-primary" /> Configuration</h3>
+              <h3 className={styles.sectionTitle}><Save size={13} className="text-primary" /> Global Operation Parameters</h3>
               <div className="flex flex-col gap-2 mt-1">
                 <Input label="Operation Name" placeholder="e.g. Monthly Mess Fee - June 2026" value={operationName} onChange={e => setOperationName(e.target.value)} />
                 <div className={styles.formGrid2}>
+                  <div>
+                    <label className="text-xs font-semibold text-muted block mb-1">Global Default Amount (₹)</label>
+                    <input 
+                      type="number"
+                      placeholder="e.g. 1200 (Applied to all students)"
+                      value={globalAmount}
+                      onChange={e => handleSyncGlobalAmountToAll(e.target.value)}
+                      className="w-full text-xs p-2 rounded-lg border border-border bg-white text-foreground"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-muted block mb-1">Transaction Type</label>
+                    <select
+                      value={globalType}
+                      onChange={e => handleSyncGlobalTypeToAll(e.target.value as any)}
+                      className="w-full text-xs p-2 rounded-lg border border-border bg-white text-foreground"
+                    >
+                      <option value="deposit">Credit (+) Deposit</option>
+                      <option value="withdrawal">Debit (-) Withdrawal</option>
+                    </select>
+                  </div>
+                </div>
+                <div className={styles.formGrid2}>
                   <Input label="Effective Date" type="date" value={operationDate} onChange={e => setOperationDate(e.target.value)} />
-                  <Input label="Default Purpose" placeholder="Applied to all rows..." value={globalPurpose} onChange={e => setGlobalPurpose(e.target.value)} />
+                  <Input label="Default Purpose" placeholder="e.g. June Mess Fee (Use {Month} for auto-date)" value={globalPurpose} onChange={e => setGlobalPurpose(e.target.value)} />
                 </div>
               </div>
             </div>
@@ -608,6 +615,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                         onClick={async () => {
                           try {
                             const batchMembers = await studentService.listByBatch(b.id);
+                            const numericAmt = parseFloat(globalAmount) || 0;
                             const batchParticipants = batchMembers
                               .filter((student: any) => student && student.id)
                               .map((student: any) => ({
@@ -615,9 +623,9 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                                 student_id: student.id,
                                 name: student.name,
                                 enrolment_no: student.enrolment_no,
-                                amount: presetDefaultAmount,
-                                type: presetDefaultType as 'deposit' | 'withdrawal',
-                                purpose: globalPurpose || drawerData?.preset?.configuration?.purpose || '',
+                                amount: numericAmt,
+                                type: globalType,
+                                purpose: globalPurpose || '',
                                 notes: ''
                               }));
                             setParticipants(batchParticipants);
@@ -695,87 +703,40 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
 
         {step === 'participants' && (
           <div className="flex flex-col gap-3">
-            {activeLoadedPreset && (
-              <div className="bg-primary/10 border border-primary/20 rounded-xl p-3 flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-xs">
-                    ⚡
-                  </div>
-                  <div>
-                    <div className="font-bold text-xs text-primary">Loaded Preset: {activeLoadedPreset.name}</div>
-                    <div className="text-[11px] text-muted font-medium">
-                      Default: <span className="font-bold text-foreground">₹{presetDefaultAmount}</span> • Type: <span className="font-bold text-foreground">{presetDefaultType === 'withdrawal' ? 'Debit (-)' : 'Credit (+)'}</span>
-                    </div>
-                  </div>
-                </div>
-                {presetDefaultAmount > 0 && (
-                  <Button 
-                    variant="soft" 
-                    size="sm" 
-                    onClick={handleApplyPresetAmountToAll}
-                    className="text-xs shrink-0"
-                  >
-                    Apply ₹{presetDefaultAmount} to All
-                  </Button>
-                )}
-              </div>
-            )}
-
-            {/* Quick Amount Calculation Tools */}
-            {participants.length > 0 && (
-              <div className="flex flex-col gap-2 p-3 bg-secondary/40 border border-border rounded-xl">
-                <div className="flex items-center justify-between text-xs font-bold text-muted uppercase tracking-wider">
-                  <span>Amount Tools</span>
-                  <div className="flex gap-2">
-                    <button 
-                      type="button" 
-                      onClick={() => { setShowAdjustTool(false); setShowSplitTool(!showSplitTool); }}
-                      className="text-primary hover:underline"
-                    >
-                      Split Total
-                    </button>
+            {/* Global Operation Parameters Summary Bar */}
+            <div className="bg-secondary/40 border border-border rounded-xl p-3 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-semibold text-foreground overflow-hidden">
+                <span className="text-muted shrink-0">{activeLoadedPreset ? `Preset (${activeLoadedPreset.name}):` : 'Global Default:'}</span>
+                <span className="font-bold text-primary shrink-0">₹{globalAmount || '0'}</span>
+                <span>•</span>
+                <span className={globalType === 'withdrawal' ? 'text-danger font-bold shrink-0' : 'text-success font-bold shrink-0'}>
+                  {globalType === 'withdrawal' ? 'Debit (-)' : 'Credit (+)'}
+                </span>
+                {globalPurpose && (
+                  <>
                     <span>•</span>
-                    <button 
-                      type="button" 
-                      onClick={() => { setShowSplitTool(false); setShowAdjustTool(!showAdjustTool); }}
-                      className="text-primary hover:underline"
-                    >
-                      Quick Adjust (+/-)
-                    </button>
-                  </div>
-                </div>
-
-                {showSplitTool && (
-                  <div className="flex items-center gap-2 mt-1">
-                    <input 
-                      type="number"
-                      placeholder="Enter total amount to split..."
-                      value={splitTotalInput}
-                      onChange={e => setSplitTotalInput(e.target.value)}
-                      className="flex-1 text-xs p-2 rounded-lg border border-border bg-white text-foreground"
-                    />
-                    <Button size="sm" variant="primary" onClick={handleEqualSplitSubmit} className="text-xs">
-                      Calculate
-                    </Button>
-                  </div>
-                )}
-
-                {showAdjustTool && (
-                  <div className="flex items-center gap-2 mt-1">
-                    <input 
-                      type="number"
-                      placeholder="Amount to add (+50) or subtract (-50)..."
-                      value={adjustAmountInput}
-                      onChange={e => setAdjustAmountInput(e.target.value)}
-                      className="flex-1 text-xs p-2 rounded-lg border border-border bg-white text-foreground"
-                    />
-                    <Button size="sm" variant="primary" onClick={handleBulkAdjustSubmit} className="text-xs">
-                      Apply
-                    </Button>
-                  </div>
+                    <span className="text-muted truncate max-w-[140px]">{globalPurpose}</span>
+                  </>
                 )}
               </div>
-            )}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <input
+                  type="number"
+                  placeholder="Sync ₹"
+                  value={globalAmount}
+                  onChange={e => handleSyncGlobalAmountToAll(e.target.value)}
+                  className="w-20 text-xs p-1 rounded-lg border border-border bg-white text-right font-medium"
+                />
+                <select
+                  value={globalType}
+                  onChange={e => handleSyncGlobalTypeToAll(e.target.value as any)}
+                  className="text-xs p-1 rounded-lg border border-border bg-white font-medium"
+                >
+                  <option value="deposit">Credit (+)</option>
+                  <option value="withdrawal">Debit (-)</option>
+                </select>
+              </div>
+            </div>
 
             <StudentSearch 
               label="Participant Lookup" 
