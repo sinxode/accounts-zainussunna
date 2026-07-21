@@ -16,29 +16,20 @@
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-
-  @include desktop {
-    padding-left: 316px; // 300px + 16px gap
-  }
-
-  @include laptop {
-    padding-left: 316px; // 300px + 16px gap
-  }
-  
-  @include tablet {
-    padding-left: 316px; // Default expanded state
-  }
+  padding-left: 316px; // 300px + 16px gap for Desktop, Laptop, Tablet
 
   @include mobile {
-    padding-left: 0;
+    padding-left: 0 !important;
     padding-bottom: calc(64px + 16px + env(safe-area-inset-bottom)); // Space for BottomActionBar + FAB
   }
 }
 
 .mainWithCollapsedSidebar {
-  @include desktop { padding-left: 106px; }
-  @include laptop { padding-left: 106px; }
-  @include tablet { padding-left: 106px; }
+  padding-left: 106px;
+
+  @include mobile {
+    padding-left: 0 !important;
+  }
 }
 
 .content {

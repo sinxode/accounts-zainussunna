@@ -51,7 +51,9 @@ export const Sidebar: React.FC = () => {
 
   // Auto-collapse sidebar on tablet screen widths to optimize workspace layout
   useEffect(() => {
-    if (width >= 768 && width < 1024) {
+    if (width < 768) {
+      setSidebarCollapsed(false);
+    } else if (width >= 768 && width < 1024) {
       setSidebarCollapsed(true);
     } else if (width >= 1024) {
       setSidebarCollapsed(false);
