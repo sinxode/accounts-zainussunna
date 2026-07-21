@@ -63,3 +63,15 @@ export const normalizeAmount = (input: string): number => {
   const parsed = parseFloat(clean);
   return isNaN(parsed) ? 0 : parsed;
 };
+
+export const formatSmartPurpose = (template: string): string => {
+  if (!template) return '';
+  const now = new Date();
+  const monthName = now.toLocaleString('default', { month: 'long' });
+  const yearName = now.getFullYear().toString();
+  const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return template
+    .replace(/\{Month\}/gi, monthName)
+    .replace(/\{Year\}/gi, yearName)
+    .replace(/\{Date\}/gi, dateStr);
+};

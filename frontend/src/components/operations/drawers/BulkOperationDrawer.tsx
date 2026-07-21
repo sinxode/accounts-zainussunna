@@ -23,6 +23,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../../contexts/AuthContext';
 import { transactionService, studentService, presetService, batchService } from '../../../lib/services';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { formatSmartPurpose } from '../../../lib/utils';
 import styles from './DrawerStyles.module.scss';
 import { useOperationsDrawer } from './OperationsDrawerContext';
 import { useUIStore } from '../../../store/useUIStore';
@@ -45,10 +46,18 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   const [step, setStep] = useState<Step>(drawerData?.preset ? 'participants' : 'configure');
   const [operationName, setOperationName] = useState(drawerData?.preset?.name || '');
   const [operationDate, setOperationDate] = useState(new Date().toISOString().split('T')[0]);
-  const [globalPurpose, setGlobalPurpose] = useState(drawerData?.preset?.configuration?.purpose || '');
+  const [globalPurpose, setGlobalPurpose] = useState(
+    formatSmartPurpose(drawerData?.preset?.configuration?.purpose || drawerData?.preset?.purpose || '')
+  );
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [isSavingPreset, setIsSavingPreset] = useState(false);
   const [showBatchSelect, setShowBatchSelect] = useState(false);
+  const [showPresetSelect, setShowPresetSelect] = useState(false);
+  const [showSplitTool, setShowSplitTool] = useState(false);
+  const [splitTotalInput, setSplitTotalInput] = useState('');
+  const [showAdjustTool, setShowAdjustTool] = useState(false);
+  const [adjustAmountInput, setAdjustAmountInput] = useState('');
+  const [activeLoadedPreset, setActiveLoadedPreset] = useState<any>(drawerData?.preset || null);
   
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -59,6 +68,13 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     queryKey: ['batches'],
     queryFn: batchService.list,
     enabled: showBatchSelect
+  });
+
+  // Load saved presets for selection
+  const { data: presets, isLoading: isPresetsLoading } = useQuery({
+    queryKey: ['presets'],
+    queryFn: presetService.list,
+    enabled: showPresetSelect
   });
 
   // Load preset or batch data if provided
@@ -164,19 +180,89 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   });
 
   const presetDefaultAmount = useMemo(() => {
-    if (!drawerData?.preset) return 0;
-    return drawerData.preset.configuration?.amount ?? drawerData.preset.amount ?? 0;
-  }, [drawerData?.preset]);
+    if (!activeLoadedPreset) return 0;
+    return activeLoadedPreset.configuration?.amount ?? activeLoadedPreset.amount ?? 0;
+  }, [activeLoadedPreset]);
 
   const presetDefaultType = useMemo(() => {
-    if (!drawerData?.preset) return 'deposit';
-    return drawerData.preset.configuration?.type || drawerData.preset.transaction_type || 'deposit';
-  }, [drawerData?.preset]);
+    if (!activeLoadedPreset) return 'deposit';
+    return activeLoadedPreset.configuration?.type || activeLoadedPreset.transaction_type || 'deposit';
+  }, [activeLoadedPreset]);
+
+  const handleApplyPreset = async (preset: any) => {
+    setActiveLoadedPreset(preset);
+    if (!operationName) setOperationName(preset.name);
+    const config = preset.configuration;
+    const formattedPurp = formatSmartPurpose(config?.purpose || preset.purpose || '');
+    if (formattedPurp) setGlobalPurpose(formattedPurp);
+
+    if (config?.participants && Array.isArray(config.participants)) {
+      const restored = config.participants.map((p: any) => ({
+        id: crypto.randomUUID(),
+        student_id: p.student_id,
+        name: p.name || 'Student',
+        enrolment_no: p.enrolment_no || 'N/A',
+        amount: p.amount || config.amount || 0,
+        type: (p.type || config.type || 'deposit') as 'deposit' | 'withdrawal',
+        purpose: formattedPurp || '',
+        notes: ''
+      }));
+      setParticipants(restored);
+    } else if (config?.batch_id) {
+      try {
+        const batchMembers = await studentService.listByBatch(config.batch_id);
+        const batchParticipants = batchMembers
+          .filter((student: any) => student && student.id)
+          .map((student: any) => ({
+            id: crypto.randomUUID(),
+            student_id: student.id,
+            name: student.name,
+            enrolment_no: student.enrolment_no,
+            amount: config.amount || 0,
+            type: (config.type || 'deposit') as 'deposit' | 'withdrawal',
+            purpose: formattedPurp || '',
+            notes: ''
+          }));
+        setParticipants(batchParticipants);
+      } catch {
+        toast.error('Failed to load preset batch members');
+      }
+    }
+    setShowPresetSelect(false);
+    setStep('participants');
+    toast.success(`Loaded preset "${preset.name}"`);
+  };
 
   const handleApplyPresetAmountToAll = () => {
     if (!presetDefaultAmount) return;
     setParticipants(participants.map(p => ({ ...p, amount: presetDefaultAmount, type: presetDefaultType })));
     toast.success(`Applied default amount (₹${presetDefaultAmount}) to all students`);
+  };
+
+  const handleEqualSplitSubmit = () => {
+    const totalVal = parseFloat(splitTotalInput);
+    if (isNaN(totalVal) || totalVal <= 0) {
+      return toast.error('Please enter a valid total amount');
+    }
+    if (participants.length === 0) {
+      return toast.error('No participating students to split among');
+    }
+    const perPerson = Math.round(totalVal / participants.length);
+    setParticipants(participants.map(p => ({ ...p, amount: perPerson })));
+    toast.success(`Split ₹${totalVal.toLocaleString()} equally: ₹${perPerson.toLocaleString()} per student`);
+    setShowSplitTool(false);
+    setSplitTotalInput('');
+  };
+
+  const handleBulkAdjustSubmit = () => {
+    const delta = parseFloat(adjustAmountInput);
+    if (isNaN(delta) || delta === 0) {
+      return toast.error('Please enter a valid adjustment amount');
+    }
+    setParticipants(participants.map(p => ({ ...p, amount: Math.max(0, p.amount + delta) })));
+    toast.success(`Adjusted all amounts by ₹${delta > 0 ? '+' : ''}${delta}`);
+    setShowAdjustTool(false);
+    setAdjustAmountInput('');
   };
 
   const handleAddParticipant = (student: any) => {
@@ -555,17 +641,45 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                   )}
                 </div>
               </div>
+            ) : showPresetSelect ? (
+              <div className={styles.configSection}>
+                <div className="flex justify-between items-center mb-1">
+                  <span className={styles.sectionTitle}><LayoutTemplate size={13} className="text-primary" /> Select Entry Preset</span>
+                  <button type="button" onClick={() => setShowPresetSelect(false)} className="text-xs text-primary font-semibold hover:underline">Cancel</button>
+                </div>
+                <div className="flex flex-col gap-2 max-h-[160px] overflow-y-auto">
+                  {isPresetsLoading ? (
+                    <div className="text-xs text-muted py-4 text-center">Loading presets...</div>
+                  ) : presets && presets.length > 0 ? (
+                    presets.map((pr: any) => (
+                      <button
+                        key={pr.id}
+                        type="button"
+                        className={styles.batchSelectItem}
+                        onClick={() => handleApplyPreset(pr)}
+                      >
+                        <span className="font-bold text-xs">{pr.name}</span>
+                        <span className="text-[10px] text-muted">{pr.description || 'Preset configuration'}</span>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="text-xs text-muted py-4 text-center">No presets found. Create your first preset to get started.</div>
+                  )}
+                </div>
+              </div>
             ) : (
-              <div className={styles.formGrid2}>
-                <button type="button" className={styles.actionBlockBtn} onClick={() => setShowBatchSelect(true)}>
-                  <UsersRound size={18} className={styles.actionIcon} />
-                  <span className={styles.actionLabel}>Load from Batch</span>
-                  <span className={styles.actionSub}>Predefined group</span>
+              <div className="grid grid-cols-3 gap-2">
+                <button type="button" className={styles.actionBlockBtn} onClick={() => { setShowPresetSelect(false); setShowBatchSelect(true); }}>
+                  <UsersRound size={16} className={styles.actionIcon} />
+                  <span className={styles.actionLabel}>Load Batch</span>
+                </button>
+                <button type="button" className={styles.actionBlockBtn} onClick={() => { setShowBatchSelect(false); setShowPresetSelect(true); }}>
+                  <LayoutTemplate size={16} className={styles.actionIcon} />
+                  <span className={styles.actionLabel}>Load Preset</span>
                 </button>
                 <button type="button" className={styles.actionBlockBtn} onClick={() => document.getElementById('csv-file-input')?.click()}>
-                  <FileSpreadsheet size={18} className={styles.actionIcon} />
+                  <FileSpreadsheet size={16} className={styles.actionIcon} />
                   <span className={styles.actionLabel}>Import CSV</span>
-                  <span className={styles.actionSub}>Spreadsheet data</span>
                 </button>
                 <input 
                   type="file" 
@@ -581,14 +695,14 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
 
         {step === 'participants' && (
           <div className="flex flex-col gap-3">
-            {drawerData?.preset && (
+            {activeLoadedPreset && (
               <div className="bg-primary/10 border border-primary/20 rounded-xl p-3 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-xs">
                     ⚡
                   </div>
                   <div>
-                    <div className="font-bold text-xs text-primary">Loaded Preset: {drawerData.preset.name}</div>
+                    <div className="font-bold text-xs text-primary">Loaded Preset: {activeLoadedPreset.name}</div>
                     <div className="text-[11px] text-muted font-medium">
                       Default: <span className="font-bold text-foreground">₹{presetDefaultAmount}</span> • Type: <span className="font-bold text-foreground">{presetDefaultType === 'withdrawal' ? 'Debit (-)' : 'Credit (+)'}</span>
                     </div>
@@ -603,6 +717,62 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                   >
                     Apply ₹{presetDefaultAmount} to All
                   </Button>
+                )}
+              </div>
+            )}
+
+            {/* Quick Amount Calculation Tools */}
+            {participants.length > 0 && (
+              <div className="flex flex-col gap-2 p-3 bg-secondary/40 border border-border rounded-xl">
+                <div className="flex items-center justify-between text-xs font-bold text-muted uppercase tracking-wider">
+                  <span>Amount Tools</span>
+                  <div className="flex gap-2">
+                    <button 
+                      type="button" 
+                      onClick={() => { setShowAdjustTool(false); setShowSplitTool(!showSplitTool); }}
+                      className="text-primary hover:underline"
+                    >
+                      Split Total
+                    </button>
+                    <span>•</span>
+                    <button 
+                      type="button" 
+                      onClick={() => { setShowSplitTool(false); setShowAdjustTool(!showAdjustTool); }}
+                      className="text-primary hover:underline"
+                    >
+                      Quick Adjust (+/-)
+                    </button>
+                  </div>
+                </div>
+
+                {showSplitTool && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <input 
+                      type="number"
+                      placeholder="Enter total amount to split..."
+                      value={splitTotalInput}
+                      onChange={e => setSplitTotalInput(e.target.value)}
+                      className="flex-1 text-xs p-2 rounded-lg border border-border bg-white text-foreground"
+                    />
+                    <Button size="sm" variant="primary" onClick={handleEqualSplitSubmit} className="text-xs">
+                      Calculate
+                    </Button>
+                  </div>
+                )}
+
+                {showAdjustTool && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <input 
+                      type="number"
+                      placeholder="Amount to add (+50) or subtract (-50)..."
+                      value={adjustAmountInput}
+                      onChange={e => setAdjustAmountInput(e.target.value)}
+                      className="flex-1 text-xs p-2 rounded-lg border border-border bg-white text-foreground"
+                    />
+                    <Button size="sm" variant="primary" onClick={handleBulkAdjustSubmit} className="text-xs">
+                      Apply
+                    </Button>
+                  </div>
                 )}
               </div>
             )}

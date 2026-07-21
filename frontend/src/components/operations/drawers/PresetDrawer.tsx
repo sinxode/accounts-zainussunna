@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
+import { StudentSearch } from '../../ui/StudentSearch';
 import styles from './PresetDrawer.module.scss';
 import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
@@ -58,9 +59,13 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
   const [name, setName] = useState(editingPreset?.name || '');
   const [description, setDescription] = useState(editingPreset?.description || '');
   const [category, setCategory] = useState(editingPreset?.category || 'Monthly');
+  const [targetMode, setTargetMode] = useState<'batch' | 'fixed' | 'shortcut'>(
+    editingPreset?.configuration?.participants?.length ? 'fixed' : editingPreset?.configuration?.batch_id ? 'batch' : 'shortcut'
+  );
   
   // Default Values State
   const [selectedBatch, setSelectedBatch] = useState<any>(null);
+  const [fixedParticipants, setFixedParticipants] = useState<any[]>(editingPreset?.configuration?.participants || []);
   const [amount, setAmount] = useState(
     editingPreset?.configuration?.amount ?? editingPreset?.amount ? String(editingPreset?.configuration?.amount ?? editingPreset?.amount) : ''
   );
@@ -124,8 +129,16 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
     if (!name) return toast.error('Preset name is required');
     
     const configuration = {
-      batch_id: selectedBatch?.id,
-      batch_name: selectedBatch?.name,
+      target_mode: targetMode,
+      batch_id: targetMode === 'batch' ? selectedBatch?.id : undefined,
+      batch_name: targetMode === 'batch' ? selectedBatch?.name : undefined,
+      participants: targetMode === 'fixed' ? fixedParticipants.map(p => ({
+        student_id: p.student_id,
+        name: p.name,
+        enrolment_no: p.enrolment_no,
+        amount: p.amount ? parseFloat(String(p.amount)) : (amount ? parseFloat(amount) : 0),
+        type: txType
+      })) : undefined,
       amount: amount ? parseFloat(amount) : undefined,
       purpose: purpose || undefined,
       type: txType,
@@ -279,31 +292,117 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
           </div>
         </section>
 
-        {/* Section 2: Default Values */}
+        {/* Section 2: Target & Default Values */}
         <section className={styles.section}>
           <div className={styles.sectionTitle}>
-            <Target size={14} /> Default Values
+            <Target size={14} /> Target & Default Values
           </div>
 
-          <div className={styles.defaultValueGrid}>
-            {/* Batch Card */}
-            <div className={styles.valueCard}>
-              <div className={styles.cardLabel}>
-                <Layers size={12} /> Default Batch
-              </div>
-              <select 
-                value={selectedBatch?.id || ''} 
-                onChange={e => {
-                  const batch = batches.find(b => b.id === e.target.value);
-                  setSelectedBatch(batch);
-                }}
+          <div className="flex flex-col gap-3">
+            {/* Target Mode Selector */}
+            <div className="flex bg-secondary/50 p-1 rounded-xl gap-1 border border-border">
+              <button
+                type="button"
+                onClick={() => setTargetMode('batch')}
+                className={clsx(
+                  "flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center",
+                  targetMode === 'batch' ? "bg-primary text-white shadow-sm" : "text-muted hover:text-foreground"
+                )}
               >
-                <option value="">No Default Batch</option>
-                {batches.map(b => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
+                Dynamic Batch
+              </button>
+              <button
+                type="button"
+                onClick={() => setTargetMode('fixed')}
+                className={clsx(
+                  "flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center",
+                  targetMode === 'fixed' ? "bg-primary text-white shadow-sm" : "text-muted hover:text-foreground"
+                )}
+              >
+                Fixed List
+              </button>
+              <button
+                type="button"
+                onClick={() => setTargetMode('shortcut')}
+                className={clsx(
+                  "flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center",
+                  targetMode === 'shortcut' ? "bg-primary text-white shadow-sm" : "text-muted hover:text-foreground"
+                )}
+              >
+                Quick Shortcut
+              </button>
             </div>
+
+            <div className={styles.defaultValueGrid}>
+              {/* Batch Card (if targetMode === 'batch') */}
+              {targetMode === 'batch' && (
+                <div className={styles.valueCard}>
+                  <div className={styles.cardLabel}>
+                    <Layers size={12} /> Default Batch
+                  </div>
+                  <select 
+                    value={selectedBatch?.id || ''} 
+                    onChange={e => {
+                      const batch = batches.find(b => b.id === e.target.value);
+                      setSelectedBatch(batch);
+                    }}
+                  >
+                    <option value="">Select Batch</option>
+                    {batches.map(b => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Fixed List Search (if targetMode === 'fixed') */}
+              {targetMode === 'fixed' && (
+                <div className="col-span-full flex flex-col gap-2 p-3 bg-secondary/30 border border-border rounded-xl">
+                  <span className="text-xs font-bold text-muted uppercase">Fixed Participants ({fixedParticipants.length})</span>
+                  <StudentSearch 
+                    placeholder="Search to add fixed student to preset..." 
+                    onSelect={(st: any) => {
+                      if (!fixedParticipants.find(p => p.student_id === st.id)) {
+                        setFixedParticipants([...fixedParticipants, {
+                          student_id: st.id,
+                          name: st.name,
+                          enrolment_no: st.enrolment_no,
+                          amount: amount || '0'
+                        }]);
+                      }
+                    }}
+                    clearOnSelect
+                  />
+                  {fixedParticipants.length > 0 && (
+                    <div className="flex flex-col gap-1.5 max-h-[140px] overflow-y-auto mt-1">
+                      {fixedParticipants.map((p, idx) => (
+                        <div key={p.student_id || idx} className="flex items-center justify-between text-xs p-2 bg-white rounded-lg border border-border">
+                          <span className="font-semibold text-foreground">{p.name}</span>
+                          <div className="flex items-center gap-2">
+                            <input 
+                              type="number"
+                              placeholder="Amount"
+                              value={p.amount}
+                              onChange={e => {
+                                const newAmount = e.target.value;
+                                setFixedParticipants(fixedParticipants.map((item, i) => i === idx ? { ...item, amount: newAmount } : item));
+                              }}
+                              className="w-20 text-xs p-1 border border-border rounded text-right"
+                            />
+                            <button 
+                              type="button" 
+                              onClick={() => setFixedParticipants(fixedParticipants.filter((_, i) => i !== idx))}
+                              className="text-danger hover:underline font-bold"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
             {/* Amount Card */}
             <div className={styles.valueCard}>

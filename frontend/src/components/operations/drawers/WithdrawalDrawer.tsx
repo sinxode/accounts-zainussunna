@@ -7,9 +7,11 @@ import { StudentSearch } from '../../ui/StudentSearch';
 import styles from './DrawerStyles.module.scss';
 import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
-import { transactionService, studentService } from '../../../lib/services';
+import { transactionService, studentService, presetService } from '../../../lib/services';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../../contexts/AuthContext';
+import { Zap } from 'lucide-react';
+import { formatSmartPurpose } from '../../../lib/utils';
 
 export const WithdrawalDrawer: React.FC<{ onClose: () => void; initialStudentId?: string }> = ({ onClose, initialStudentId }) => {
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
@@ -20,6 +22,11 @@ export const WithdrawalDrawer: React.FC<{ onClose: () => void; initialStudentId?
   
   const queryClient = useQueryClient();
   const { user } = useAuth();
+
+  const { data: presets } = useQuery({
+    queryKey: ['presets'],
+    queryFn: presetService.list
+  });
 
   // Pre-fetch student if initialStudentId is provided
   const { data: fetchedStudent } = useQuery({
@@ -116,6 +123,32 @@ export const WithdrawalDrawer: React.FC<{ onClose: () => void; initialStudentId?
       }
     >
       <div className={styles.drawerContent}>
+        {presets && presets.length > 0 && (
+          <div className="flex items-center gap-2 mb-1 p-2 bg-secondary/50 border border-border rounded-xl">
+            <Zap size={14} className="text-amber-500 fill-amber-500 shrink-0" />
+            <span className="text-xs font-semibold text-muted shrink-0">Quick Preset:</span>
+            <select
+              className="text-xs bg-white border border-border rounded-lg px-2 py-1 text-foreground flex-1 font-medium"
+              onChange={(e) => {
+                const pr = presets.find(p => p.id === e.target.value);
+                if (pr) {
+                  const prAmount = pr.configuration?.amount ?? pr.amount;
+                  if (prAmount) setAmount(String(prAmount));
+                  const prPurpose = formatSmartPurpose(pr.configuration?.purpose || pr.purpose || '');
+                  if (prPurpose) setPurpose(prPurpose);
+                  toast.success(`Applied preset "${pr.name}"`);
+                }
+              }}
+              defaultValue=""
+            >
+              <option value="" disabled>Select a Preset to Pre-fill...</option>
+              {presets.map(p => (
+                <option key={p.id} value={p.id}>{p.name} (₹{p.configuration?.amount ?? p.amount ?? 0})</option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {initialStudentId ? (
           <div className={styles.selectedStudent}>
             <div className={styles.avatar}>{selectedStudent?.name?.charAt(0) || '?'}</div>
