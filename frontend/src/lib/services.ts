@@ -632,6 +632,23 @@ export const presetService = {
       .single();
     if (error) throw error;
     return data;
+  },
+  update: async (id: string, preset: any) => {
+    const { data, error } = await supabase
+      .from('transaction_presets')
+      .update(preset)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+  delete: async (id: string) => {
+    const { error } = await supabase
+      .from('transaction_presets')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
   }
 };
 

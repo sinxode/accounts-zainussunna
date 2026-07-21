@@ -163,6 +163,22 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     }
   });
 
+  const presetDefaultAmount = useMemo(() => {
+    if (!drawerData?.preset) return 0;
+    return drawerData.preset.configuration?.amount ?? drawerData.preset.amount ?? 0;
+  }, [drawerData?.preset]);
+
+  const presetDefaultType = useMemo(() => {
+    if (!drawerData?.preset) return 'deposit';
+    return drawerData.preset.configuration?.type || drawerData.preset.transaction_type || 'deposit';
+  }, [drawerData?.preset]);
+
+  const handleApplyPresetAmountToAll = () => {
+    if (!presetDefaultAmount) return;
+    setParticipants(participants.map(p => ({ ...p, amount: presetDefaultAmount, type: presetDefaultType })));
+    toast.success(`Applied default amount (₹${presetDefaultAmount}) to all students`);
+  };
+
   const handleAddParticipant = (student: any) => {
     if (participants.find(p => p.student_id === student.id)) {
       toast.error('Student already added');
@@ -174,9 +190,9 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
       student_id: student.id,
       name: student.name,
       enrolment_no: student.enrolment_no,
-      amount: 0,
-      type: 'deposit',
-      purpose: globalPurpose,
+      amount: presetDefaultAmount,
+      type: presetDefaultType,
+      purpose: globalPurpose || drawerData?.preset?.configuration?.purpose || '',
       notes: ''
     };
 
@@ -513,9 +529,9 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                                 student_id: student.id,
                                 name: student.name,
                                 enrolment_no: student.enrolment_no,
-                                amount: 0,
-                                type: 'deposit' as 'deposit' | 'withdrawal',
-                                purpose: globalPurpose || '',
+                                amount: presetDefaultAmount,
+                                type: presetDefaultType as 'deposit' | 'withdrawal',
+                                purpose: globalPurpose || drawerData?.preset?.configuration?.purpose || '',
                                 notes: ''
                               }));
                             setParticipants(batchParticipants);
@@ -565,6 +581,32 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
 
         {step === 'participants' && (
           <div className="flex flex-col gap-3">
+            {drawerData?.preset && (
+              <div className="bg-primary/10 border border-primary/20 rounded-xl p-3 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-xs">
+                    ⚡
+                  </div>
+                  <div>
+                    <div className="font-bold text-xs text-primary">Loaded Preset: {drawerData.preset.name}</div>
+                    <div className="text-[11px] text-muted font-medium">
+                      Default: <span className="font-bold text-foreground">₹{presetDefaultAmount}</span> • Type: <span className="font-bold text-foreground">{presetDefaultType === 'withdrawal' ? 'Debit (-)' : 'Credit (+)'}</span>
+                    </div>
+                  </div>
+                </div>
+                {presetDefaultAmount > 0 && (
+                  <Button 
+                    variant="soft" 
+                    size="sm" 
+                    onClick={handleApplyPresetAmountToAll}
+                    className="text-xs shrink-0"
+                  >
+                    Apply ₹{presetDefaultAmount} to All
+                  </Button>
+                )}
+              </div>
+            )}
+
             <StudentSearch 
               label="Participant Lookup" 
               placeholder="Search and link students..." 

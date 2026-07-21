@@ -5,8 +5,10 @@ import styles from '../../pages/presets/EntryPresets.module.scss';
 import { useQuery } from '@tanstack/react-query';
 import { presetService } from '../../lib/services';
 import { formatRelativeTime } from '../../lib/utils';
+import { useOperationsDrawer } from '../operations/drawers/OperationsDrawerContext';
 
 export const QuickAccessStrip: React.FC = () => {
+  const { openDrawer } = useOperationsDrawer();
   const { data: presets, isLoading } = useQuery({
     queryKey: ['presets'],
     queryFn: () => presetService.list()
@@ -44,6 +46,8 @@ export const QuickAccessStrip: React.FC = () => {
             category={preset.transaction_type}
             lastUsed={formatRelativeTime(preset.created_at)}
             isFavorite={true}
+            onRun={() => openDrawer('bulk', { preset })}
+            onEdit={() => openDrawer('preset', { preset, mode: 'edit' })}
           />
         ))}
       </div>

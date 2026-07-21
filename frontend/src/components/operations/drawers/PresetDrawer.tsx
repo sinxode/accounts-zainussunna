@@ -51,19 +51,40 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 };
 
 export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const { openDrawer } = useOperationsDrawer();
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Monthly');
+  const { openDrawer, drawerData } = useOperationsDrawer();
+  const editingPreset = drawerData?.preset;
+  const isEditMode = drawerData?.mode === 'edit' || !!editingPreset;
+
+  const [name, setName] = useState(editingPreset?.name || '');
+  const [description, setDescription] = useState(editingPreset?.description || '');
+  const [category, setCategory] = useState(editingPreset?.category || 'Monthly');
   
   // Default Values State
   const [selectedBatch, setSelectedBatch] = useState<any>(null);
-  const [amount, setAmount] = useState('');
-  const [purpose, setPurpose] = useState('');
-  const [txType, setTxType] = useState<'deposit' | 'withdrawal'>('deposit');
-  const [notes, setNotes] = useState('');
+  const [amount, setAmount] = useState(
+    editingPreset?.configuration?.amount ?? editingPreset?.amount ? String(editingPreset?.configuration?.amount ?? editingPreset?.amount) : ''
+  );
+  const [purpose, setPurpose] = useState(editingPreset?.configuration?.purpose || editingPreset?.purpose || '');
+  const [txType, setTxType] = useState<'deposit' | 'withdrawal'>(
+    editingPreset?.configuration?.type || editingPreset?.transaction_type || 'deposit'
+  );
+  const [notes, setNotes] = useState(editingPreset?.configuration?.notes || '');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const queryClient = useQueryClient();
+
+  const { data: batches = [] } = useQuery({
+    queryKey: ['batches'],
+    queryFn: batchService.list
+  });
+
+  useEffect(() => {
+    if (editingPreset?.configuration?.batch_id && batches.length > 0) {
+      const b = batches.find((item: any) => item.id === editingPreset.configuration.batch_id);
+      if (b) setSelectedBatch(b);
+    }
+  }, [editingPreset, batches]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -74,13 +95,6 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  
-  const queryClient = useQueryClient();
-
-  const { data: batches = [] } = useQuery({
-    queryKey: ['batches'],
-    queryFn: batchService.list
-  });
 
   const handleClear = () => {
     setName('');
@@ -93,11 +107,13 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
     setTxType('deposit');
   };
 
-  const createMutation = useMutation({
-    mutationFn: (data: any) => presetService.create(data),
+  const saveMutation = useMutation({
+    mutationFn: (data: any) => isEditMode && editingPreset?.id
+      ? presetService.update(editingPreset.id, data)
+      : presetService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['presets'] });
-      toast.success('Preset created successfully');
+      toast.success(isEditMode ? 'Preset updated successfully' : 'Preset created successfully');
     },
     onError: (error: any) => {
       toast.error(`Error: ${error.message}`);
@@ -126,7 +142,7 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
     };
 
     try {
-      await createMutation.mutateAsync(presetData);
+      await saveMutation.mutateAsync(presetData);
       
       if (runAfter) {
         openDrawer('bulk', { preset: presetData });
@@ -154,28 +170,30 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
 
   return (
     <DrawerLayout
-      title="Create Preset"
-      subtitle="Define reusable shortcuts for your operations"
+      title={isEditMode ? 'Edit Preset' : 'Create Preset'}
+      subtitle={isEditMode ? 'Update preset configuration shortcuts' : 'Define reusable shortcuts for your operations'}
       icon={<PlusCircle className="text-white" size={24} />}
       onClose={onClose}
       onClear={handleClear}
       footer={
         <div className="flex w-full gap-2">
-          <Button 
-            variant="secondary" 
-            onClick={() => handleSubmit(false, false)} 
-            loading={createMutation.isPending} 
-            className="flex-1"
-          >
-            Save & Next
-          </Button>
+          {!isEditMode && (
+            <Button 
+              variant="secondary" 
+              onClick={() => handleSubmit(false, false)} 
+              loading={saveMutation.isPending} 
+              className="flex-1"
+            >
+              Save & Next
+            </Button>
+          )}
           <Button 
             variant="primary" 
             onClick={() => handleSubmit(false, true)} 
-            loading={createMutation.isPending} 
+            loading={saveMutation.isPending} 
             className="flex-1"
           >
-            Save & Close
+            {isEditMode ? 'Update Preset' : 'Save & Close'}
           </Button>
         </div>
       }

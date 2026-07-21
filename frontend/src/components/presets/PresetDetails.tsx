@@ -8,9 +8,11 @@ import { useUIStore } from '../../store/useUIStore';
 import { useQuery } from '@tanstack/react-query';
 import { presetService } from '../../lib/services';
 import { formatDate, formatCurrency } from '../../lib/utils';
+import { useOperationsDrawer } from '../operations/drawers/OperationsDrawerContext';
 
 export const PresetDetails: React.FC = () => {
   const { selectedPresetId } = useUIStore();
+  const { openDrawer } = useOperationsDrawer();
 
   const { data: presets, isLoading } = useQuery({
     queryKey: ['presets'],
@@ -78,15 +80,17 @@ export const PresetDetails: React.FC = () => {
           <div className={styles.defaultsList}>
             <div className={styles.defaultRow}>
               <span className={styles.defaultKey}>Batch</span>
-              <span className={styles.defaultVal}>None Linked</span>
+              <span className={styles.defaultVal}>{selectedPreset?.configuration?.batch_name || 'None Linked'}</span>
             </div>
             <div className={styles.defaultRow}>
               <span className={styles.defaultKey}>Amount</span>
-              <span className={styles.defaultVal}>{selectedPreset?.amount ? formatCurrency(selectedPreset.amount) : '₹0'}</span>
+              <span className={styles.defaultVal}>
+                {(selectedPreset?.configuration?.amount ?? selectedPreset?.amount) ? formatCurrency(selectedPreset?.configuration?.amount ?? selectedPreset?.amount) : '₹0 (Variable)'}
+              </span>
             </div>
             <div className={styles.defaultRow}>
               <span className={styles.defaultKey}>Purpose</span>
-              <span className={styles.defaultVal}>{selectedPreset?.purpose}</span>
+              <span className={styles.defaultVal}>{selectedPreset?.configuration?.purpose || selectedPreset?.purpose || 'N/A'}</span>
             </div>
             <div className={styles.defaultRow}>
               <span className={styles.defaultKey}>Transaction Type</span>
@@ -100,8 +104,22 @@ export const PresetDetails: React.FC = () => {
         </div>
 
         <div className={styles.detailsActions}>
-          <Button variant="primary" icon={<Play size={16} />} className="w-full justify-center">Run Preset</Button>
-          <Button variant="soft" icon={<Edit size={16} />} className="w-full justify-center">Edit Configuration</Button>
+          <Button 
+            variant="primary" 
+            icon={<Play size={16} />} 
+            className="w-full justify-center"
+            onClick={() => selectedPreset && openDrawer('bulk', { preset: selectedPreset })}
+          >
+            Run Preset
+          </Button>
+          <Button 
+            variant="soft" 
+            icon={<Edit size={16} />} 
+            className="w-full justify-center"
+            onClick={() => selectedPreset && openDrawer('preset', { preset: selectedPreset, mode: 'edit' })}
+          >
+            Edit Configuration
+          </Button>
         </div>
       </Card>
     </div>
