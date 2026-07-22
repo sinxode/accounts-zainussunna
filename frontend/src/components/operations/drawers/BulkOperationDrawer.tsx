@@ -16,6 +16,7 @@ import {
   Star
 } from 'lucide-react';
 import { Input } from '../../ui/Input';
+import { Select } from '../../ui/Select';
 import { Button } from '../../ui/Button';
 import { StudentSearch } from '../../ui/StudentSearch';
 import { clsx } from 'clsx';
@@ -558,27 +559,21 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
               <div className="flex flex-col gap-2 mt-1">
                 <Input label="Operation Name" placeholder="e.g. Monthly Mess Fee - June 2026" value={operationName} onChange={e => setOperationName(e.target.value)} />
                 <div className={styles.formGrid2}>
-                  <div>
-                    <label className="text-xs font-semibold text-muted block mb-1">Global Default Amount (₹)</label>
-                    <input 
-                      type="number"
-                      placeholder="e.g. 1200 (Applied to all students)"
-                      value={globalAmount}
-                      onChange={e => handleSyncGlobalAmountToAll(e.target.value)}
-                      className="w-full text-xs p-2 rounded-lg border border-border bg-white text-foreground"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-muted block mb-1">Transaction Type</label>
-                    <select
-                      value={globalType}
-                      onChange={e => handleSyncGlobalTypeToAll(e.target.value as any)}
-                      className="w-full text-xs p-2 rounded-lg border border-border bg-white text-foreground"
-                    >
-                      <option value="deposit">Credit (+) Deposit</option>
-                      <option value="withdrawal">Debit (-) Withdrawal</option>
-                    </select>
-                  </div>
+                  <Input 
+                    label="Global Default Amount (₹)" 
+                    type="number"
+                    placeholder="e.g. 1200 (Applied to all students)"
+                    value={globalAmount}
+                    onChange={e => handleSyncGlobalAmountToAll(e.target.value)}
+                  />
+                  <Select
+                    label="Transaction Type"
+                    value={globalType}
+                    onChange={e => handleSyncGlobalTypeToAll(e.target.value as any)}
+                  >
+                    <option value="deposit">Credit (+) Deposit</option>
+                    <option value="withdrawal">Debit (-) Withdrawal</option>
+                  </Select>
                 </div>
                 <div className={styles.formGrid2}>
                   <Input label="Effective Date" type="date" value={operationDate} onChange={e => setOperationDate(e.target.value)} />
