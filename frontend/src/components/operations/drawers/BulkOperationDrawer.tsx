@@ -36,6 +36,7 @@ interface TransactionItem {
   amount: string;
   purpose: string;
   date: string;
+  type?: 'deposit' | 'withdrawal';
 }
 
 interface ParticipantGroup {
@@ -59,7 +60,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   // Common values
   const [commonAmount, setCommonAmount] = useState<string>('');
   const [commonPurpose, setCommonPurpose] = useState<string>('');
-  const [commonType, setCommonType] = useState<'deposit' | 'withdrawal'>('deposit');
+  const [commonType, setCommonType] = useState<'deposit' | 'withdrawal' | ''>('');
   const [commonDate, setCommonDate] = useState<string>('');
 
   // Preset saving fields
@@ -116,7 +117,8 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                 id: crypto.randomUUID(),
                 amount: '',
                 purpose: '',
-                date: ''
+                date: '',
+                type: 'deposit'
               }]
             })));
             setStep('participants');
@@ -137,7 +139,8 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
             id: crypto.randomUUID(),
             amount: p.amount ? String(p.amount) : '',
             purpose: '',
-            date: ''
+            date: '',
+            type: 'deposit'
           }]
         })));
         setStep('participants');
@@ -207,11 +210,12 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
 
     participants.forEach(p => {
       p.transactions.forEach(tx => {
+        const txType = commonType || tx.type || 'deposit';
         payload.push({
           student_id: p.student_id,
           operation_id: operationId,
-          transaction_type: commonType,
-          direction: commonType === 'deposit' ? 'credit' : 'debit',
+          transaction_type: txType,
+          direction: txType === 'deposit' ? 'credit' : 'debit',
           amount: parseFloat(commonAmount || tx.amount || '0'),
           purpose: formatSmartPurpose(commonPurpose || tx.purpose || 'Transaction Composer Entry'),
           transaction_date: new Date(commonDate || tx.date || new Date().toISOString().split('T')[0]).toISOString(),
@@ -393,7 +397,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     setParticipants([]);
     setCommonAmount('');
     setCommonPurpose('');
-    setCommonType('deposit');
+    setCommonType('');
     setCommonDate('');
     setParticipantSource(null);
     setSelectedBatchId('');
@@ -415,7 +419,8 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
               id: crypto.randomUUID(),
               amount: '',
               purpose: '',
-              date: ''
+              date: '',
+              type: 'deposit'
             }
           ]
         };
@@ -557,11 +562,11 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
       footer={renderFooter()}
     >
       <div className={styles.workspace}>
-        {/* Step 1: Common Values Selection */}
+        {/* Step 1: Shared Transaction Values Selection */}
         {step === 'configure' && (
           <>
             <div className={styles.stepHeader}>
-              <h2 className={styles.title}>Common Values</h2>
+              <h2 className={styles.title}>Shared Transaction Values</h2>
               <p className={styles.subtitle}>Enter anything that should remain identical for every transaction.</p>
             </div>
 
@@ -644,6 +649,33 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                 </select>
               </div>
             )}
+
+            {/* Shared vs Individual live summary */}
+            <div className="grid grid-cols-2 gap-6 p-5 mb-6 bg-slate-50 border border-slate-200 rounded-2xl">
+              <div>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2.5">Shared Values</span>
+                <ul className="text-sm text-slate-700 font-semibold space-y-2">
+                  {participants.length > 0 && <li className="flex items-center gap-1.5 text-green-600">✓ Participants</li>}
+                  {commonType && <li className="flex items-center gap-1.5 text-green-600">✓ Transaction Type</li>}
+                  {commonAmount && <li className="flex items-center gap-1.5 text-green-600">✓ Amount</li>}
+                  {commonPurpose && <li className="flex items-center gap-1.5 text-green-600">✓ Purpose</li>}
+                  {commonDate && <li className="flex items-center gap-1.5 text-green-600">✓ Date</li>}
+                  {participants.length === 0 && !commonType && !commonAmount && !commonPurpose && !commonDate && (
+                    <li className="text-xs text-slate-400 italic font-normal">No shared values selected yet</li>
+                  )}
+                </ul>
+              </div>
+              <div>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2.5">Individual Values</span>
+                <ul className="text-sm text-slate-600 space-y-2">
+                  {participants.length === 0 && <li className="flex items-center gap-1.5">• Participants</li>}
+                  {!commonType && <li className="flex items-center gap-1.5">• Transaction Type</li>}
+                  {!commonAmount && <li className="flex items-center gap-1.5">• Amount</li>}
+                  {!commonPurpose && <li className="flex items-center gap-1.5">• Purpose</li>}
+                  {!commonDate && <li className="flex items-center gap-1.5">• Date</li>}
+                </ul>
+              </div>
+            </div>
 
             {/* Participants Source Cards */}
             <div className={styles.section}>
@@ -844,6 +876,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                     value={commonType}
                     onChange={e => setCommonType(e.target.value as any)}
                   >
+                    <option value="">Individual (Choose per transaction)</option>
                     <option value="deposit">Credit (+) Deposit</option>
                     <option value="withdrawal">Debit (-) Withdrawal</option>
                   </select>
@@ -1014,6 +1047,20 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                             </div>
 
                             <div className={styles.transactionCardGrid}>
+                              {/* Transaction Type select cell */}
+                              {!commonType && (
+                                <div className={styles.inputWrapper}>
+                                  <label>Type</label>
+                                  <select 
+                                    value={tx.type || 'deposit'}
+                                    onChange={e => updateTransactionField(p.student_id, tx.id, 'type', e.target.value)}
+                                  >
+                                    <option value="deposit">Credit (+) Deposit</option>
+                                    <option value="withdrawal">Debit (-) Withdrawal</option>
+                                  </select>
+                                </div>
+                              )}
+
                               {/* Amount input cell */}
                               {!commonAmount && (
                                 <div className={styles.inputWrapper}>
