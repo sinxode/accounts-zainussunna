@@ -86,7 +86,16 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   // Restores preset if passed via context
   React.useEffect(() => {
     if (drawerData?.preset) {
-      const config = drawerData.preset.configuration;
+      let config = drawerData.preset.configuration;
+      if (typeof config === 'string') {
+        try {
+          config = JSON.parse(config);
+        } catch {
+          config = {};
+        }
+      }
+      config = config || {};
+
       setCommonAmount(drawerData.preset.amount ? String(drawerData.preset.amount) : '');
       setCommonPurpose(drawerData.preset.purpose || '');
       setCommonType(drawerData.preset.transaction_type || 'deposit');
@@ -96,6 +105,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
         setParticipantSource('batch');
         setSelectedBatchId(config.batch_id || '');
         if (config.batch_id) {
+          const loadToast = toast.loading('Loading preset batch students...');
           studentService.listByBatch(config.batch_id).then(members => {
             setParticipants(members.map((s: any) => ({
               student_id: s.id,
@@ -110,6 +120,10 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
               }]
             })));
             setStep('participants');
+            toast.dismiss(loadToast);
+          }).catch(() => {
+            toast.dismiss(loadToast);
+            toast.error('Failed to load preset batch students');
           });
         }
       } else if (config?.target_mode === 'fixed' && config.participants) {
@@ -130,6 +144,13 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
       }
     }
   }, [drawerData]);
+
+  // Expand the first participant accordion if none is expanded
+  React.useEffect(() => {
+    if (participants.length > 0 && !expandedStudentId) {
+      setExpandedStudentId(participants[0].student_id);
+    }
+  }, [participants, expandedStudentId]);
 
   // Aggregate transaction counts and estimated totals
   const totalTransactionsCount = useMemo(() => {
@@ -488,7 +509,16 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                   onChange={async (e) => {
                     const pr = presets.find(p => p.id === e.target.value);
                     if (pr) {
-                      const config = pr.configuration;
+                      let config = pr.configuration;
+                      if (typeof config === 'string') {
+                        try {
+                          config = JSON.parse(config);
+                        } catch {
+                          config = {};
+                        }
+                      }
+                      config = config || {};
+
                       setCommonAmount(pr.amount ? String(pr.amount) : '');
                       setCommonPurpose(pr.purpose || '');
                       setCommonType(pr.transaction_type || 'deposit');
@@ -498,6 +528,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                         setParticipantSource('batch');
                         setSelectedBatchId(config.batch_id || '');
                         if (config.batch_id) {
+                          const loadToast = toast.loading('Loading preset batch students...');
                           try {
                             const members = await studentService.listByBatch(config.batch_id);
                             setParticipants(members.map((s: any) => ({
@@ -513,7 +544,9 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                               }]
                             })));
                             setStep('participants');
+                            toast.dismiss(loadToast);
                           } catch {
+                            toast.dismiss(loadToast);
                             toast.error('Failed to load batch students');
                           }
                         }
