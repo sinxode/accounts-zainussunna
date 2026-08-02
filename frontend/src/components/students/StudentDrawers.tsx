@@ -25,7 +25,11 @@ export const AddStudentDrawer: React.FC<{ onClose: () => void }> = ({ onClose })
 
     setLoading(true);
     try {
-      const { error } = await supabase.from('students').insert([form]);
+      const cleanedName = form.name.replace(/^(Muhammed|Muhammad|Mohammed|Mohamed|Muhamad)\s+/i, '');
+      const { error } = await supabase.from('students').insert([{
+        ...form,
+        name: cleanedName
+      }]);
       if (error) throw error;
       toast.success('Student added successfully');
       queryClient.invalidateQueries({ queryKey: ['studentsSummary'] });
