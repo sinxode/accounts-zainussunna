@@ -468,6 +468,84 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     setParticipants(participants.filter(p => p.student_id !== studentId));
   };
 
+  const renderFooter = () => {
+    if (step === 'configure') {
+      return (
+        <Button
+          variant="primary"
+          disabled={participants.length === 0}
+          onClick={() => setStep('participants')}
+          icon={<ChevronRight size={16} />}
+          iconPosition="right"
+          fullWidth
+        >
+          Continue
+        </Button>
+      );
+    }
+
+    if (step === 'participants') {
+      return (
+        <div className={styles.stickyFooter} style={{ width: '100%' }}>
+          <div className={styles.footerStats}>
+            <div className={styles.statItem}>
+              <span className={styles.label}>Participants</span>
+              <span className={styles.value}>{participants.length} Student{participants.length !== 1 ? 's' : ''}</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.label}>Composed Count</span>
+              <span className={styles.value}>{totalTransactionsCount} Entry{totalTransactionsCount !== 1 ? 'ies' : ''}</span>
+            </div>
+            <div className={styles.statItem}>
+              <span className={styles.label}>Total Amount</span>
+              <span className={styles.value}>₹{totalAmount.toLocaleString()}</span>
+            </div>
+          </div>
+
+          <div className={styles.footerActions}>
+            <Button
+              variant="secondary"
+              onClick={() => setStep('configure')}
+            >
+              Back
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleProcess}
+              loading={bulkMutation.isPending}
+              disabled={hasErrors}
+            >
+              Process Composer
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    if (step === 'success') {
+      return (
+        <div className="flex w-full gap-2">
+          <Button
+            variant="secondary"
+            onClick={onClose}
+            className="flex-1"
+          >
+            View Transactions
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleClear}
+            className="flex-1"
+          >
+            Create Another
+          </Button>
+        </div>
+      );
+    }
+
+    return <></>;
+  };
+
   return (
     <DrawerLayout
       title={step === 'success' ? "Composer Success" : "Transaction Composer"}
@@ -476,43 +554,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
       onClose={onClose}
       onClear={step === 'success' ? undefined : handleClear}
       size="xl"
-      footer={
-        step === 'participants' && (
-          <div className={styles.stickyFooter}>
-            <div className={styles.footerStats}>
-              <div className={styles.statItem}>
-                <span className={styles.label}>Participants</span>
-                <span className={styles.value}>{participants.length} Student{participants.length !== 1 ? 's' : ''}</span>
-              </div>
-              <div className={styles.statItem}>
-                <span className={styles.label}>Composed Count</span>
-                <span className={styles.value}>{totalTransactionsCount} Entry{totalTransactionsCount !== 1 ? 'ies' : ''}</span>
-              </div>
-              <div className={styles.statItem}>
-                <span className={styles.label}>Total Amount</span>
-                <span className={styles.value}>₹{totalAmount.toLocaleString()}</span>
-              </div>
-            </div>
-
-            <div className={styles.footerActions}>
-              <Button
-                variant="secondary"
-                onClick={() => setStep('configure')}
-              >
-                Back
-              </Button>
-              <Button
-                variant="primary"
-                onClick={handleProcess}
-                loading={bulkMutation.isPending}
-                disabled={hasErrors}
-              >
-                Process Composer
-              </Button>
-            </div>
-          </div>
-        )
-      }
+      footer={renderFooter()}
     >
       <div className={styles.workspace}>
         {/* Step 1: Common Values Selection */}
@@ -871,16 +913,6 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
               </div>
             </div>
 
-            <Button
-              variant="primary"
-              disabled={participants.length === 0}
-              onClick={() => setStep('participants')}
-              icon={<ChevronRight size={16} />}
-              iconPosition="right"
-              fullWidth
-            >
-              Continue
-            </Button>
           </>
         )}
 
@@ -1067,22 +1099,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
               </div>
             </div>
 
-            <div className={styles.buttonRow}>
-              <Button
-                variant="secondary"
-                onClick={onClose}
-                className="flex-1"
-              >
-                View Transactions
-              </Button>
-              <Button
-                variant="primary"
-                onClick={handleClear}
-                className="flex-1"
-              >
-                Create Another
-              </Button>
-            </div>
+
 
             {!presetSaved ? (
               <div className={styles.savePresetBox}>
