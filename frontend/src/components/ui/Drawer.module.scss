@@ -41,10 +41,10 @@
     box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
   }
 
-  &.sm { @include desktop { width: 440px; } @include tablet { width: 440px; } }
-  &.md { @include desktop { width: 440px; } @include tablet { width: 440px; } }
-  &.lg { @include desktop { width: 640px; } @include tablet { width: 80%; } }
-  &.xl { @include desktop { width: 920px; } @include tablet { width: 90%; } }
+  &.sm { width: 440px; }
+  &.md { width: 440px; }
+  &.lg { width: 640px; }
+  &.xl { width: 920px; }
 }
 
 .backBtn {

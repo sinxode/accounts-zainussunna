@@ -152,6 +152,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     }
   }, [participants, expandedStudentId]);
 
+
   // Aggregate transaction counts and estimated totals
   const totalTransactionsCount = useMemo(() => {
     return participants.reduce((sum, p) => sum + p.transactions.length, 0);
@@ -221,6 +222,29 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
 
     bulkMutation.mutate(payload);
   };
+
+  // Keyboard Shortcuts
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (document.activeElement?.tagName === 'TEXTAREA') return;
+
+      if (e.key === 'Enter') {
+        if (e.metaKey || e.ctrlKey) {
+          e.preventDefault();
+          if (step === 'participants' && !hasErrors) {
+            handleProcess();
+          }
+        } else {
+          if (step === 'configure' && participants.length > 0) {
+            e.preventDefault();
+            setStep('participants');
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [step, participants, hasErrors, handleProcess]);
 
   const handleSaveAsPreset = async () => {
     if (!presetName) return toast.error('Preset name is required');
@@ -376,6 +400,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     setPresetName('');
     setPresetDescription('');
     setPresetSaved(false);
+    setStep('configure');
   };
 
   // Participant modifiers
