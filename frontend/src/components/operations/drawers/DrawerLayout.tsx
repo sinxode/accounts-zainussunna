@@ -12,6 +12,7 @@ interface DrawerLayoutProps {
   onClear?: () => void;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export const DrawerLayout: React.FC<DrawerLayoutProps> = ({ 
@@ -22,7 +23,8 @@ export const DrawerLayout: React.FC<DrawerLayoutProps> = ({
   onClose, 
   onClear,
   children, 
-  footer
+  footer,
+  size = 'md'
 }) => {
   const footerContent = (
     <div className="flex w-full items-center gap-2">
@@ -68,7 +70,7 @@ export const DrawerLayout: React.FC<DrawerLayoutProps> = ({
       }
       subtitle={subtitle}
       footer={footerContent}
-      size="xl"
+      size={size}
     >
       {children}
     </Drawer>

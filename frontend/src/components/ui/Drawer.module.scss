@@ -43,8 +43,8 @@
 
   &.sm { @include desktop { width: 440px; } @include tablet { width: 440px; } }
   &.md { @include desktop { width: 440px; } @include tablet { width: 440px; } }
-  &.lg { @include desktop { width: 440px; } @include tablet { width: 440px; } }
-  &.xl { @include desktop { width: 440px; } @include tablet { width: 440px; } }
+  &.lg { @include desktop { width: 640px; } @include tablet { width: 80%; } }
+  &.xl { @include desktop { width: 920px; } @include tablet { width: 90%; } }
 }
 
 .backBtn {
