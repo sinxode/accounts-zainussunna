@@ -8,7 +8,6 @@ import {
   FileText, 
   ArrowDownCircle, 
   Calendar, 
-  NotebookPen, 
   CheckCircle2, 
   Trash2, 
   ChevronRight, 
@@ -16,8 +15,7 @@ import {
   LayoutTemplate,
   ChevronDown,
   Plus,
-  Copy,
-  Tag
+  Copy
 } from 'lucide-react';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
@@ -38,9 +36,6 @@ interface TransactionItem {
   amount: string;
   purpose: string;
   date: string;
-  notes: string;
-  reference: string;
-  tags: string;
 }
 
 interface ParticipantGroup {
@@ -66,9 +61,6 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   const [commonPurpose, setCommonPurpose] = useState<string>('');
   const [commonType, setCommonType] = useState<'deposit' | 'withdrawal'>('deposit');
   const [commonDate, setCommonDate] = useState<string>('');
-  const [commonNotes, setCommonNotes] = useState<string>('');
-  const [commonReference, setCommonReference] = useState<string>('');
-  const [commonTags, setCommonTags] = useState<string>('');
 
   // Preset saving fields
   const [presetName, setPresetName] = useState<string>('');
@@ -98,10 +90,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
       setCommonAmount(drawerData.preset.amount ? String(drawerData.preset.amount) : '');
       setCommonPurpose(drawerData.preset.purpose || '');
       setCommonType(drawerData.preset.transaction_type || 'deposit');
-      setCommonNotes(config?.notes || '');
       setCommonDate(config?.date || '');
-      setCommonReference(config?.reference || '');
-      setCommonTags(config?.tags || '');
 
       if (config?.target_mode === 'batch') {
         setParticipantSource('batch');
@@ -117,10 +106,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                 id: crypto.randomUUID(),
                 amount: '',
                 purpose: '',
-                date: '',
-                notes: '',
-                reference: '',
-                tags: ''
+                date: ''
               }]
             })));
             setStep('participants');
@@ -137,10 +123,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
             id: crypto.randomUUID(),
             amount: p.amount ? String(p.amount) : '',
             purpose: '',
-            date: '',
-            notes: '',
-            reference: '',
-            tags: ''
+            date: ''
           }]
         })));
         setStep('participants');
@@ -237,10 +220,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
           })) : undefined,
           amount: commonAmount ? parseFloat(commonAmount) : undefined,
           type: commonType,
-          purpose: commonPurpose || undefined,
-          notes: commonNotes || undefined,
-          reference: commonReference || undefined,
-          tags: commonTags || undefined
+          purpose: commonPurpose || undefined
         },
         transaction_type: commonType,
         amount: commonAmount ? parseFloat(commonAmount) : null,
@@ -300,9 +280,6 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
         );
         const purposeIndex = headers.findIndex(h => h.includes('purpose') || h.includes('description'));
         const dateIndex = headers.findIndex(h => h.includes('date') || h.includes('time'));
-        const notesIndex = headers.findIndex(h => h.includes('note') || h.includes('remark'));
-        const referenceIndex = headers.findIndex(h => h.includes('reference') || h.includes('ref'));
-        const tagsIndex = headers.findIndex(h => h.includes('tag') || h.includes('label'));
 
         if (enrolmentIndex === -1) {
           toast.error("CSV must contain a column for 'Enrolment No' or 'Student ID'");
@@ -328,9 +305,6 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
             const parsedAmt = amountIndex !== -1 ? cols[amountIndex] : '';
             const parsedPurpose = purposeIndex !== -1 ? cols[purposeIndex] : '';
             const parsedDate = dateIndex !== -1 ? cols[dateIndex] : '';
-            const parsedNotes = notesIndex !== -1 ? cols[notesIndex] : '';
-            const parsedReference = referenceIndex !== -1 ? cols[referenceIndex] : '';
-            const parsedTags = tagsIndex !== -1 ? cols[tagsIndex] : '';
 
             if (!groupedCSV[student.id]) {
               groupedCSV[student.id] = { student, rows: [] };
@@ -339,10 +313,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
               id: crypto.randomUUID(),
               amount: parsedAmt,
               purpose: parsedPurpose,
-              date: parsedDate,
-              notes: parsedNotes,
-              reference: parsedReference,
-              tags: parsedTags
+              date: parsedDate
             });
             successCount++;
           } else {
@@ -379,9 +350,6 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     setCommonPurpose('');
     setCommonType('deposit');
     setCommonDate('');
-    setCommonNotes('');
-    setCommonReference('');
-    setCommonTags('');
     setParticipantSource(null);
     setSelectedBatchId('');
     setPresetName('');
@@ -401,10 +369,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
               id: crypto.randomUUID(),
               amount: '',
               purpose: '',
-              date: '',
-              notes: '',
-              reference: '',
-              tags: ''
+              date: ''
             }
           ]
         };
@@ -527,10 +492,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                       setCommonAmount(pr.amount ? String(pr.amount) : '');
                       setCommonPurpose(pr.purpose || '');
                       setCommonType(pr.transaction_type || 'deposit');
-                      setCommonNotes(config?.notes || '');
                       setCommonDate(config?.date || '');
-                      setCommonReference(config?.reference || '');
-                      setCommonTags(config?.tags || '');
 
                       if (config?.target_mode === 'batch') {
                         setParticipantSource('batch');
@@ -547,10 +509,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                                 id: crypto.randomUUID(),
                                 amount: '',
                                 purpose: '',
-                                date: '',
-                                notes: '',
-                                reference: '',
-                                tags: ''
+                                date: ''
                               }]
                             })));
                             setStep('participants');
@@ -569,10 +528,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                             id: crypto.randomUUID(),
                             amount: p.amount ? String(p.amount) : '',
                             purpose: '',
-                            date: '',
-                            notes: '',
-                            reference: '',
-                            tags: ''
+                            date: ''
                           }]
                         })));
                         setStep('participants');
@@ -658,10 +614,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                             id: crypto.randomUUID(),
                             amount: '',
                             purpose: '',
-                            date: '',
-                            notes: '',
-                            reference: '',
-                            tags: ''
+                            date: ''
                           }]
                         })));
                         toast.success(`Loaded ${members.length} students from batch`);
@@ -700,10 +653,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                         id: crypto.randomUUID(),
                         amount: '',
                         purpose: '',
-                        date: '',
-                        notes: '',
-                        reference: '',
-                        tags: ''
+                        date: ''
                       }]
                     };
                     setParticipants([...participants, newP]);
@@ -810,45 +760,6 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                     onChange={e => setCommonDate(e.target.value)}
                   />
                 </div>
-
-                {/* Notes */}
-                <div className={styles.valueCard}>
-                  <div className={styles.cardHeader}>
-                    <NotebookPen size={13} /> Notes
-                  </div>
-                  <input 
-                    type="text"
-                    placeholder="e.g. Special boarding discount..."
-                    value={commonNotes}
-                    onChange={e => setCommonNotes(e.target.value)}
-                  />
-                </div>
-
-                {/* Reference */}
-                <div className={styles.valueCard}>
-                  <div className={styles.cardHeader}>
-                    <FileText size={13} /> Reference
-                  </div>
-                  <input 
-                    type="text"
-                    placeholder="e.g. VOUCHER-92"
-                    value={commonReference}
-                    onChange={e => setCommonReference(e.target.value)}
-                  />
-                </div>
-
-                {/* Optional Tags */}
-                <div className={styles.valueCard} style={{ gridColumn: 'span 2' }}>
-                  <div className={styles.cardHeader}>
-                    <Tag size={13} /> Optional Tags
-                  </div>
-                  <input 
-                    type="text"
-                    placeholder="e.g. scholarship, boarder"
-                    value={commonTags}
-                    onChange={e => setCommonTags(e.target.value)}
-                  />
-                </div>
               </div>
             </div>
 
@@ -861,10 +772,10 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                     {participants.length} Student{participants.length !== 1 ? 's' : ''} Selected
                   </span>
                   <span className={clsx(styles.badge, styles.gray)}>
-                    {[commonAmount, commonPurpose, commonType, commonDate, commonNotes, commonReference, commonTags].filter(Boolean).length} Common
+                    {[commonAmount, commonPurpose, commonType, commonDate].filter(Boolean).length} Common
                   </span>
                   <span className={clsx(styles.badge, styles.gray)}>
-                    {[commonAmount, commonPurpose, commonDate, commonNotes, commonReference, commonTags].filter(x => !x).length} Individual
+                    {[commonAmount, commonPurpose, commonDate].filter(x => !x).length} Individual
                   </span>
                 </div>
               </div>
@@ -885,10 +796,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                       commonAmount && 'Amount',
                       commonPurpose && 'Purpose',
                       commonType && 'Type',
-                      commonDate && 'Date',
-                      commonNotes && 'Notes',
-                      commonReference && 'Reference',
-                      commonTags && 'Tags'
+                      commonDate && 'Date'
                     ].filter(Boolean).join(', ') || 'None'}
                   </span>
                 </div>
@@ -898,10 +806,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                     {[
                       !commonAmount && 'Amount',
                       !commonPurpose && 'Purpose',
-                      !commonDate && 'Date',
-                      !commonNotes && 'Notes',
-                      !commonReference && 'Reference',
-                      !commonTags && 'Tags'
+                      !commonDate && 'Date'
                     ].filter(Boolean).join(', ') || 'None'}
                   </span>
                 </div>
@@ -1057,44 +962,6 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                                 </div>
                               )}
 
-                              {/* Notes input cell */}
-                              {!commonNotes && (
-                                <div className={styles.inputWrapper}>
-                                  <label>Notes</label>
-                                  <input 
-                                    type="text"
-                                    placeholder="Remarks..."
-                                    value={tx.notes}
-                                    onChange={e => updateTransactionField(p.student_id, tx.id, 'notes', e.target.value)}
-                                  />
-                                </div>
-                              )}
-
-                              {/* Reference input cell */}
-                              {!commonReference && (
-                                <div className={styles.inputWrapper}>
-                                  <label>Reference</label>
-                                  <input 
-                                    type="text"
-                                    placeholder="Ref Code..."
-                                    value={tx.reference}
-                                    onChange={e => updateTransactionField(p.student_id, tx.id, 'reference', e.target.value)}
-                                  />
-                                </div>
-                              )}
-
-                              {/* Tags input cell */}
-                              {!commonTags && (
-                                <div className={styles.inputWrapper}>
-                                  <label>Tags</label>
-                                  <input 
-                                    type="text"
-                                    placeholder="scholarship..."
-                                    value={tx.tags}
-                                    onChange={e => updateTransactionField(p.student_id, tx.id, 'tags', e.target.value)}
-                                  />
-                                </div>
-                              )}
                             </div>
                           </div>
                         ))}
