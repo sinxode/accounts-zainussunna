@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { formatDisplayName } from './utils';
 
 export const globalSearchService = {
   async search(query: string) {
@@ -33,7 +34,7 @@ export const globalSearchService = {
       .limit(5);
 
     return [
-      ...(students?.map(s => ({ id: s.id, title: s.name, sub: s.enrolment_no, type: 'Student', path: `/students/${s.id}` })) || []),
+      ...(students?.map(s => ({ id: s.id, title: formatDisplayName(s.name), sub: s.enrolment_no, type: 'Student', path: `/students/${s.id}` })) || []),
       ...(borrowers?.map(b => ({ id: b.id, title: b.name, sub: 'Outside Borrower', type: 'Borrower', path: `/borrowers/${b.id}` })) || []),
       ...(events?.map(e => ({ id: e.id, title: e.event_name, sub: e.event_type.replace('_', ' '), type: 'Event', path: `/events/workspace/${e.id}` })) || []),
       ...(transactions?.map(t => ({ id: t.id, title: t.purpose, sub: `₹${t.amount}`, type: 'Transaction', path: `/transactions/${t.id}` })) || []),

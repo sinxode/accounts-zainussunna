@@ -75,3 +75,8 @@ export const formatSmartPurpose = (template: string): string => {
     .replace(/\{Year\}/gi, yearName)
     .replace(/\{Date\}/gi, dateStr);
 };
+
+export const formatDisplayName = (name: string): string => {
+  if (!name) return '';
+  return name.replace(/^(Muhammed|Muhammad|Mohammed|Mohamed|Muhamad)\s+/i, '');
+};

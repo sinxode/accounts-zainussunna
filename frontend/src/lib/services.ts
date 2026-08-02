@@ -1,5 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 import { supabase } from './supabase';
+import { formatDisplayName } from './utils';
 
 export const queryClient = new QueryClient();
 
@@ -125,7 +126,11 @@ export const studentService = {
       .from('student_health')
       .select('*');
     if (error) throw error;
-    return (data as unknown as StudentHealthSummary[]) || [];
+    const list = (data as unknown as StudentHealthSummary[]) || [];
+    return list.map(s => ({
+      ...s,
+      name: formatDisplayName(s.name)
+    }));
   },
   getById: async (id: string) => {
     const { data, error } = await supabase
@@ -134,6 +139,9 @@ export const studentService = {
       .eq('id', id)
       .single();
     if (error) throw error;
+    if (data) {
+      data.name = formatDisplayName(data.name);
+    }
     return data;
   },
   getTransactionsByStudentId: async (studentId: string) => {
@@ -184,7 +192,13 @@ export const studentService = {
       .select('student_id, students(*)')
       .eq('batch_id', batchId);
     if (error) throw error;
-    return data?.map(item => item.students) || [];
+    return data?.map(item => {
+      const s = item.students as any;
+      if (s) {
+        s.name = formatDisplayName(s.name);
+      }
+      return s;
+    }) || [];
   }
 };
 
@@ -196,7 +210,13 @@ export const transactionService = {
       .order('created_at', { ascending: false })
       .limit(limit);
     if (error) throw error;
-    return data || [];
+    const list = data || [];
+    return list.map(item => {
+      if (item.students) {
+        item.students.name = formatDisplayName(item.students.name);
+      }
+      return item;
+    });
   },
   listAllUnified: async (limit = 200): Promise<any[]> => {
     // 1. Fetch Standard Transactions
@@ -232,7 +252,7 @@ export const transactionService = {
         amount: Number(t.amount),
         date: t.transaction_date || t.created_at,
         purpose: t.purpose,
-        entity_name: t.students?.name || 'Unknown',
+        entity_name: t.students?.name ? formatDisplayName(t.students.name) : 'Unknown',
         entity_sub: t.students?.enrolment_no || '-',
         direction: t.direction,
         is_reversed: t.is_reversed,
@@ -308,7 +328,7 @@ export const transactionService = {
         amount: Number(t.amount),
         date: t.transaction_date || t.created_at,
         purpose: t.purpose,
-        entity_name: t.students?.name || 'Unknown',
+        entity_name: t.students?.name ? formatDisplayName(t.students.name) : 'Unknown',
         direction: t.direction,
         is_reversed: t.is_reversed,
         raw: t
@@ -349,6 +369,9 @@ export const transactionService = {
       .eq('id', id)
       .single();
     if (error) throw error;
+    if (data && data.students) {
+      data.students.name = formatDisplayName(data.students.name);
+    }
     return data;
   },
   getTodaySummary: async () => {

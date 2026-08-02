@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { formatDisplayName } from './utils';
 import type { Database } from '../types/database';
 
 export const adminService = {
@@ -193,7 +194,13 @@ export const adminService = {
       console.error('Failed to fetch transactions', error);
       return [];
     }
-    return data || [];
+    const list = data || [];
+    return list.map(item => {
+      if (item.students) {
+        item.students.name = formatDisplayName(item.students.name);
+      }
+      return item;
+    });
   },
 
   async getDiagnosticLogs() {
