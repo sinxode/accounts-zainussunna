@@ -163,8 +163,8 @@ export const StudentProfile: React.FC = () => {
           <section className={clsx(styles.section, styles.orderActions)}>
             <h3 className="label-sm mb-4">Quick Actions</h3>
             <div className={styles.actionsGrid}>
-              <Button size="lg" icon={<ArrowDownCircle size={20} />} className={styles.actionBtn} onClick={() => openDrawer('deposit')}>Deposit</Button>
-              <Button size="lg" icon={<ArrowUpCircle size={20} />} variant="soft" className={styles.actionBtn} onClick={() => openDrawer('withdrawal')}>Withdraw</Button>
+              <Button size="lg" icon={<ArrowDownCircle size={20} />} className={styles.actionBtn} onClick={() => openDrawer('deposit', { studentId: id })}>Deposit</Button>
+              <Button size="lg" icon={<ArrowUpCircle size={20} />} variant="soft" className={styles.actionBtn} onClick={() => openDrawer('withdrawal', { studentId: id })}>Withdraw</Button>
               <Button 
                 size="lg" 
                 icon={<Star size={20} className={isFavorite ? "text-warning" : ""} fill={isFavorite ? "currentColor" : "none"} />} 

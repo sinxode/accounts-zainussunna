@@ -60,7 +60,7 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
     setResetKey(prev => prev + 1);
   };
 
-  const handleSubmit = (shouldClose: boolean = true) => {
+  const handleSubmit = React.useCallback((shouldClose: boolean = true) => {
     if (!selectedStudent || !amount || parseFloat(amount) <= 0) {
       toast.error('Please select a student and enter a valid amount');
       return;
@@ -88,7 +88,23 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
         }
       }
     });
-  };
+  }, [selectedStudent, amount, purpose, user, createMutation, onClose]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        const target = e.target as HTMLElement;
+        if (target && (target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+          return;
+        }
+        e.preventDefault();
+        const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+        handleSubmit(!isCmdOrCtrl); // Enter -> Save & Next (shouldClose: false), cmd/ctrl + Enter -> Save & Close (shouldClose: true)
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSubmit]);
 
   const currentBalance = selectedStudent?.current_balance || 0;
   const depositAmount = parseFloat(amount) || 0;
@@ -150,28 +166,20 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
           </div>
         )}
 
-        {initialStudentId ? (
-          <div className={styles.selectedStudent}>
-            <div className={styles.avatar}>{selectedStudent?.name?.charAt(0) || '?'}</div>
-            <div className={styles.info}>
-              <span className={styles.name}>{selectedStudent?.name || 'Loading...'}</span>
-              <span className={styles.enr}>{selectedStudent?.enrolment_no}</span>
-            </div>
-          </div>
-        ) : (
-          <StudentSearch 
-            key={resetKey}
-            label="Student" 
-            placeholder="Search student by name or ID..." 
-            onSelect={(student) => setSelectedStudent(student)} 
-          />
-        )}
+        <StudentSearch 
+          key={resetKey}
+          label="Student" 
+          placeholder="Search student by name or ID..." 
+          onSelect={(student) => setSelectedStudent(student)} 
+          initialStudentId={initialStudentId}
+        />
         <Input 
           label="Amount (₹)" 
           placeholder="0.00" 
           type="number" 
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
+          autoFocus={!!initialStudentId}
         />
         <Input label="Purpose" placeholder="e.g. Zakaath, Monthly Allowance" value={purpose} onChange={(e) => setPurpose(e.target.value)} />
         <Input label="Notes (Optional)" placeholder="Any additional remarks..." value={notes} onChange={(e) => setNotes(e.target.value)} />

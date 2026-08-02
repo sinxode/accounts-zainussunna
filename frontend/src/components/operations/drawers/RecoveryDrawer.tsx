@@ -68,7 +68,7 @@ export const RecoveryDrawer: React.FC<{ onClose: () => void; initialBorrowerId?:
     }
   });
 
-  const handleSubmit = (shouldClose: boolean = true) => {
+  const handleSubmit = React.useCallback((shouldClose: boolean = true) => {
     if (!selectedBorrower) return toast.error('Please select a borrower');
     if (recoveryAmount <= 0) return toast.error('Please enter a valid recovery amount');
     recoveryMutation.mutate(undefined, {
@@ -81,7 +81,23 @@ export const RecoveryDrawer: React.FC<{ onClose: () => void; initialBorrowerId?:
         }
       }
     });
-  };
+  }, [selectedBorrower, recoveryAmount, recoveryMutation, onClose]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        const target = e.target as HTMLElement;
+        if (target && (target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+          return;
+        }
+        e.preventDefault();
+        const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+        handleSubmit(!isCmdOrCtrl); // Enter -> Save & Next (shouldClose: false), cmd/ctrl + Enter -> Save & Close (shouldClose: true)
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSubmit]);
 
   return (
     <DrawerLayout
@@ -143,6 +159,7 @@ export const RecoveryDrawer: React.FC<{ onClose: () => void; initialBorrowerId?:
               value={amount} 
               onChange={e => setAmount(e.target.value)} 
               icon={<Wallet size={18} className="text-success" />}
+              autoFocus={!!initialBorrowerId}
             />
             
             <Input 

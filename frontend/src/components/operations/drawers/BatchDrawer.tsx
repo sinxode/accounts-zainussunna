@@ -62,7 +62,7 @@ export const BatchDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setSelectedStudents(selectedStudents.filter(s => s.id !== id));
   };
 
-  const handleSubmit = (shouldClose: boolean = true) => {
+  const handleSubmit = React.useCallback((shouldClose: boolean = true) => {
     if (!name) return toast.error('Batch name is required');
     if (selectedStudents.length === 0) return toast.error('Add students to the batch');
     createMutation.mutate(undefined, {
@@ -75,7 +75,23 @@ export const BatchDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         }
       }
     });
-  };
+  }, [name, selectedStudents, createMutation, onClose]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        const target = e.target as HTMLElement;
+        if (target && (target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+          return;
+        }
+        e.preventDefault();
+        const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+        handleSubmit(!isCmdOrCtrl); // Enter -> Save & Next (shouldClose: false), cmd/ctrl + Enter -> Save & Close (shouldClose: true)
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSubmit]);
 
   return (
     <DrawerLayout

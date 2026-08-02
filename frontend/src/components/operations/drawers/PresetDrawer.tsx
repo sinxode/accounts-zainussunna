@@ -126,7 +126,7 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
     }
   });
 
-  const handleSubmit = async (runAfter = false, shouldClose = true) => {
+  const handleSubmit = React.useCallback(async (runAfter = false, shouldClose = true) => {
     if (!name) return toast.error('Preset name is required');
     
     const configuration = {
@@ -170,7 +170,23 @@ export const PresetDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => 
     } catch (err) {
       // Error handled by mutation
     }
-  };
+  }, [name, targetMode, selectedBatch, fixedParticipants, amount, txType, purpose, notes, description, isEditMode, editingPreset, saveMutation, onClose, openDrawer]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        const target = e.target as HTMLElement;
+        if (target && (target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+          return;
+        }
+        e.preventDefault();
+        const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+        handleSubmit(false, isCmdOrCtrl); // Enter -> Save & Next (shouldClose: false), cmd/ctrl + Enter -> Save & Close (shouldClose: true)
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSubmit]);
 
   const defaultsCount = useMemo(() => {
     let count = 0;

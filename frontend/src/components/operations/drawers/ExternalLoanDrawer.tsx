@@ -72,7 +72,7 @@ export const ExternalLoanDrawer: React.FC<{ onClose: () => void; initialBorrower
     setResetKey(prev => prev + 1);
   };
 
-  const handleSubmit = (shouldClose: boolean = true) => {
+  const handleSubmit = React.useCallback((shouldClose: boolean = true) => {
     if (isNewBorrower && !newName) return toast.error('Please enter borrower name');
     if (!isNewBorrower && !selectedBorrower) return toast.error('Please select a borrower');
     if (!amount || parseFloat(amount) <= 0) return toast.error('Please enter a valid amount');
@@ -87,7 +87,23 @@ export const ExternalLoanDrawer: React.FC<{ onClose: () => void; initialBorrower
         }
       }
     });
-  };
+  }, [isNewBorrower, newName, selectedBorrower, amount, loanMutation, onClose]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        const target = e.target as HTMLElement;
+        if (target && (target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+          return;
+        }
+        e.preventDefault();
+        const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+        handleSubmit(!isCmdOrCtrl); // Enter -> Save & Next (shouldClose: false), cmd/ctrl + Enter -> Save & Close (shouldClose: true)
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSubmit]);
 
   return (
     <DrawerLayout
@@ -193,6 +209,7 @@ export const ExternalLoanDrawer: React.FC<{ onClose: () => void; initialBorrower
               value={amount} 
               onChange={e => setAmount(e.target.value)} 
               icon={<Landmark size={18} className="text-primary" />}
+              autoFocus={!!initialBorrowerId}
             />
             
             <Input 

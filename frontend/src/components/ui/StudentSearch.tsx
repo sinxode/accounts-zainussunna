@@ -44,7 +44,7 @@ export const StudentSearch: React.FC<StudentSearchProps> = ({
   const { data: students } = useQuery({
     queryKey: ['studentsSummary', searchTerm],
     queryFn: () => studentService.getHealthSummary(),
-    enabled: searchTerm.length > 0 && !initialStudentId
+    enabled: searchTerm.length > 0
   });
 
   const filtered = students?.filter(s => 

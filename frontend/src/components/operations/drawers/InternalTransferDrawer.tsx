@@ -42,7 +42,7 @@ export const InternalTransferDrawer: React.FC<{ isOpen?: boolean; onClose: () =>
     setResetKey(prev => prev + 1);
   };
 
-  const handleSubmit = (shouldClose: boolean = true) => {
+  const handleSubmit = React.useCallback((shouldClose: boolean = true) => {
     if (!fromStudent || !toStudent || !amount || parseFloat(amount) <= 0) {
       toast.error('Please select both students and enter a valid amount');
       return;
@@ -76,7 +76,23 @@ export const InternalTransferDrawer: React.FC<{ isOpen?: boolean; onClose: () =>
         }
       }
     });
-  };
+  }, [fromStudent, toStudent, amount, purpose, user, createMutation, onClose]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        const target = e.target as HTMLElement;
+        if (target && (target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+          return;
+        }
+        e.preventDefault();
+        const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+        handleSubmit(!isCmdOrCtrl); // Enter -> Save & Next (shouldClose: false), cmd/ctrl + Enter -> Save & Close (shouldClose: true)
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSubmit]);
 
   const lenderBalance = fromStudent?.current_balance || 0;
   const borrowerBalance = toStudent?.current_balance || 0;
