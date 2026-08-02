@@ -15,7 +15,8 @@ import {
   LayoutTemplate,
   ChevronDown,
   Plus,
-  Copy
+  Copy,
+  Check
 } from 'lucide-react';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
@@ -651,29 +652,70 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
             )}
 
             {/* Shared vs Individual live summary */}
-            <div className="grid grid-cols-2 gap-6 p-5 mb-6 bg-slate-50 border border-slate-200 rounded-2xl">
-              <div>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2.5">Shared Values</span>
-                <ul className="text-sm text-slate-700 font-semibold space-y-2">
-                  {participants.length > 0 && <li className="flex items-center gap-1.5 text-green-600">✓ Participants</li>}
-                  {commonType && <li className="flex items-center gap-1.5 text-green-600">✓ Transaction Type</li>}
-                  {commonAmount && <li className="flex items-center gap-1.5 text-green-600">✓ Amount</li>}
-                  {commonPurpose && <li className="flex items-center gap-1.5 text-green-600">✓ Purpose</li>}
-                  {commonDate && <li className="flex items-center gap-1.5 text-green-600">✓ Date</li>}
-                  {participants.length === 0 && !commonType && !commonAmount && !commonPurpose && !commonDate && (
-                    <li className="text-xs text-slate-400 italic font-normal">No shared values selected yet</li>
+            <div className={styles.summaryCard}>
+              <div className={styles.summaryCol}>
+                <span className={styles.colTitle}>Shared Values</span>
+                <div className={styles.pillContainer}>
+                  {participants.length > 0 && (
+                    <span className={styles.sharedPill}>
+                      <Check size={12} /> Participants
+                    </span>
                   )}
-                </ul>
+                  {commonType && (
+                    <span className={styles.sharedPill}>
+                      <Check size={12} /> Transaction Type
+                    </span>
+                  )}
+                  {commonAmount && (
+                    <span className={styles.sharedPill}>
+                      <Check size={12} /> Amount
+                    </span>
+                  )}
+                  {commonPurpose && (
+                    <span className={styles.sharedPill}>
+                      <Check size={12} /> Purpose
+                    </span>
+                  )}
+                  {commonDate && (
+                    <span className={styles.sharedPill}>
+                      <Check size={12} /> Date
+                    </span>
+                  )}
+                  {participants.length === 0 && !commonType && !commonAmount && !commonPurpose && !commonDate && (
+                    <span className={styles.emptyState}>No shared values selected yet</span>
+                  )}
+                </div>
               </div>
-              <div>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2.5">Individual Values</span>
-                <ul className="text-sm text-slate-600 space-y-2">
-                  {participants.length === 0 && <li className="flex items-center gap-1.5">• Participants</li>}
-                  {!commonType && <li className="flex items-center gap-1.5">• Transaction Type</li>}
-                  {!commonAmount && <li className="flex items-center gap-1.5">• Amount</li>}
-                  {!commonPurpose && <li className="flex items-center gap-1.5">• Purpose</li>}
-                  {!commonDate && <li className="flex items-center gap-1.5">• Date</li>}
-                </ul>
+
+              <div className={styles.summaryCol}>
+                <span className={styles.colTitle}>Individual Values</span>
+                <div className={styles.pillContainer}>
+                  {participants.length === 0 && (
+                    <span className={styles.individualPill}>
+                      • Participants
+                    </span>
+                  )}
+                  {!commonType && (
+                    <span className={styles.individualPill}>
+                      • Transaction Type
+                    </span>
+                  )}
+                  {!commonAmount && (
+                    <span className={styles.individualPill}>
+                      • Amount
+                    </span>
+                  )}
+                  {!commonPurpose && (
+                    <span className={styles.individualPill}>
+                      • Purpose
+                    </span>
+                  )}
+                  {!commonDate && (
+                    <span className={styles.individualPill}>
+                      • Date
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
