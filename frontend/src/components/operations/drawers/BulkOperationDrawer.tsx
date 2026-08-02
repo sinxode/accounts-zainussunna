@@ -13,7 +13,11 @@ import {
   Trash2, 
   ChevronRight, 
   Star, 
-  LayoutTemplate
+  LayoutTemplate,
+  ChevronDown,
+  Plus,
+  Copy,
+  Tag
 } from 'lucide-react';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
@@ -29,15 +33,22 @@ import { useOperationsDrawer } from './OperationsDrawerContext';
 
 type Step = 'configure' | 'participants' | 'success';
 
-interface Participant {
+interface TransactionItem {
   id: string;
-  student_id: string;
-  name: string;
-  enrolment_no: string;
   amount: string;
   purpose: string;
   date: string;
   notes: string;
+  reference: string;
+  tags: string;
+}
+
+interface ParticipantGroup {
+  student_id: string;
+  name: string;
+  enrolment_no: string;
+  current_balance: number;
+  transactions: TransactionItem[];
 }
 
 export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => {
@@ -47,7 +58,8 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   
   // Selections
   const [selectedBatchId, setSelectedBatchId] = useState<string>('');
-  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [participants, setParticipants] = useState<ParticipantGroup[]>([]);
+  const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
   
   // Common values
   const [commonAmount, setCommonAmount] = useState<string>('');
@@ -55,6 +67,8 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   const [commonType, setCommonType] = useState<'deposit' | 'withdrawal'>('deposit');
   const [commonDate, setCommonDate] = useState<string>('');
   const [commonNotes, setCommonNotes] = useState<string>('');
+  const [commonReference, setCommonReference] = useState<string>('');
+  const [commonTags, setCommonTags] = useState<string>('');
 
   // Preset saving fields
   const [presetName, setPresetName] = useState<string>('');
@@ -86,6 +100,8 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
       setCommonType(drawerData.preset.transaction_type || 'deposit');
       setCommonNotes(config?.notes || '');
       setCommonDate(config?.date || '');
+      setCommonReference(config?.reference || '');
+      setCommonTags(config?.tags || '');
 
       if (config?.target_mode === 'batch') {
         setParticipantSource('batch');
@@ -93,14 +109,19 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
         if (config.batch_id) {
           studentService.listByBatch(config.batch_id).then(members => {
             setParticipants(members.map((s: any) => ({
-              id: crypto.randomUUID(),
               student_id: s.id,
               name: s.name,
               enrolment_no: s.enrolment_no,
-              amount: '',
-              purpose: '',
-              date: '',
-              notes: ''
+              current_balance: Number(s.current_balance) || 0,
+              transactions: [{
+                id: crypto.randomUUID(),
+                amount: '',
+                purpose: '',
+                date: '',
+                notes: '',
+                reference: '',
+                tags: ''
+              }]
             })));
             setStep('participants');
           });
@@ -108,31 +129,48 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
       } else if (config?.target_mode === 'fixed' && config.participants) {
         setParticipantSource('fixed');
         setParticipants(config.participants.map((p: any) => ({
-          id: crypto.randomUUID(),
           student_id: p.student_id,
           name: p.name || 'Student',
           enrolment_no: p.enrolment_no || 'N/A',
-          amount: p.amount ? String(p.amount) : '',
-          purpose: '',
-          date: '',
-          notes: ''
+          current_balance: Number(p.current_balance) || 0,
+          transactions: [{
+            id: crypto.randomUUID(),
+            amount: p.amount ? String(p.amount) : '',
+            purpose: '',
+            date: '',
+            notes: '',
+            reference: '',
+            tags: ''
+          }]
         })));
         setStep('participants');
       }
     }
   }, [drawerData]);
 
+  // Aggregate transaction counts and estimated totals
+  const totalTransactionsCount = useMemo(() => {
+    return participants.reduce((sum, p) => sum + p.transactions.length, 0);
+  }, [participants]);
+
   const totalAmount = useMemo(() => {
     return participants.reduce((sum, p) => {
-      const amt = parseFloat(commonAmount || p.amount || '0') || 0;
-      return sum + amt;
+      return sum + p.transactions.reduce((tSum, tx) => {
+        const amt = parseFloat(commonAmount || tx.amount || '0') || 0;
+        return tSum + amt;
+      }, 0);
     }, 0);
   }, [participants, commonAmount]);
 
   const hasErrors = useMemo(() => {
     if (participants.length === 0) return true;
-    if (!commonAmount && participants.some(p => !p.amount || parseFloat(p.amount) <= 0)) return true;
-    if (!commonDate && participants.some(p => !p.date)) return true;
+    for (const p of participants) {
+      if (p.transactions.length === 0) return true;
+      for (const tx of p.transactions) {
+        if (!commonAmount && (!tx.amount || parseFloat(tx.amount) <= 0)) return true;
+        if (!commonDate && !tx.date) return true;
+      }
+    }
     return false;
   }, [participants, commonAmount, commonDate]);
 
@@ -141,7 +179,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recentOperations'] });
       queryClient.invalidateQueries({ queryKey: ['todaySummary'] });
-      toast.success('Bulk operation processed successfully');
+      toast.success('Transactions composed and processed successfully');
       setStep('success');
     },
     onError: (error: any) => {
@@ -160,16 +198,22 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     }
 
     const operationId = crypto.randomUUID();
-    const payload = participants.map(p => ({
-      student_id: p.student_id,
-      operation_id: operationId,
-      transaction_type: commonType,
-      direction: commonType === 'deposit' ? 'credit' : 'debit',
-      amount: parseFloat(commonAmount || p.amount || '0'),
-      purpose: formatSmartPurpose(commonPurpose || p.purpose || 'Bulk Operation'),
-      transaction_date: new Date(commonDate || p.date || new Date().toISOString().split('T')[0]).toISOString(),
-      created_by: user.id
-    }));
+    const payload: any[] = [];
+
+    participants.forEach(p => {
+      p.transactions.forEach(tx => {
+        payload.push({
+          student_id: p.student_id,
+          operation_id: operationId,
+          transaction_type: commonType,
+          direction: commonType === 'deposit' ? 'credit' : 'debit',
+          amount: parseFloat(commonAmount || tx.amount || '0'),
+          purpose: formatSmartPurpose(commonPurpose || tx.purpose || 'Transaction Composer Entry'),
+          transaction_date: new Date(commonDate || tx.date || new Date().toISOString().split('T')[0]).toISOString(),
+          created_by: user.id
+        });
+      });
+    });
 
     bulkMutation.mutate(payload);
   };
@@ -180,7 +224,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     try {
       await presetService.create({
         name: presetName,
-        description: presetDescription || `Bulk operation V3 for ${participants.length} students`,
+        description: presetDescription || `Transaction Composer Preset for ${participants.length} students`,
         configuration: {
           target_mode: participantSource === 'batch' ? 'batch' : 'fixed',
           batch_id: participantSource === 'batch' ? selectedBatchId : undefined,
@@ -188,19 +232,21 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
             student_id: p.student_id,
             name: p.name,
             enrolment_no: p.enrolment_no,
-            amount: p.amount ? parseFloat(p.amount) : 0,
+            amount: commonAmount ? parseFloat(commonAmount) : 0,
             type: commonType
           })) : undefined,
           amount: commonAmount ? parseFloat(commonAmount) : undefined,
           type: commonType,
           purpose: commonPurpose || undefined,
-          notes: commonNotes || undefined
+          notes: commonNotes || undefined,
+          reference: commonReference || undefined,
+          tags: commonTags || undefined
         },
         transaction_type: commonType,
         amount: commonAmount ? parseFloat(commonAmount) : null,
         purpose: commonPurpose || null
       });
-      toast.success('Configuration saved as preset');
+      toast.success('Composer configuration saved as preset');
       setPresetSaved(true);
     } catch (err: any) {
       toast.error(`Failed to save preset: ${err.message}`);
@@ -255,6 +301,8 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
         const purposeIndex = headers.findIndex(h => h.includes('purpose') || h.includes('description'));
         const dateIndex = headers.findIndex(h => h.includes('date') || h.includes('time'));
         const notesIndex = headers.findIndex(h => h.includes('note') || h.includes('remark'));
+        const referenceIndex = headers.findIndex(h => h.includes('reference') || h.includes('ref'));
+        const tagsIndex = headers.findIndex(h => h.includes('tag') || h.includes('label'));
 
         if (enrolmentIndex === -1) {
           toast.error("CSV must contain a column for 'Enrolment No' or 'Student ID'");
@@ -262,7 +310,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
         }
 
         const healthSummary = await studentService.getHealthSummary();
-        const importedParticipants: Participant[] = [];
+        const groupedCSV: Record<string, { student: any; rows: any[] }> = {};
         let successCount = 0;
         let failCount = 0;
 
@@ -281,16 +329,20 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
             const parsedPurpose = purposeIndex !== -1 ? cols[purposeIndex] : '';
             const parsedDate = dateIndex !== -1 ? cols[dateIndex] : '';
             const parsedNotes = notesIndex !== -1 ? cols[notesIndex] : '';
+            const parsedReference = referenceIndex !== -1 ? cols[referenceIndex] : '';
+            const parsedTags = tagsIndex !== -1 ? cols[tagsIndex] : '';
 
-            importedParticipants.push({
+            if (!groupedCSV[student.id]) {
+              groupedCSV[student.id] = { student, rows: [] };
+            }
+            groupedCSV[student.id].rows.push({
               id: crypto.randomUUID(),
-              student_id: student.id,
-              name: student.name,
-              enrolment_no: student.enrolment_no,
               amount: parsedAmt,
               purpose: parsedPurpose,
               date: parsedDate,
-              notes: parsedNotes
+              notes: parsedNotes,
+              reference: parsedReference,
+              tags: parsedTags
             });
             successCount++;
           } else {
@@ -298,10 +350,18 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
           }
         }
 
-        if (importedParticipants.length > 0) {
-          setParticipants(importedParticipants);
+        const importedGroups: ParticipantGroup[] = Object.values(groupedCSV).map(group => ({
+          student_id: group.student.id,
+          name: group.student.name,
+          enrolment_no: group.student.enrolment_no,
+          current_balance: Number(group.student.current_balance) || 0,
+          transactions: group.rows
+        }));
+
+        if (importedGroups.length > 0) {
+          setParticipants(importedGroups);
           setStep('participants');
-          toast.success(`Imported ${successCount} students. ${failCount > 0 ? `Skipped ${failCount} unmatched.` : ''}`);
+          toast.success(`Imported ${successCount} entries. ${failCount > 0 ? `Skipped ${failCount} unmatched.` : ''}`);
         } else {
           toast.error("No matching student records found in CSV");
         }
@@ -320,6 +380,8 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     setCommonType('deposit');
     setCommonDate('');
     setCommonNotes('');
+    setCommonReference('');
+    setCommonTags('');
     setParticipantSource(null);
     setSelectedBatchId('');
     setPresetName('');
@@ -327,10 +389,78 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     setPresetSaved(false);
   };
 
+  // Participant modifiers
+  const addTransaction = (studentId: string) => {
+    setParticipants(participants.map(p => {
+      if (p.student_id === studentId) {
+        return {
+          ...p,
+          transactions: [
+            ...p.transactions,
+            {
+              id: crypto.randomUUID(),
+              amount: '',
+              purpose: '',
+              date: '',
+              notes: '',
+              reference: '',
+              tags: ''
+            }
+          ]
+        };
+      }
+      return p;
+    }));
+  };
+
+  const deleteTransaction = (studentId: string, transactionId: string) => {
+    setParticipants(participants.map(p => {
+      if (p.student_id === studentId) {
+        return {
+          ...p,
+          transactions: p.transactions.filter(t => t.id !== transactionId)
+        };
+      }
+      return p;
+    }));
+  };
+
+  const duplicateTransaction = (studentId: string, transactionId: string) => {
+    setParticipants(participants.map(p => {
+      if (p.student_id === studentId) {
+        const target = p.transactions.find(t => t.id === transactionId);
+        if (target) {
+          const clone = { ...target, id: crypto.randomUUID() };
+          return {
+            ...p,
+            transactions: [...p.transactions, clone]
+          };
+        }
+      }
+      return p;
+    }));
+  };
+
+  const updateTransactionField = (studentId: string, transactionId: string, field: keyof TransactionItem, value: string) => {
+    setParticipants(participants.map(p => {
+      if (p.student_id === studentId) {
+        return {
+          ...p,
+          transactions: p.transactions.map(t => t.id === transactionId ? { ...t, [field]: value } : t)
+        };
+      }
+      return p;
+    }));
+  };
+
+  const removeParticipant = (studentId: string) => {
+    setParticipants(participants.filter(p => p.student_id !== studentId));
+  };
+
   return (
     <DrawerLayout
-      title={step === 'success' ? "Operation Complete" : "Bulk Transaction Workspace"}
-      subtitle={step === 'success' ? "All transactions processed successfully" : "Adaptive Bulk Operation"}
+      title={step === 'success' ? "Composer Success" : "Transaction Composer"}
+      subtitle={step === 'success' ? "All composed entries processed successfully" : "Compose multiple financial transactions intelligently."}
       icon={<UsersRound className="text-white" />}
       onClose={onClose}
       onClear={step === 'success' ? undefined : handleClear}
@@ -342,6 +472,10 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
               <div className={styles.statItem}>
                 <span className={styles.label}>Participants</span>
                 <span className={styles.value}>{participants.length} Student{participants.length !== 1 ? 's' : ''}</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.label}>Composed Count</span>
+                <span className={styles.value}>{totalTransactionsCount} Entry{totalTransactionsCount !== 1 ? 'ies' : ''}</span>
               </div>
               <div className={styles.statItem}>
                 <span className={styles.label}>Total Amount</span>
@@ -362,7 +496,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                 loading={bulkMutation.isPending}
                 disabled={hasErrors}
               >
-                Process Operation
+                Process Composer
               </Button>
             </div>
           </div>
@@ -370,12 +504,12 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
       }
     >
       <div className={styles.workspace}>
-        {/* Step 1: Configure Common Values & Sources */}
+        {/* Step 1: Common Values Selection */}
         {step === 'configure' && (
           <>
             <div className={styles.stepHeader}>
               <h2 className={styles.title}>Common Values</h2>
-              <p className={styles.subtitle}>Choose what will remain the same for every transaction.</p>
+              <p className={styles.subtitle}>Enter anything that should remain identical for every transaction.</p>
             </div>
 
             {/* Quick Preset Selector */}
@@ -395,6 +529,8 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                       setCommonType(pr.transaction_type || 'deposit');
                       setCommonNotes(config?.notes || '');
                       setCommonDate(config?.date || '');
+                      setCommonReference(config?.reference || '');
+                      setCommonTags(config?.tags || '');
 
                       if (config?.target_mode === 'batch') {
                         setParticipantSource('batch');
@@ -403,14 +539,19 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                           try {
                             const members = await studentService.listByBatch(config.batch_id);
                             setParticipants(members.map((s: any) => ({
-                              id: crypto.randomUUID(),
                               student_id: s.id,
                               name: s.name,
                               enrolment_no: s.enrolment_no,
-                              amount: '',
-                              purpose: '',
-                              date: '',
-                              notes: ''
+                              current_balance: Number(s.current_balance) || 0,
+                              transactions: [{
+                                id: crypto.randomUUID(),
+                                amount: '',
+                                purpose: '',
+                                date: '',
+                                notes: '',
+                                reference: '',
+                                tags: ''
+                              }]
                             })));
                             setStep('participants');
                           } catch {
@@ -420,14 +561,19 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                       } else if (config?.target_mode === 'fixed' && config.participants) {
                         setParticipantSource('fixed');
                         setParticipants(config.participants.map((p: any) => ({
-                          id: crypto.randomUUID(),
                           student_id: p.student_id,
                           name: p.name || 'Student',
                           enrolment_no: p.enrolment_no || 'N/A',
-                          amount: p.amount ? String(p.amount) : '',
-                          purpose: '',
-                          date: '',
-                          notes: ''
+                          current_balance: Number(p.current_balance) || 0,
+                          transactions: [{
+                            id: crypto.randomUUID(),
+                            amount: p.amount ? String(p.amount) : '',
+                            purpose: '',
+                            date: '',
+                            notes: '',
+                            reference: '',
+                            tags: ''
+                          }]
                         })));
                         setStep('participants');
                       }
@@ -435,7 +581,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                     }
                   }}
                 >
-                  <option value="" disabled>Select Preset to Pre-fill Workspace...</option>
+                  <option value="" disabled>Select Preset to Pre-fill Composer...</option>
                   {presets.map(p => (
                     <option key={p.id} value={p.id}>{p.name} (₹{p.amount ?? 0})</option>
                   ))}
@@ -458,7 +604,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                     <UsersRound size={20} />
                   </div>
                   <span className={styles.cardTitle}>Batch</span>
-                  <span className={styles.cardDesc}>Use an existing student batch.</span>
+                  <span className={styles.cardDesc}>Load students from an existing batch.</span>
                 </div>
 
                 <div 
@@ -471,8 +617,8 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                   <div className={styles.iconContainer}>
                     <UserCheck size={20} />
                   </div>
-                  <span className={styles.cardTitle}>Fixed Student List</span>
-                  <span className={styles.cardDesc}>Select individual students.</span>
+                  <span className={styles.cardTitle}>Student List</span>
+                  <span className={styles.cardDesc}>Manually choose students.</span>
                 </div>
 
                 <div 
@@ -485,13 +631,13 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                   <div className={styles.iconContainer}>
                     <FileSpreadsheet size={20} />
                   </div>
-                  <span className={styles.cardTitle}>Import CSV</span>
-                  <span className={styles.cardDesc}>Import students from CSV.</span>
+                  <span className={styles.cardTitle}>CSV Import</span>
+                  <span className={styles.cardDesc}>Import participants from CSV.</span>
                 </div>
               </div>
             </div>
 
-            {/* Render Active Source Input Block */}
+            {/* Render Active Source Input Box */}
             {participantSource === 'batch' && (
               <div className={styles.activeSourceBox}>
                 <label className="text-xs font-bold text-slate-500 uppercase">Select Batch</label>
@@ -504,14 +650,19 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                       try {
                         const members = await studentService.listByBatch(batchId);
                         setParticipants(members.map((s: any) => ({
-                          id: crypto.randomUUID(),
                           student_id: s.id,
                           name: s.name,
                           enrolment_no: s.enrolment_no,
-                          amount: '',
-                          purpose: '',
-                          date: '',
-                          notes: ''
+                          current_balance: Number(s.current_balance) || 0,
+                          transactions: [{
+                            id: crypto.randomUUID(),
+                            amount: '',
+                            purpose: '',
+                            date: '',
+                            notes: '',
+                            reference: '',
+                            tags: ''
+                          }]
                         })));
                         toast.success(`Loaded ${members.length} students from batch`);
                       } catch (err: any) {
@@ -533,22 +684,27 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
             {participantSource === 'fixed' && (
               <div className={styles.activeSourceBox}>
                 <StudentSearch
-                  label="Search & Add Student"
-                  placeholder="Type student name to add..."
+                  label="Search & Link Student"
+                  placeholder="Type student name to link..."
                   onSelect={(student) => {
                     if (participants.find(p => p.student_id === student.id)) {
                       toast.error('Student already added');
                       return;
                     }
-                    const newP: Participant = {
-                      id: crypto.randomUUID(),
+                    const newP: ParticipantGroup = {
                       student_id: student.id,
                       name: student.name,
                       enrolment_no: student.enrolment_no,
-                      amount: '',
-                      purpose: '',
-                      date: '',
-                      notes: ''
+                      current_balance: Number(student.current_balance) || 0,
+                      transactions: [{
+                        id: crypto.randomUUID(),
+                        amount: '',
+                        purpose: '',
+                        date: '',
+                        notes: '',
+                        reference: '',
+                        tags: ''
+                      }]
                     };
                     setParticipants([...participants, newP]);
                   }}
@@ -558,11 +714,11 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                 {participants.length > 0 && (
                   <div className="flex flex-col gap-1.5 max-h-[140px] overflow-y-auto mt-1">
                     {participants.map((p) => (
-                      <div key={p.id} className="flex items-center justify-between text-xs p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                      <div key={p.student_id} className="flex items-center justify-between text-xs p-2.5 bg-slate-50 rounded-xl border border-slate-200">
                         <span className="font-semibold text-slate-700">{p.name} ({p.enrolment_no})</span>
                         <button
                           type="button"
-                          onClick={() => setParticipants(participants.filter(pt => pt.id !== p.id))}
+                          onClick={() => removeParticipant(p.student_id)}
                           className="text-red-500 hover:text-red-700 cursor-pointer"
                         >
                           <Trash2 size={14} />
@@ -623,7 +779,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                   </div>
                   <input 
                     type="text"
-                    placeholder="e.g. Mess Fee - {Month} {Year}"
+                    placeholder="e.g. Zakaath - {Month} {Year}"
                     value={commonPurpose}
                     onChange={e => setCommonPurpose(e.target.value)}
                   />
@@ -656,14 +812,41 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                 </div>
 
                 {/* Notes */}
-                <div className={styles.valueCard} style={{ gridColumn: 'span 2' }}>
+                <div className={styles.valueCard}>
                   <div className={styles.cardHeader}>
                     <NotebookPen size={13} /> Notes
                   </div>
-                  <textarea 
-                    placeholder="e.g. Monthly hostel boarding charge details..."
+                  <input 
+                    type="text"
+                    placeholder="e.g. Special boarding discount..."
                     value={commonNotes}
                     onChange={e => setCommonNotes(e.target.value)}
+                  />
+                </div>
+
+                {/* Reference */}
+                <div className={styles.valueCard}>
+                  <div className={styles.cardHeader}>
+                    <FileText size={13} /> Reference
+                  </div>
+                  <input 
+                    type="text"
+                    placeholder="e.g. VOUCHER-92"
+                    value={commonReference}
+                    onChange={e => setCommonReference(e.target.value)}
+                  />
+                </div>
+
+                {/* Optional Tags */}
+                <div className={styles.valueCard} style={{ gridColumn: 'span 2' }}>
+                  <div className={styles.cardHeader}>
+                    <Tag size={13} /> Optional Tags
+                  </div>
+                  <input 
+                    type="text"
+                    placeholder="e.g. scholarship, boarder"
+                    value={commonTags}
+                    onChange={e => setCommonTags(e.target.value)}
                   />
                 </div>
               </div>
@@ -678,10 +861,10 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                     {participants.length} Student{participants.length !== 1 ? 's' : ''} Selected
                   </span>
                   <span className={clsx(styles.badge, styles.gray)}>
-                    {[commonAmount, commonPurpose, commonType, commonDate, commonNotes].filter(Boolean).length} Common Values
+                    {[commonAmount, commonPurpose, commonType, commonDate, commonNotes, commonReference, commonTags].filter(Boolean).length} Common
                   </span>
                   <span className={clsx(styles.badge, styles.gray)}>
-                    {[commonAmount, commonPurpose, commonDate, commonNotes].filter(x => !x).length} Individual Fields
+                    {[commonAmount, commonPurpose, commonDate, commonNotes, commonReference, commonTags].filter(x => !x).length} Individual
                   </span>
                 </div>
               </div>
@@ -703,7 +886,9 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                       commonPurpose && 'Purpose',
                       commonType && 'Type',
                       commonDate && 'Date',
-                      commonNotes && 'Notes'
+                      commonNotes && 'Notes',
+                      commonReference && 'Reference',
+                      commonTags && 'Tags'
                     ].filter(Boolean).join(', ') || 'None'}
                   </span>
                 </div>
@@ -714,7 +899,9 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
                       !commonAmount && 'Amount',
                       !commonPurpose && 'Purpose',
                       !commonDate && 'Date',
-                      !commonNotes && 'Notes'
+                      !commonNotes && 'Notes',
+                      !commonReference && 'Reference',
+                      !commonTags && 'Tags'
                     ].filter(Boolean).join(', ') || 'None'}
                   </span>
                 </div>
@@ -734,108 +921,196 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
           </>
         )}
 
-        {/* Step 2: Complete Remaining Values */}
+        {/* Step 2: Compose Transactions Accordion Workspace */}
         {step === 'participants' && (
           <>
             <div className={styles.stepHeader}>
-              <h2 className={styles.title}>Complete Remaining Values</h2>
-              <p className={styles.subtitle}>Only complete the information that was not defined as common.</p>
+              <h2 className={styles.title}>Compose Transactions</h2>
+              <p className={styles.subtitle}>Only complete the values that are still missing.</p>
             </div>
 
-            <div className={styles.tableContainer}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Student</th>
-                    {!commonAmount && <th>Amount (₹)</th>}
-                    {!commonPurpose && <th>Purpose</th>}
-                    {!commonDate && <th>Date</th>}
-                    {!commonNotes && <th>Notes</th>}
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {participants.map((p, idx) => (
-                    <tr key={p.id || idx}>
-                      <td>
-                        <div className={styles.studentCell}>
-                          <span className={styles.name}>{p.name}</span>
-                          <span className={styles.enr}>{p.enrolment_no}</span>
+            <div className={styles.composerArea}>
+              {participants.map((p) => {
+                const isExpanded = expandedStudentId === p.student_id;
+                const estimatedPTotal = p.transactions.reduce((acc, tx) => {
+                  return acc + (parseFloat(commonAmount || tx.amount || '0') || 0);
+                }, 0);
+
+                return (
+                  <div key={p.student_id} className={clsx(styles.participantCard, isExpanded && styles.expanded)}>
+                    {/* Header */}
+                    <div 
+                      className={styles.participantHeader}
+                      onClick={() => setExpandedStudentId(isExpanded ? null : p.student_id)}
+                    >
+                      <div className={styles.leftSection}>
+                        <div className={styles.avatarCircle}>
+                          {p.name.charAt(0).toUpperCase()}
                         </div>
-                      </td>
-                      
-                      {!commonAmount && (
-                        <td>
-                          <input 
-                            type="number"
-                            placeholder="0.00"
-                            value={p.amount}
-                            onChange={e => {
-                              const updated = [...participants];
-                              updated[idx].amount = e.target.value;
-                              setParticipants(updated);
-                            }}
-                          />
-                        </td>
-                      )}
+                        <div className={styles.pInfoBlock}>
+                          <span className={styles.pName}>{p.name}</span>
+                          <div className={styles.pMeta}>
+                            <span>{p.enrolment_no}</span>
+                            <div className="w-1 h-1 rounded-full bg-slate-300" />
+                            <span>Balance: 
+                              <strong className={clsx("ml-1", p.current_balance < 0 ? styles.negative : styles.positive)}>
+                                ₹{p.current_balance.toLocaleString()}
+                              </strong>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
 
-                      {!commonPurpose && (
-                        <td>
-                          <input 
-                            type="text"
-                            placeholder="Purpose..."
-                            value={p.purpose}
-                            onChange={e => {
-                              const updated = [...participants];
-                              updated[idx].purpose = e.target.value;
-                              setParticipants(updated);
-                            }}
-                          />
-                        </td>
-                      )}
+                      <div className={styles.rightSection}>
+                        <span className={styles.txCountBadge}>
+                          {p.transactions.length} Tx{p.transactions.length !== 1 ? 's' : ''}
+                        </span>
+                        
+                        <div className={styles.estimatedTotal}>
+                          <span className="estLabel">Total</span>
+                          <span className="estValue">₹{estimatedPTotal.toLocaleString()}</span>
+                        </div>
 
-                      {!commonDate && (
-                        <td>
-                          <input 
-                            type="date"
-                            value={p.date}
-                            onChange={e => {
-                              const updated = [...participants];
-                              updated[idx].date = e.target.value;
-                              setParticipants(updated);
-                            }}
-                          />
-                        </td>
-                      )}
+                        <div className={styles.headerActions} onClick={e => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            className={clsx(styles.chevronBtn, isExpanded && styles.rotated)}
+                            onClick={() => setExpandedStudentId(isExpanded ? null : p.student_id)}
+                          >
+                            <ChevronDown size={18} />
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.removeBtn}
+                            onClick={() => removeParticipant(p.student_id)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
 
-                      {!commonNotes && (
-                        <td>
-                          <input 
-                            type="text"
-                            placeholder="Notes..."
-                            value={p.notes}
-                            onChange={e => {
-                              const updated = [...participants];
-                              updated[idx].notes = e.target.value;
-                              setParticipants(updated);
-                            }}
-                          />
-                        </td>
-                      )}
+                    {/* Collapsible workspace */}
+                    {isExpanded && (
+                      <div className={styles.expandedWorkspace}>
+                        {p.transactions.map((tx, txIdx) => (
+                          <div key={tx.id} className={styles.transactionCard}>
+                            <div className={styles.cardTitleLine}>
+                              <span className={styles.txTitle}>Transaction Card #{txIdx + 1}</span>
+                              <div className={styles.cardActions}>
+                                <button
+                                  type="button"
+                                  title="Duplicate Transaction Card"
+                                  onClick={() => duplicateTransaction(p.student_id, tx.id)}
+                                >
+                                  <Copy size={13} />
+                                </button>
+                                {p.transactions.length > 1 && (
+                                  <button
+                                    type="button"
+                                    className={styles.deleteBtn}
+                                    title="Delete Transaction Card"
+                                    onClick={() => deleteTransaction(p.student_id, tx.id)}
+                                  >
+                                    <Trash2 size={13} />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
 
-                      <td>
+                            <div className={styles.transactionCardGrid}>
+                              {/* Amount input cell */}
+                              {!commonAmount && (
+                                <div className={styles.inputWrapper}>
+                                  <label>Amount (₹)</label>
+                                  <input 
+                                    type="number"
+                                    placeholder="0.00"
+                                    value={tx.amount}
+                                    onChange={e => updateTransactionField(p.student_id, tx.id, 'amount', e.target.value)}
+                                  />
+                                </div>
+                              )}
+
+                              {/* Purpose input cell */}
+                              {!commonPurpose && (
+                                <div className={styles.inputWrapper}>
+                                  <label>Purpose</label>
+                                  <input 
+                                    type="text"
+                                    placeholder="e.g. Mess charge..."
+                                    value={tx.purpose}
+                                    onChange={e => updateTransactionField(p.student_id, tx.id, 'purpose', e.target.value)}
+                                  />
+                                </div>
+                              )}
+
+                              {/* Date input cell */}
+                              {!commonDate && (
+                                <div className={styles.inputWrapper}>
+                                  <label>Date</label>
+                                  <input 
+                                    type="date"
+                                    value={tx.date}
+                                    onChange={e => updateTransactionField(p.student_id, tx.id, 'date', e.target.value)}
+                                  />
+                                </div>
+                              )}
+
+                              {/* Notes input cell */}
+                              {!commonNotes && (
+                                <div className={styles.inputWrapper}>
+                                  <label>Notes</label>
+                                  <input 
+                                    type="text"
+                                    placeholder="Remarks..."
+                                    value={tx.notes}
+                                    onChange={e => updateTransactionField(p.student_id, tx.id, 'notes', e.target.value)}
+                                  />
+                                </div>
+                              )}
+
+                              {/* Reference input cell */}
+                              {!commonReference && (
+                                <div className={styles.inputWrapper}>
+                                  <label>Reference</label>
+                                  <input 
+                                    type="text"
+                                    placeholder="Ref Code..."
+                                    value={tx.reference}
+                                    onChange={e => updateTransactionField(p.student_id, tx.id, 'reference', e.target.value)}
+                                  />
+                                </div>
+                              )}
+
+                              {/* Tags input cell */}
+                              {!commonTags && (
+                                <div className={styles.inputWrapper}>
+                                  <label>Tags</label>
+                                  <input 
+                                    type="text"
+                                    placeholder="scholarship..."
+                                    value={tx.tags}
+                                    onChange={e => updateTransactionField(p.student_id, tx.id, 'tags', e.target.value)}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+
                         <button
                           type="button"
-                          className={styles.removeBtn}
-                          onClick={() => setParticipants(participants.filter(pt => pt.id !== p.id))}
+                          className={styles.addTransactionBtn}
+                          onClick={() => addTransaction(p.student_id)}
                         >
-                          <Trash2 size={14} />
+                          <Plus size={12} /> Add Transaction
                         </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </>
         )}
@@ -846,19 +1121,23 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
             <div className={styles.checkIcon}>
               <CheckCircle2 size={36} />
             </div>
-            <h2 className={styles.successTitle}>Bulk Process Successful</h2>
+            <h2 className={styles.successTitle}>Composer Success</h2>
             <p className={styles.successDesc}>
-              Ledger transactions have been successfully recorded for all participating students.
+              All composed transactions have been successfully recorded in the student ledgers.
             </p>
 
             <div className={styles.summaryBox}>
-              <div className={styles.summaryTitle}>Operation Summary</div>
+              <div className={styles.summaryTitle}>Composed Operation Summary</div>
               <div className={styles.summaryRow}>
-                <span>Transactions Created</span>
-                <span>{participants.length} Entries</span>
+                <span>Students Composed</span>
+                <span>{participants.length} Students</span>
               </div>
               <div className={styles.summaryRow}>
-                <span>Total Capital Processed</span>
+                <span>Total Composed Entries</span>
+                <span>{totalTransactionsCount} Transactions</span>
+              </div>
+              <div className={styles.summaryRow}>
+                <span>Total Capital Composed</span>
                 <span>₹{totalAmount.toLocaleString()}</span>
               </div>
             </div>
@@ -882,16 +1161,16 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
 
             {!presetSaved ? (
               <div className={styles.savePresetBox}>
-                <span className={styles.presetTitle}>Save This Operation As Preset</span>
+                <span className={styles.presetTitle}>Save Composer Preset</span>
                 <Input 
                   label="Preset Name"
-                  placeholder="e.g. Monthly Mess Fee"
+                  placeholder="e.g. Composed Mess & Books"
                   value={presetName}
                   onChange={e => setPresetName(e.target.value)}
                 />
                 <Input 
                   label="Description"
-                  placeholder="e.g. Monthly boarding charge template"
+                  placeholder="e.g. Shortcut configuration presets"
                   value={presetDescription}
                   onChange={e => setPresetDescription(e.target.value)}
                 />
