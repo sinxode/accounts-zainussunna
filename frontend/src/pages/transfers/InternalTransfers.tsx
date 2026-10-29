@@ -24,7 +24,7 @@ export const InternalTransfers: React.FC = () => {
             <Button 
               variant="soft" 
               icon={<FileText size={16} />}
-              onClick={() => openDrawer('recovery')}
+              onClick={() => openDrawer('internalRepayment')}
             >
               Record Repayment
             </Button>
@@ -66,7 +66,7 @@ export const InternalTransfers: React.FC = () => {
                   <div className={styles.actionDesc}>Record a new borrowing transaction</div>
                 </div>
 
-                <div className={styles.actionCard} onClick={() => openDrawer('recovery')}>
+                <div className={styles.actionCard} onClick={() => openDrawer('internalRepayment')}>
                   <div className={clsx(styles.actionIcon, styles.success)}>
                     <IndianRupee size={16} />
                   </div>

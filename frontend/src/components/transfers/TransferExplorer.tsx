@@ -127,25 +127,15 @@ export const TransferExplorer: React.FC = () => {
     {
       header: 'Actions',
       accessor: (trf: any) => {
-        const borrower = trf.participants.find((p: any) => p.direction === 'credit');
-        const borrowerId = borrower?.student_id;
         return (
           <div className="flex gap-1 justify-end">
             <Button 
               variant="ghost" 
               size="sm" 
               icon={<IndianRupee size={14} />} 
-              onClick={() => openDrawer('recovery', { studentId: borrowerId })}
-              disabled={trf.is_reversed}
+              onClick={() => openDrawer('internalRepayment', { loanId: trf.id })}
+              disabled={trf.is_reversed || trf.status === 'settled'}
               title="Record Repayment"
-            />
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              icon={<Archive size={14} className={trf.is_reversed ? "text-success" : "text-muted"} />} 
-              onClick={() => handleSettle(trf.id)}
-              disabled={trf.is_reversed}
-              title={trf.is_reversed ? "Settled" : "Settle / Close"}
             />
           </div>
         );

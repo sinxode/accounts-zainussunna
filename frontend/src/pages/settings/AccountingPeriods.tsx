@@ -13,7 +13,7 @@ import styles from './AccountingPeriods.module.scss';
 export const AccountingPeriods: React.FC = () => {
   const { role } = useAuth();
   const queryClient = useQueryClient();
-  const isOwner = role === 'owner';
+  const isFinancialAdmin = ['super_admin', 'admin', 'owner'].includes(role || '');
 
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -25,12 +25,12 @@ export const AccountingPeriods: React.FC = () => {
   });
 
   const toggleMutation = useMutation({
-    mutationFn: ({ id, lock }: { id: string, lock: boolean }) => 
-      adminService.togglePeriodLock(id, lock),
+    mutationFn: ({ year, month, lock }: { year: number; month: number; lock: boolean }) => 
+      adminService.togglePeriodLock(year, month, lock),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['periods'] });
       queryClient.invalidateQueries({ queryKey: ['adminDashboardStats'] });
-      toast.success('Period status updated');
+      toast.success('Period status updated successfully');
     },
     onError: (err: { message?: string }) => {
       toast.error(err.message || 'Failed to update period');
@@ -42,10 +42,10 @@ export const AccountingPeriods: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['periods'] });
       queryClient.invalidateQueries({ queryKey: ['adminDashboardStats'] });
-      toast.success(`Period created: ${monthNames[currentMonth - 1]} ${currentYear}`);
+      toast.success(`Period initialized: ${monthNames[currentMonth - 1]} ${currentYear}`);
     },
     onError: (err: { message?: string }) => {
-      toast.error(err.message || 'Failed to create period');
+      toast.error(err.message || 'Failed to initialize period');
     }
   });
 
@@ -64,13 +64,13 @@ export const AccountingPeriods: React.FC = () => {
       <header className={styles.header}>
         <div>
           <h1 className="page-title">Accounting Periods</h1>
-          <p className="text-muted">Control financial locks to prevent changes to historical data.</p>
+          <p className="text-muted">Database-enforced period locking to preserve immutable historical financial data.</p>
         </div>
         <div className="flex gap-2 items-center">
-          {isOwner && (
-            <Badge variant="primary" icon={<Shield size={14} />}>Owner Control Active</Badge>
+          {isFinancialAdmin && (
+            <Badge variant="primary" icon={<Shield size={14} />}>Admin Period Control Active</Badge>
           )}
-          {isOwner && !currentPeriodExists && !isLoading && (
+          {isFinancialAdmin && !currentPeriodExists && !isLoading && (
             <Button
               variant="primary"
               size="sm"
@@ -78,7 +78,7 @@ export const AccountingPeriods: React.FC = () => {
               onClick={() => createMutation.mutate()}
               disabled={createMutation.isPending}
             >
-              Create {monthNames[currentMonth - 1]} {currentYear}
+              Initialize {monthNames[currentMonth - 1]} {currentYear}
             </Button>
           )}
         </div>
@@ -87,7 +87,9 @@ export const AccountingPeriods: React.FC = () => {
       <Card className={styles.tableCard}>
         <div className={styles.infoBox}>
           <Lock size={18} />
-          <p>Locked periods prevent all staff and managers from creating or reversing transactions. Only Owners can override these locks.</p>
+          <p>
+            <strong>Database-Level Enforcement:</strong> When an accounting period is locked, the PostgreSQL engine strictly rejects all postings, reversals, and adjustments dated within that period across all user roles.
+          </p>
         </div>
 
         {isLoading ? (
@@ -95,15 +97,15 @@ export const AccountingPeriods: React.FC = () => {
         ) : (periods || []).length === 0 ? (
           <div className="flex-center p-8 text-muted flex-col gap-3">
             <Calendar size={32} className="text-dim" />
-            <span>No accounting periods found.</span>
-            {isOwner && (
+            <span>No accounting periods registered.</span>
+            {isFinancialAdmin && (
               <Button
                 variant="primary"
                 icon={<PlusCircle size={16} />}
                 onClick={() => createMutation.mutate()}
                 disabled={createMutation.isPending}
               >
-                Create {monthNames[currentMonth - 1]} {currentYear}
+                Initialize Current Period ({monthNames[currentMonth - 1]} {currentYear})
               </Button>
             )}
           </div>
@@ -111,16 +113,16 @@ export const AccountingPeriods: React.FC = () => {
           <DataTable 
             columns={[
               { 
-                header: 'Period', 
+                header: 'Accounting Period', 
                 accessor: (p) => (
                   <div className={styles.periodInfo}>
                     <Calendar size={18} className="text-dim" />
-                    <span>{monthNames[p.period_month - 1]} {p.period_year}</span>
+                    <span className="font-semibold">{monthNames[p.period_month - 1]} {p.period_year}</span>
                   </div>
                 )
               },
               { 
-                header: 'Status', 
+                header: 'Lock Status', 
                 accessor: (p) => (
                   <Badge variant={p.is_locked ? 'danger' : 'success'} pill>
                     {p.is_locked ? 'Locked' : 'Open'}
@@ -132,24 +134,24 @@ export const AccountingPeriods: React.FC = () => {
                 accessor: (p) => p.is_locked ? (
                   <div className={styles.metaInfo}>
                     <UserCheck size={14} />
-                    <span>{p.profiles?.full_name}</span>
+                    <span>{p.profiles?.full_name || 'Admin'}</span>
                   </div>
                 ) : '-'
               },
               { 
-                header: 'Locked Date', 
-                accessor: (p) => p.locked_at ? new Date(p.locked_at).toLocaleDateString() : '-'
+                header: 'Lock Timestamp', 
+                accessor: (p) => p.locked_at ? new Date(p.locked_at).toLocaleString() : '-'
               },
               { 
                 header: 'Actions', 
                 accessor: (p) => (
                   <button 
                     className={p.is_locked ? styles.unlockBtn : styles.lockBtn}
-                    disabled={!isOwner || toggleMutation.isPending}
-                    onClick={() => toggleMutation.mutate({ id: p.id, lock: !p.is_locked })}
+                    disabled={!isFinancialAdmin || toggleMutation.isPending}
+                    onClick={() => toggleMutation.mutate({ year: p.period_year, month: p.period_month, lock: !p.is_locked })}
                   >
                     {p.is_locked ? <Unlock size={16} /> : <Lock size={16} />}
-                    <span>{p.is_locked ? 'Unlock' : 'Lock Period'}</span>
+                    <span>{p.is_locked ? 'Unlock Period' : 'Lock Period'}</span>
                   </button>
                 ),
                 align: 'right'

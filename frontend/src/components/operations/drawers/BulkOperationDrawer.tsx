@@ -50,6 +50,7 @@ interface ParticipantGroup {
 
 export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const { drawerData } = useOperationsDrawer();
+  const idempotencyKeyRef = React.useRef<string>(crypto.randomUUID());
   const [step, setStep] = useState<Step>('configure');
   const [participantSource, setParticipantSource] = useState<'batch' | 'fixed' | 'csv' | null>(null);
   
@@ -184,11 +185,17 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   }, [participants, commonAmount, commonDate]);
 
   const bulkMutation = useMutation({
-    mutationFn: (txs: any[]) => transactionService.createBulk(txs),
+    mutationFn: ({ txs, opId, idempKey }: { txs: any[]; opId: string; idempKey: string }) => 
+      transactionService.createBulk(txs, opId, idempKey),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recentOperations'] });
       queryClient.invalidateQueries({ queryKey: ['todaySummary'] });
-      toast.success('Transactions composed and processed successfully');
+      queryClient.invalidateQueries({ queryKey: ['studentsSummary'] });
+      queryClient.invalidateQueries({ queryKey: ['student-health-dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['recent-transactions-dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['transactionsUnified'] });
+      queryClient.invalidateQueries({ queryKey: ['daily-summary'] });
+      toast.success('Transactions composed and processed atomically and successfully');
       setStep('success');
     },
     onError: (error: any) => {
@@ -209,23 +216,45 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
     const operationId = crypto.randomUUID();
     const payload: any[] = [];
 
-    participants.forEach(p => {
-      p.transactions.forEach(tx => {
+    // Pre-flight row validations
+    for (const p of participants) {
+      for (const tx of p.transactions) {
+        const rawAmt = commonAmount || tx.amount || '0';
+        const parsedAmt = parseFloat(rawAmt);
+        if (isNaN(parsedAmt) || parsedAmt <= 0) {
+          toast.error(`Invalid amount for student ${p.name}. Amount must be greater than zero.`);
+          return;
+        }
+        const decimalParts = rawAmt.toString().split('.');
+        if (decimalParts[1] && decimalParts[1].length > 2) {
+          toast.error(`Invalid currency precision for student ${p.name}. Maximum 2 decimal places allowed.`);
+          return;
+        }
+        const txPurpose = formatSmartPurpose(commonPurpose || tx.purpose || 'Bulk Operation Entry');
+        if (!txPurpose || txPurpose.trim().length === 0) {
+          toast.error(`Purpose required for student ${p.name}`);
+          return;
+        }
+
         const txType = commonType || tx.type || 'deposit';
         payload.push({
           student_id: p.student_id,
           operation_id: operationId,
           transaction_type: txType,
           direction: txType === 'deposit' ? 'credit' : 'debit',
-          amount: parseFloat(commonAmount || tx.amount || '0'),
-          purpose: formatSmartPurpose(commonPurpose || tx.purpose || 'Transaction Composer Entry'),
+          amount: parsedAmt,
+          purpose: txPurpose,
           transaction_date: new Date(commonDate || tx.date || new Date().toISOString().split('T')[0]).toISOString(),
           created_by: user.id
         });
-      });
-    });
+      }
+    }
 
-    bulkMutation.mutate(payload);
+    bulkMutation.mutate({
+      txs: payload,
+      opId: operationId,
+      idempKey: idempotencyKeyRef.current
+    });
   };
 
   // Keyboard Shortcuts

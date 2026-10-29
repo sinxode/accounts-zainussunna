@@ -488,45 +488,67 @@ export const transactionService = {
     if (error) throw error;
     return data;
   },
-  listInternalTransfers: async () => {
+  listInternalLoans: async () => {
     const { data, error } = await supabase
-      .from('transactions')
-      .select('*, students(name)')
-      .eq('transaction_type', 'adjustment')
-      .order('transaction_date', { ascending: false });
+      .from('internal_loans')
+      .select(`
+        *,
+        lender:students!internal_loans_lender_student_id_fkey(id, name, enrolment_no),
+        borrower:students!internal_loans_borrower_student_id_fkey(id, name, enrolment_no),
+        internal_loan_repayments(*)
+      `)
+      .order('created_at', { ascending: false });
     
     if (error) throw error;
-    if (!data) return [];
-
-    const groups: Record<string, any> = {};
-    data.forEach((trf: any) => {
-      const dateKey = trf.transaction_date ? trf.transaction_date.substring(0, 16) : 'unknown';
-      const opId = trf.operation_id || `${trf.amount}_${dateKey}`;
-      
-      if (!groups[opId]) {
-        groups[opId] = {
-          id: trf.operation_id || trf.id,
-          amount: trf.amount,
-          transaction_date: trf.transaction_date,
-          purpose: trf.purpose,
-          is_reversed: trf.is_reversed,
-          participants: []
-        };
-      }
-      
-      const participant = {
-        student_id: trf.student_id,
-        name: trf.students?.name,
-        direction: trf.direction,
-        amount: trf.amount
-      };
-      
-      if (!groups[opId].participants.find((p: any) => p.student_id === trf.student_id && p.direction === trf.direction)) {
-        groups[opId].participants.push(participant);
-      }
-    });
-
-    return Object.values(groups);
+    return (data || []).map(l => ({
+      ...l,
+      lender_name: l.lender ? formatDisplayName((l.lender as any).name) : 'Unknown',
+      borrower_name: l.borrower ? formatDisplayName((l.borrower as any).name) : 'Unknown',
+    }));
+  },
+  listInternalTransfers: async () => {
+    // Queries authoritative internal_loans table
+    const { data, error } = await supabase
+      .from('internal_loans')
+      .select(`
+        *,
+        lender:students!internal_loans_lender_student_id_fkey(id, name, enrolment_no),
+        borrower:students!internal_loans_borrower_student_id_fkey(id, name, enrolment_no),
+        internal_loan_repayments(*)
+      `)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching internal loans:', error);
+      return [];
+    }
+    
+    return (data || []).map(l => ({
+      id: l.id,
+      operation_id: l.operation_id,
+      amount: Number(l.principal_amount),
+      principal_amount: Number(l.principal_amount),
+      outstanding_amount: Number(l.outstanding_amount),
+      transaction_date: l.loan_date || l.created_at,
+      purpose: l.notes || 'Internal Student Transfer',
+      is_reversed: l.status === 'settled',
+      status: l.status,
+      participants: [
+        {
+          student_id: l.lender_student_id,
+          name: l.lender ? formatDisplayName((l.lender as any).name) : 'Unknown',
+          direction: 'debit',
+          amount: Number(l.principal_amount)
+        },
+        {
+          student_id: l.borrower_student_id,
+          name: l.borrower ? formatDisplayName((l.borrower as any).name) : 'Unknown',
+          direction: 'credit',
+          amount: Number(l.principal_amount)
+        }
+      ],
+      repayments: l.internal_loan_repayments || []
+    }));
   },
   getInternalTransferById: async (id: string) => {
     const { data, error } = await supabase
@@ -667,7 +689,16 @@ export const batchService = {
     if (error) throw error;
     return data || [];
   },
-  create: async (batch: { name: string; description: string; created_by: string }) => {
+  getById: async (id: string) => {
+    const { data, error } = await supabase
+      .from('saved_batches')
+      .select('*, members:batch_members(student_id, students(*))')
+      .eq('id', id)
+      .single();
+    if (error) throw error;
+    return data;
+  },
+  create: async (batch: { name: string; description?: string; created_by: string }) => {
     const { data, error } = await supabase
       .from('saved_batches')
       .insert([batch])
@@ -675,6 +706,23 @@ export const batchService = {
       .single();
     if (error) throw error;
     return data;
+  },
+  update: async (id: string, updates: { name?: string; description?: string }) => {
+    const { data, error } = await supabase
+      .from('saved_batches')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+  delete: async (id: string) => {
+    const { error } = await supabase
+      .from('saved_batches')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
   },
   addMembers: async (batchId: string, studentIds: string[]) => {
     const members = studentIds.map(sid => ({
@@ -684,6 +732,14 @@ export const batchService = {
     const { error } = await supabase
       .from('batch_members')
       .insert(members);
+    if (error) throw error;
+  },
+  removeMember: async (batchId: string, studentId: string) => {
+    const { error } = await supabase
+      .from('batch_members')
+      .delete()
+      .eq('batch_id', batchId)
+      .eq('student_id', studentId);
     if (error) throw error;
   }
 };

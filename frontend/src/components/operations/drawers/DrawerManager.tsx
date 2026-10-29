@@ -4,6 +4,7 @@ import { DepositDrawer } from './DepositDrawer';
 import { WithdrawalDrawer } from './WithdrawalDrawer';
 import { BulkOperationDrawer } from './BulkOperationDrawer';
 import { InternalTransferDrawer } from './InternalTransferDrawer';
+import { InternalRepaymentDrawer } from './InternalRepaymentDrawer';
 import { ExternalLoanDrawer } from './ExternalLoanDrawer';
 import { RecoveryDrawer } from './RecoveryDrawer';
 import { PresetDrawer } from './PresetDrawer';
@@ -26,6 +27,7 @@ export const DrawerManager: React.FC = () => {
     case 'withdrawal': return <WithdrawalDrawer onClose={close} initialStudentId={drawerData?.studentId} />;
     case 'bulk': return <BulkOperationDrawer onClose={close} />;
     case 'internal': return <InternalTransferDrawer onClose={close} />;
+    case 'internalRepayment': return <InternalRepaymentDrawer onClose={close} initialLoanId={drawerData?.loanId} />;
     case 'external': return <ExternalLoanDrawer onClose={close} initialBorrowerId={drawerData?.studentId} />;
     case 'recovery': return <RecoveryDrawer onClose={close} initialBorrowerId={drawerData?.studentId} />;
     case 'preset': return <PresetDrawer onClose={close} />;

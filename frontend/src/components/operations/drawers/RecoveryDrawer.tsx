@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 
 export const RecoveryDrawer: React.FC<{ onClose: () => void; initialBorrowerId?: string }> = ({ onClose, initialBorrowerId }) => {
   const { user } = useAuth();
+  const idempotencyKeyRef = React.useRef<string>(crypto.randomUUID());
   const [selectedBorrower, setSelectedBorrower] = useState<any>(null);
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
@@ -58,10 +59,15 @@ export const RecoveryDrawer: React.FC<{ onClose: () => void; initialBorrowerId?:
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['borrowers'] });
       queryClient.invalidateQueries({ queryKey: ['borrower'] });
+      queryClient.invalidateQueries({ queryKey: ['borrowerDashboardStats'] });
+      queryClient.invalidateQueries({ queryKey: ['borrowerStats'] });
+      queryClient.invalidateQueries({ queryKey: ['borrower-stats-dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['daily-summary'] });
       queryClient.invalidateQueries({ queryKey: ['transferSummary'] });
       queryClient.invalidateQueries({ queryKey: ['recentOperations'] });
       queryClient.invalidateQueries({ queryKey: ['todaySummary'] });
       queryClient.invalidateQueries({ queryKey: ['systemNotifications'] });
+      idempotencyKeyRef.current = crypto.randomUUID();
     },
     onError: (err: any) => {
       toast.error(err.message);
@@ -70,7 +76,12 @@ export const RecoveryDrawer: React.FC<{ onClose: () => void; initialBorrowerId?:
 
   const handleSubmit = React.useCallback((shouldClose: boolean = true) => {
     if (!selectedBorrower) return toast.error('Please select a borrower');
-    if (recoveryAmount <= 0) return toast.error('Please enter a valid recovery amount');
+    if (isNaN(recoveryAmount) || recoveryAmount <= 0) return toast.error('Please enter a valid recovery amount greater than zero');
+    if (recoveryAmount > outstanding) return toast.error(`Recovery amount cannot exceed outstanding balance of ₹${outstanding.toLocaleString()}`);
+
+    const parts = amount.split('.');
+    if (parts[1] && parts[1].length > 2) return toast.error('Amount cannot have more than 2 decimal places');
+
     recoveryMutation.mutate(undefined, {
       onSuccess: () => {
         toast.success('Recovery recorded successfully');
@@ -81,7 +92,7 @@ export const RecoveryDrawer: React.FC<{ onClose: () => void; initialBorrowerId?:
         }
       }
     });
-  }, [selectedBorrower, recoveryAmount, recoveryMutation, onClose]);
+  }, [selectedBorrower, recoveryAmount, outstanding, amount, recoveryMutation, onClose]);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

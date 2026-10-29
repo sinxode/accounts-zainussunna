@@ -6,6 +6,7 @@ export type DrawerType =
   | 'withdrawal' 
   | 'bulk' 
   | 'internal' 
+  | 'internalRepayment'
   | 'external' 
   | 'recovery' 
   | 'batch' 

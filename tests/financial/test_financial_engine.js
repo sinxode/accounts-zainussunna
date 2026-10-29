@@ -35,6 +35,9 @@ console.log('================================================================\n'
 runSql(`
 -- Clean tables
 DELETE FROM public.audit_logs;
+DELETE FROM public.batch_members;
+DELETE FROM public.saved_batches;
+DELETE FROM public.transaction_presets;
 DELETE FROM public.internal_loan_repayments;
 DELETE FROM public.internal_loans;
 DELETE FROM public.recoveries;

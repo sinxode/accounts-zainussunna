@@ -62,17 +62,25 @@ export const BorrowerDashboard: React.FC = () => {
     queryFn: borrowerService.list
   });
 
+  const { data: dashboardStats } = useQuery({
+    queryKey: ['borrowerDashboardStats'],
+    queryFn: borrowerService.getDashboardStats
+  });
+
+  const totalOutstanding = dashboardStats?.outstanding ?? borrowers.reduce((acc: number, b: any) => acc + (Number(b.total_outstanding) || 0), 0);
+  const totalRecovered = dashboardStats?.totalRecoveries ?? borrowers.reduce((acc: number, b: any) => acc + (b.borrower_loans?.reduce((sum: number, l: any) => sum + (l.recoveries?.reduce((recSum: number, r: any) => recSum + Number(r.amount), 0) || 0), 0) || 0), 0);
+
   const stats = [
-    { label: 'Outstanding Amount', value: `₹${borrowers.reduce((acc: number, b: any) => acc + (b.borrower_loans?.reduce((sum: number, l: any) => sum + Number(l.loan_amount), 0) || 0), 0).toLocaleString()}`, icon: <HandCoins size={24} />, variant: 'danger' as const, subtitle: 'Total exposure' },
-    { label: 'Active Borrowers', value: borrowers.filter(b => b.status === 'active').length.toString(), icon: <Users size={24} />, variant: 'primary' as const, subtitle: 'Current debtors' },
-    { label: 'Recoveries (MTD)', value: `₹${borrowers.reduce((acc: number, b: any) => acc + (b.borrower_loans?.reduce((sum: number, l: any) => sum + (l.recoveries?.reduce((recSum: number, r: any) => recSum + Number(r.amount), 0) || 0), 0) || 0), 0).toLocaleString()}`, icon: <BadgeIndianRupee size={24} />, variant: 'success' as const, subtitle: 'This month' },
+    { label: 'Outstanding Balance', value: `₹${totalOutstanding.toLocaleString()}`, icon: <HandCoins size={24} />, variant: 'danger' as const, subtitle: 'Total exposure derived from views' },
+    { label: 'Active Borrowers', value: borrowers.filter(b => b.status === 'active').length.toString(), icon: <Users size={24} />, variant: 'primary' as const, subtitle: 'Current registered debtors' },
+    { label: 'Total Recoveries', value: `₹${totalRecovered.toLocaleString()}`, icon: <BadgeIndianRupee size={24} />, variant: 'success' as const, subtitle: 'Confirmed repayments' },
     { label: 'Overdue Borrowers', value: borrowers.filter(b => b.status === 'overdue').length.toString(), icon: <AlertTriangle size={24} />, variant: 'warning' as const, subtitle: 'Attention needed' },
   ];
 
   const insights = [
-    { title: 'Largest Exposure', value: borrowers.reduce((prev: any, curr: any) => (prev.borrower_loans?.reduce((s: number, l: any) => s + Number(l.loan_amount), 0) || 0) > (curr.borrower_loans?.reduce((s: number, l: any) => s + Number(l.loan_amount), 0) || 0) ? prev : curr, borrowers[0])?.name || 'N/A', desc: 'Highest total loaned', icon: <Target size={18} />, color: 'danger' },
-    { title: 'Most Reliable', value: 'N/A', desc: '100% recovery rate', icon: <CheckCircle2 size={18} />, color: 'success' },
-    { title: 'Total Recoveries', value: `₹${borrowers.reduce((acc: number, b: any) => acc + (b.borrower_loans?.reduce((sum: number, l: any) => sum + (l.recoveries?.reduce((recSum: number, r: any) => recSum + Number(r.amount), 0) || 0), 0) || 0), 0).toLocaleString()}`, desc: 'All time', icon: <TrendingUp size={18} />, color: 'primary' },
+    { title: 'Largest Exposure', value: borrowers.reduce((prev: any, curr: any) => (prev.total_outstanding || 0) > (curr.total_outstanding || 0) ? prev : curr, borrowers[0])?.name || 'N/A', desc: 'Highest outstanding balance', icon: <Target size={18} />, color: 'danger' },
+    { title: 'Registered Debtors', value: `${borrowers.length} Entities`, desc: 'Total borrower accounts', icon: <CheckCircle2 size={18} />, color: 'success' },
+    { title: 'Cumulative Recoveries', value: `₹${totalRecovered.toLocaleString()}`, desc: 'Verified cash receipts', icon: <TrendingUp size={18} />, color: 'primary' },
   ];
 
   return (
@@ -87,6 +95,15 @@ export const BorrowerDashboard: React.FC = () => {
           </div>
         }
       />
+
+      {/* Historical Loan Ledger Notice Banner */}
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 mb-4 text-xs text-amber-900 flex items-start gap-2.5">
+        <AlertTriangle size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
+        <div>
+          <strong className="block text-amber-950 font-semibold mb-0.5">Historical Loan Reconciliation Notice (20 Historical Loans)</strong>
+          Historical borrower records indicate 20 active loans totaling approximately ₹196,562 recorded prior to the ZLS rebuild, with zero digital recovery rows. These balances represent unverified historical records requiring physical receipt reconciliation by Academy Finance before being treated as confirmed cash recoveries.
+        </div>
+      </div>
 
       <div className={styles.grid}>
         <div className={styles.statsRow}>

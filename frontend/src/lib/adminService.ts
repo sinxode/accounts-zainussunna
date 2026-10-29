@@ -1,6 +1,5 @@
 import { supabase } from './supabase';
 import { formatDisplayName } from './utils';
-import type { Database } from '../types/database';
 
 export const adminService = {
   /**
@@ -18,28 +17,21 @@ export const adminService = {
   },
 
   async createPeriod(year: number, month: number) {
-    const { data, error } = await supabase
-      .from('accounting_periods')
-      .insert({ period_year: year, period_month: month, is_locked: false })
-      .select()
-      .single();
+    const { data, error } = await (supabase.rpc as any)('rpc_set_accounting_period_lock', {
+      p_year: year,
+      p_month: month,
+      p_lock: false
+    });
     if (error) throw error;
     return data;
   },
 
-  async togglePeriodLock(id: string, isLocked: boolean) {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data, error } = await supabase
-      .from('accounting_periods')
-      .update({ 
-        is_locked: isLocked,
-        locked_at: isLocked ? new Date().toISOString() : null,
-        locked_by: isLocked ? user?.id : null
-      })
-      .eq('id', id)
-      .select()
-      .single();
-    
+  async togglePeriodLock(year: number, month: number, isLocked: boolean) {
+    const { data, error } = await (supabase.rpc as any)('rpc_set_accounting_period_lock', {
+      p_year: year,
+      p_month: month,
+      p_lock: isLocked
+    });
     if (error) throw error;
     return data;
   },
@@ -56,11 +48,20 @@ export const adminService = {
     return data;
   },
 
-  async updateUserRole(id: string, role: Database['public']['Tables']['profiles']['Row']['role']) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .update({ role })
-      .eq('id', id);
+  async updateUserRole(id: string, role: string) {
+    const { data, error } = await (supabase.rpc as any)('admin_set_user_role', {
+      p_target_user_id: id,
+      p_new_role: role
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async updateUserActive(id: string, isActive: boolean) {
+    const { data, error } = await (supabase.rpc as any)('admin_set_user_active', {
+      p_target_user_id: id,
+      p_is_active: isActive
+    });
     if (error) throw error;
     return data;
   },
@@ -71,7 +72,7 @@ export const adminService = {
   async getAuditLogs(limit = 100) {
     const { data, error } = await supabase
       .from('audit_logs')
-      .select('*, profiles(full_name)')
+      .select('*, profiles(full_name, email)')
       .order('created_at', { ascending: false })
       .limit(limit);
     if (error) throw error;
@@ -88,10 +89,12 @@ export const adminService = {
   },
 
   async updateSetting(key: string, value: unknown) {
-    const { error } = await supabase
-      .from('settings')
-      .upsert({ key, value, updated_at: new Date().toISOString() });
+    const { data, error } = await (supabase.rpc as any)('rpc_update_setting', {
+      p_key: key,
+      p_value: typeof value === 'object' ? value : JSON.stringify(value)
+    });
     if (error) throw error;
+    return data;
   },
 
   /**
