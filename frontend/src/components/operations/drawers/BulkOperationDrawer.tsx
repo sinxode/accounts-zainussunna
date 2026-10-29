@@ -184,7 +184,7 @@ export const BulkOperationDrawer: React.FC<{ onClose: () => void }> = ({ onClose
   }, [participants, commonAmount, commonDate]);
 
   const bulkMutation = useMutation({
-    mutationFn: transactionService.createBulk,
+    mutationFn: (txs: any[]) => transactionService.createBulk(txs),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recentOperations'] });
       queryClient.invalidateQueries({ queryKey: ['todaySummary'] });

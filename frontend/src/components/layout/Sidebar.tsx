@@ -23,31 +23,43 @@ import styles from './Sidebar.module.scss';
 import { useWindowSize } from '../../hooks/useWindowSize';
 import { Button } from '../ui/Button';
 import logoImg from '../../assets/logo_dark.png';
+import { useAuth } from '../../contexts/AuthContext';
+import type { Database } from '../../types/database';
+
+type Role = Database['public']['Tables']['profiles']['Row']['role'];
 
 interface NavItem {
   title: string;
   icon: React.ReactNode;
   path: string;
+  roles?: Role[];
 }
 
 const navigation: NavItem[] = [
   { title: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
-  { title: 'Operations Center', icon: <Workflow size={20} />, path: '/operations' },
+  { title: 'Operations Center', icon: <Workflow size={20} />, path: '/operations', roles: ['super_admin', 'admin', 'owner', 'manager'] },
   { title: 'Students', icon: <Users size={20} />, path: '/students' },
-  { title: 'Internal Transfers', icon: <ArrowLeftRight size={20} />, path: '/internal-transfers' },
-  { title: 'Batches', icon: <UsersRound size={20} />, path: '/batches' },
-  { title: 'Entry Presets', icon: <LayoutTemplate size={20} />, path: '/presets' },
-  { title: 'Borrowers', icon: <HandCoins size={20} />, path: '/borrowers' },
+  { title: 'Internal Transfers', icon: <ArrowLeftRight size={20} />, path: '/internal-transfers', roles: ['super_admin', 'admin', 'owner', 'manager'] },
+  { title: 'Batches', icon: <UsersRound size={20} />, path: '/batches', roles: ['super_admin', 'admin', 'owner', 'manager'] },
+  { title: 'Entry Presets', icon: <LayoutTemplate size={20} />, path: '/presets', roles: ['super_admin', 'admin', 'owner', 'manager'] },
+  { title: 'Borrowers', icon: <HandCoins size={20} />, path: '/borrowers', roles: ['super_admin', 'admin', 'owner', 'manager'] },
   { title: 'Transactions', icon: <Receipt size={20} />, path: '/transactions' },
-  { title: 'Reports', icon: <BarChart3 size={20} />, path: '/reports' },
-  { title: 'Administration', icon: <ShieldCheck size={20} />, path: '/administration' },
-  { title: 'Settings', icon: <Settings size={20} />, path: '/settings' },
+  { title: 'Reports', icon: <BarChart3 size={20} />, path: '/reports', roles: ['super_admin', 'admin', 'faculty', 'owner', 'manager', 'staff'] },
+  { title: 'Administration', icon: <ShieldCheck size={20} />, path: '/administration', roles: ['super_admin', 'owner'] },
+  { title: 'Settings', icon: <Settings size={20} />, path: '/settings', roles: ['super_admin', 'admin', 'owner', 'manager'] },
 ];
 
 export const Sidebar: React.FC = () => {
+  const { role } = useAuth();
   const { isSidebarOpen, setSidebarOpen, isSidebarCollapsed, setSidebarCollapsed } = useUIStore();
   const { width } = useWindowSize();
   const isMobile = width < 768;
+
+  const visibleNavigation = navigation.filter(item => {
+    if (!item.roles) return true;
+    if (!role) return false;
+    return item.roles.includes(role);
+  });
 
   // Auto-collapse sidebar on tablet screen widths to optimize workspace layout
   useEffect(() => {
@@ -104,7 +116,7 @@ export const Sidebar: React.FC = () => {
 
         <div className={styles.scrollArea}>
           <nav className={styles.nav}>
-            {navigation.map((item) => (
+            {visibleNavigation.map((item) => (
               <NavLink 
                 key={item.path}
                 to={item.path}

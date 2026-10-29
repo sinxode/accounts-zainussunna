@@ -64,8 +64,7 @@ export const InternalTransferDrawer: React.FC<{ isOpen?: boolean; onClose: () =>
       to_student_id: toStudent.id,
       amount: transferAmount,
       purpose: `Transfer: ${purpose || 'Internal Funds'}`,
-      operation_id: operationId,
-      created_by: user.id
+      operation_id: operationId
     }, {
       onSuccess: () => {
         toast.success('Transfer processed successfully');

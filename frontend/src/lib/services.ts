@@ -132,13 +132,16 @@ export const studentService = {
   },
   getTransactionsByStudentId: async (studentId: string) => {
     const { data, error } = await supabase
-      .from('transactions')
+      .from('student_ledger_view')
       .select('*')
       .eq('student_id', studentId)
-      .order('created_at', { ascending: false });
+      .order('transaction_date', { ascending: false });
     if (error) throw error;
-    console.log('Backend Service: Fetched transactions:', data);
-    return data || [];
+    return (data || []).map((t: any) => ({
+      ...t,
+      id: t.transaction_id || t.id,
+      created_at: t.transaction_date
+    }));
   },
   isFavorite: async (userId: string, studentId: string) => {
     const { data, error } = await supabase
@@ -476,7 +479,7 @@ export const transactionService = {
       repaymentsThisMonth 
     };
   },
-  settleInternalTransfer: async (loanId: string, amount: number, notes?: string) => {
+  settleInternalTransfer: async (loanId: string, amount: number = 0, notes?: string) => {
     const { data, error } = await (supabase.rpc as any)('rpc_repay_internal_loan', {
       p_loan_id: loanId,
       p_amount: amount,

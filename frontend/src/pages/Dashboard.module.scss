@@ -764,3 +764,80 @@
     display: none !important;
   }
 }
+
+// Negative Balance Alert Banner
+.negativeAlertBanner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: $radius-card;
+  padding: 1.25rem 1.5rem;
+  box-shadow: $shadow-soft;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.negativeAlertHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.negativeAlertTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #991b1b;
+    margin: 0;
+  }
+}
+
+.negativeAlertText {
+  font-size: 0.85rem;
+  color: #7f1d1d;
+  margin: 0;
+}
+
+.negativeStudentsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+.negativeStudentCard {
+  background: #ffffff;
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: #ef4444;
+    background: #fff5f5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1);
+  }
+}
+
+.readOnlyNotice {
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $radius-card;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: $text-secondary;
+  font-size: 0.875rem;
+}
+

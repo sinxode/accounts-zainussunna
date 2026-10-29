@@ -28,7 +28,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ allowedRoles }) => {
   }
 
   if (allowedRoles && role && !allowedRoles.includes(role)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/access-denied" state={{ from: location }} replace />;
   }
 
   return <Outlet />;

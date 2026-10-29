@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
   ArrowDownCircle, 
@@ -7,10 +7,10 @@ import {
   Receipt, 
   Star, 
   Printer,
-  Trash2,
+  RotateCcw,
+  Eye,
   Wallet,
-  ArrowDownLeft,
-  ArrowUpRight,
+  AlertTriangle
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageContainer } from '../../components/ui/PageContainer';
@@ -18,6 +18,7 @@ import { Card } from '../../components/ui/Card';
 import { StatCard } from '../../components/ui/StatCard';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
 import { DataTable } from '../../components/ui/DataTable';
 import { useUIStore } from '../../store/useUIStore';
 import { studentService, transactionService } from '../../lib/services';
@@ -29,10 +30,17 @@ import styles from './StudentProfile.module.scss';
 
 export const StudentProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { user, role } = useAuth();
   const queryClient = useQueryClient();
   const { openDrawer } = useOperationsDrawer();
-  const { setActiveModal, setExportData, openConfirmation } = useUIStore();
+  const { setActiveModal, setExportData } = useUIStore();
+
+  const [txToReverse, setTxToReverse] = useState<any>(null);
+  const [reversalReason, setReversalReason] = useState('');
+
+  const canMutate = role && ['super_admin', 'admin', 'owner', 'manager'].includes(role);
+  const canReverse = canMutate;
 
   const { data: student, isLoading: isLoadingStudent } = useQuery({
     queryKey: ['student', id],
@@ -40,7 +48,7 @@ export const StudentProfile: React.FC = () => {
     enabled: !!id
   });
 
-  const { data: transactions } = useQuery({
+  const { data: transactions, isLoading: isLoadingTx } = useQuery({
     queryKey: ['studentTransactions', id],
     queryFn: () => studentService.getTransactionsByStudentId(id!),
     enabled: !!id
@@ -63,35 +71,33 @@ export const StudentProfile: React.FC = () => {
     }
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (t: any) => {
-      if (t.transaction_type === 'adjustment') {
-        return transactionService.deleteOperation(t.id);
-      } else {
-        return transactionService.delete(t.id);
-      }
+  const reverseMutation = useMutation({
+    mutationFn: () => transactionService.reverse(txToReverse.id, reversalReason.trim()),
+    onSuccess: () => {
+      toast.success('Transaction successfully reversed');
+      setTxToReverse(null);
+      setReversalReason('');
+      queryClient.invalidateQueries({ queryKey: ['student', id] });
+      queryClient.invalidateQueries({ queryKey: ['studentTransactions', id] });
+      queryClient.invalidateQueries({ queryKey: ['studentsSummary'] });
+      queryClient.invalidateQueries({ queryKey: ['daily-summary'] });
+      queryClient.invalidateQueries({ queryKey: ['transactionsUnified'] });
     },
-    onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['studentTransactions', id] });
-      await queryClient.refetchQueries({ queryKey: ['student', id] });
-      toast.success('Transaction deleted');
-    },
-    onError: (error: any) => {
-      toast.error(`Error: ${error.message}`);
+    onError: (err: any) => {
+      toast.error(`Reversal failed: ${err.message}`);
     }
   });
 
-  const handleDeleteTransaction = (t: any) => {
-    openConfirmation({
-      title: 'Delete Transaction?',
-      message: 'Are you sure you want to delete this transaction? This will permanently delete the entry from the student\'s ledger statement.',
-      confirmLabel: 'Delete',
-      variant: 'danger',
-      onConfirm: () => deleteMutation.mutate(t)
-    });
-  };
+  if (isLoadingStudent || !student) {
+    return (
+      <PageContainer>
+        <div className="p-8 text-center text-muted">Loading student profile...</div>
+      </PageContainer>
+    );
+  }
 
-  if (isLoadingStudent || !student) return <PageContainer>Loading...</PageContainer>;
+  const currentBalance = Number(student.current_balance || 0);
+  const isNegative = currentBalance < 0;
 
   const totalDeposited = transactions?.filter(t => t.direction === 'credit').reduce((sum, t) => sum + Number(t.amount), 0) || 0;
   const totalWithdrawn = transactions?.filter(t => t.direction === 'debit').reduce((sum, t) => sum + Number(t.amount), 0) || 0;
@@ -103,12 +109,13 @@ export const StudentProfile: React.FC = () => {
       title: `Account Statement: ${student.name}`,
       filename: `Statement_${student.enrolment_no}_${new Date().toISOString().split('T')[0]}`,
       type: 'statement',
-      columns: ['Date', 'Purpose', 'Type', 'Amount'],
+      columns: ['Date', 'Purpose', 'Type', 'Amount', 'Status'],
       rows: transactions.map(t => [
-        new Date(t.created_at).toLocaleDateString(),
+        new Date(t.created_at || t.transaction_date).toLocaleDateString(),
         t.purpose,
         t.transaction_type,
-        `${t.direction === 'credit' ? '+' : '-'}₹${Number(t.amount).toLocaleString()}`
+        `${t.direction === 'credit' ? '+' : '-'}₹${Number(t.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+        t.is_reversed ? 'Reversed' : 'Active'
       ])
     });
     setActiveModal('printExport');
@@ -140,144 +147,219 @@ export const StudentProfile: React.FC = () => {
                   <span className={styles.enr}>{student.enrolment_no}</span>
                   <div className={styles.dot} />
                   <Badge variant={student.status === 'active' ? 'success' : 'neutral'} size="sm">{student.status}</Badge>
+                  {isNegative && (
+                    <Badge variant="danger" size="sm" pill>
+                      <AlertTriangle size={12} className="mr-1 inline" /> Negative Balance
+                    </Badge>
+                  )}
                 </div>
               </div>
             </div>
             <div className={styles.heroBalance}>
-              <span className={styles.balanceLabel}>Current Balance</span>
-              <div className={styles.balanceValue}>₹ {Number(student.current_balance).toLocaleString()}</div>
+              <span className={styles.balanceLabel}>Authoritative Ledger Balance</span>
+              <div className={clsx(styles.balanceValue, isNegative && "text-danger")}>
+                ₹ {currentBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              </div>
             </div>
           </section>
+
+          {/* Negative Balance Alert */}
+          {isNegative && (
+            <Card padding="md" className="border-danger/30 bg-danger/5 mb-4">
+              <div className="flex items-center gap-3">
+                <AlertTriangle size={20} className="text-danger flex-shrink-0" />
+                <p className="text-xs text-danger font-medium">
+                  This student account currently has a negative balance of ₹{Math.abs(currentBalance).toLocaleString(undefined, { minimumFractionDigits: 2 })}. 
+                  Negative balances are tolerated to prevent disruption of academic services, but prompt recovery is required.
+                </p>
+              </div>
+            </Card>
+          )}
 
           {/* Section 2: Financial Overview */}
           <div className={clsx(styles.overviewGrid, styles.orderBalance)}>
             <div className={styles.mobileOnlyCard}>
-              <StatCard label="Current Balance" value={`₹${Number(student.current_balance).toLocaleString()}`} icon={<Wallet />} variant="primary" />
+              <StatCard 
+                label="Authoritative Balance" 
+                value={`₹${currentBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+                icon={<Wallet />} 
+                variant={isNegative ? "error" : "primary"} 
+              />
             </div>
-            <StatCard label="Total Deposited" value={`₹${totalDeposited.toLocaleString()}`} icon={<ArrowDownCircle />} variant="success" />
-            <StatCard label="Total Withdrawn" value={`₹${totalWithdrawn.toLocaleString()}`} icon={<ArrowUpCircle />} variant="error" />
-            <StatCard label="Total Transactions" value={transactions?.length || 0} icon={<Receipt />} variant="neutral" />
+            <StatCard label="Total Inflows (Credits)" value={`₹${totalDeposited.toLocaleString(undefined, { minimumFractionDigits: 2 })}`} icon={<ArrowDownCircle />} variant="success" />
+            <StatCard label="Total Outflows (Debits)" value={`₹${totalWithdrawn.toLocaleString(undefined, { minimumFractionDigits: 2 })}`} icon={<ArrowUpCircle />} variant="error" />
+            <StatCard label="Total Ledger Entries" value={transactions?.length || 0} icon={<Receipt />} variant="neutral" />
           </div>
 
-          {/* Section 3: Quick Actions */}
-          <section className={clsx(styles.section, styles.orderActions)}>
-            <h3 className="label-sm mb-4">Quick Actions</h3>
-            <div className={styles.actionsGrid}>
-              <Button size="lg" icon={<ArrowDownCircle size={20} />} className={styles.actionBtn} onClick={() => openDrawer('deposit', { studentId: id })}>Deposit</Button>
-              <Button size="lg" icon={<ArrowUpCircle size={20} />} variant="soft" className={styles.actionBtn} onClick={() => openDrawer('withdrawal', { studentId: id })}>Withdraw</Button>
-              <Button 
-                size="lg" 
-                icon={<Star size={20} className={isFavorite ? "text-warning" : ""} fill={isFavorite ? "currentColor" : "none"} />} 
-                variant="ghost" 
-                className={styles.actionBtn}
-                onClick={() => toggleFavMutation.mutate()}
-                loading={isLoadingFav || toggleFavMutation.isPending}
-              >
-                {isFavorite ? 'Favorited' : 'Favorite'}
-              </Button>
-            </div>
-          </section>
+          {/* Section 3: Quick Actions (Only for permitted roles) */}
+          {canMutate && (
+            <section className={clsx(styles.section, styles.orderActions)}>
+              <h3 className="label-sm mb-4 font-semibold text-xs tracking-wider uppercase text-muted">Financial Operations</h3>
+              <div className={styles.actionsGrid}>
+                <Button size="lg" icon={<ArrowDownCircle size={20} />} className={styles.actionBtn} onClick={() => openDrawer('deposit', { studentId: id })}>Deposit</Button>
+                <Button size="lg" icon={<ArrowUpCircle size={20} />} variant="soft" className={styles.actionBtn} onClick={() => openDrawer('withdrawal', { studentId: id })}>Withdraw</Button>
+                <Button 
+                  size="lg" 
+                  icon={<Star size={20} className={isFavorite ? "text-warning" : ""} fill={isFavorite ? "currentColor" : "none"} />} 
+                  variant="ghost" 
+                  className={styles.actionBtn}
+                  onClick={() => toggleFavMutation.mutate()}
+                  loading={isLoadingFav || toggleFavMutation.isPending}
+                >
+                  {isFavorite ? 'Favorited' : 'Favorite'}
+                </Button>
+              </div>
+            </section>
+          )}
 
-          {/* Section 6: Transaction Ledger */}
+          {/* Section 4: Authoritative Transaction Ledger */}
           <section className={clsx(styles.section, styles.orderLedger)}>
-            <div className="flex-between mb-4">
-              <h3 className="label-sm">Transaction Ledger</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="label-sm font-semibold text-xs tracking-wider uppercase text-muted">Authoritative Journal Entries</h3>
+              <span className="text-xs text-muted">Chronological order with running balance</span>
             </div>
-            <DataTable 
-              key={transactions?.length}
-              columns={[
-                { 
-                  header: 'Date', 
-                  width: '100px',
-                  accessor: (t: any) => (
-                    <div className="flex flex-col">
-                      <span>{new Date(t.created_at).toLocaleDateString()}</span>
-                      <div className="mobile-only-flex items-center gap-1 mt-1 text-muted text-xs">
-                        {t.transaction_type === 'deposit' ? (
-                          <ArrowDownLeft size={12} className="text-success" />
-                        ) : (
-                          <ArrowUpRight size={12} className="text-danger" />
-                        )}
-                        <span className="capitalize">{t.transaction_type}</span>
-                      </div>
-                    </div>
-                  )
-                },
-                { 
-                  header: 'Purpose', 
-                  responsiveHidden: 'mobile',
-                  accessor: 'purpose' 
-                },
-                { 
-                  header: 'Type', 
-                  responsiveHidden: 'mobile',
-                  accessor: (t: any) => {
-                    const isDeposit = t.transaction_type === 'deposit';
-                    return (
-                      <div className="flex items-center gap-1.5 justify-center" title={t.transaction_type}>
-                        {isDeposit ? (
-                          <ArrowDownLeft size={16} className="text-success" />
-                        ) : (
-                          <ArrowUpRight size={16} className="text-danger" />
-                        )}
-                        <span className={clsx(
-                          "desktop-only-inline text-xs font-semibold capitalize",
-                          isDeposit ? "text-success" : "text-danger"
-                        )}>
-                          {t.transaction_type}
+
+            {isLoadingTx ? (
+              <div className="p-8 text-center text-muted">Loading journal entries...</div>
+            ) : (
+              <DataTable 
+                key={transactions?.length}
+                onRowClick={(t: any) => navigate(`/transactions/${t.id}`)}
+                columns={[
+                  { 
+                    header: 'Date', 
+                    width: '110px',
+                    accessor: (t: any) => (
+                      <div className="flex flex-col">
+                        <span>{new Date(t.transaction_date || t.created_at).toLocaleDateString()}</span>
+                        <span className="text-[11px] text-muted">
+                          {new Date(t.transaction_date || t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                    );
+                    )
                   },
-                  align: 'center' 
-                },
-                { 
-                  header: 'Amount', 
-                  accessor: (t: any) => (
-                    <div className="flex flex-col items-end">
-                      <span className={`${t.direction === 'credit' ? "text-success" : "text-danger"} ${styles.amountVal}`}>
-                        {t.direction === 'credit' ? '+' : '-'}₹{Math.abs(Number(t.amount)).toLocaleString()}
-                      </span>
-                      <span className="mobile-only-inline text-muted text-xs mt-1 text-right">
-                        {t.purpose}
-                      </span>
-                    </div>
-                  ),
-                  align: 'right'
-                },
-                { 
-                  header: '', 
-                  width: '60px',
-                  accessor: (t: any) => (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleDeleteTransaction(t)}
-                      className="text-danger hover:bg-danger/10"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  ),
-                  align: 'right'
-                },
-              ]}
-              data={transactions || []}
-            />
+                  { 
+                    header: 'Purpose / Reason', 
+                    accessor: (t: any) => (
+                      <div className="flex flex-col">
+                        <span className={clsx("font-medium", t.is_reversed && "line-through text-muted")}>
+                          {t.purpose}
+                        </span>
+                        {t.is_reversed && (
+                          <span className="text-[11px] text-danger">
+                            Reversed: {t.reversal_reason || 'Administrative correction'}
+                          </span>
+                        )}
+                        {t.reversal_of_id && (
+                          <span className="text-[11px] text-warning">
+                            Offsetting compensating entry
+                          </span>
+                        )}
+                      </div>
+                    )
+                  },
+                  { 
+                    header: 'Type', 
+                    responsiveHidden: 'mobile',
+                    align: 'center',
+                    accessor: (t: any) => (
+                      <Badge variant="neutral" size="sm">
+                        {t.transaction_type}
+                      </Badge>
+                    )
+                  },
+                  { 
+                    header: 'Amount', 
+                    align: 'right',
+                    accessor: (t: any) => (
+                      <div className="flex flex-col items-end">
+                        <span className={clsx("font-semibold", t.direction === 'credit' ? "text-success" : "text-danger", t.is_reversed && "line-through opacity-70")}>
+                          {t.direction === 'credit' ? '+' : '-'}₹{Math.abs(Number(t.amount)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </span>
+                        <span className="text-[10px] text-muted uppercase tracking-wider">
+                          {t.direction}
+                        </span>
+                      </div>
+                    )
+                  },
+                  { 
+                    header: 'Running Balance', 
+                    responsiveHidden: 'mobile',
+                    align: 'right',
+                    accessor: (t: any) => {
+                      const rb = Number(t.running_balance ?? 0);
+                      return (
+                        <span className={clsx("font-mono font-medium text-xs", rb < 0 ? "text-danger" : "text-primary")}>
+                          ₹{rb.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </span>
+                      );
+                    }
+                  },
+                  { 
+                    header: 'Status', 
+                    align: 'center',
+                    accessor: (t: any) => (
+                      <Badge variant={t.is_reversed ? 'danger' : 'success'} size="sm" pill>
+                        {t.is_reversed ? 'Reversed' : 'Active'}
+                      </Badge>
+                    )
+                  },
+                  { 
+                    header: '', 
+                    width: '80px',
+                    align: 'right',
+                    accessor: (t: any) => {
+                      const isReversible = canReverse && !t.is_reversed && !t.reversal_of_id;
+                      return (
+                        <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            title="View Transaction Record"
+                            onClick={() => navigate(`/transactions/${t.id}`)}
+                          >
+                            <Eye size={16} />
+                          </Button>
+                          {canReverse && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              disabled={!isReversible}
+                              title={isReversible ? "Reverse Transaction" : "Cannot be reversed"}
+                              onClick={() => {
+                                setTxToReverse(t);
+                                setReversalReason('');
+                              }}
+                              className="text-danger hover:bg-danger/10 disabled:opacity-30"
+                            >
+                              <RotateCcw size={16} />
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    }
+                  },
+                ]}
+                data={transactions || []}
+              />
+            )}
           </section>
         </div>
+
         {/* Sidebar / Snapshot area */}
         <aside className={styles.sidebar}>
-          {/* Section 4: Financial Health */}
           <section className={styles.stickySection}>
             <div className={styles.orderHealth}>
               <Card padding="lg" className={styles.snapshotCard}>
-                <div className="flex-between mb-6">
-                  <h3 className="label-sm">Financial Health</h3>
-                  <Badge variant={student.health_status === 'healthy' ? 'success' : 'warning'} pill>{student.health_status}</Badge>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="label-sm font-semibold text-xs tracking-wider uppercase text-muted">Financial Health</h3>
+                  <Badge variant={student.health_status === 'healthy' ? 'success' : isNegative ? 'danger' : 'warning'} pill>
+                    {student.health_status}
+                  </Badge>
                 </div>
                 <div className={styles.healthInfo}>
                   <p className={styles.healthDesc}>
-                    Account status is currently {student.health_status}.
+                    Account status is classified as <strong>{student.health_status}</strong> based on authoritative balances.
                   </p>
                 </div>
                 
@@ -286,52 +368,85 @@ export const StudentProfile: React.FC = () => {
                 <div className={styles.snapMeta}>
                   <div className={styles.mRow}>
                     <span>Last Transaction</span>
-                    <strong>{student.last_transaction_date ? new Date(student.last_transaction_date).toLocaleDateString() : 'N/A'}</strong>
+                    <strong>{student.last_transaction_date ? new Date(student.last_transaction_date).toLocaleDateString() : 'No activity'}</strong>
                   </div>
                 </div>
 
-                <div className={styles.snapActions}>
-                  <Button fullWidth onClick={() => openDrawer('deposit')}>Quick Deposit</Button>
-                  <Button fullWidth variant="soft" onClick={() => openDrawer('withdrawal')}>Quick Withdraw</Button>
-                </div>
+                {canMutate && (
+                  <div className={styles.snapActions}>
+                    <Button fullWidth onClick={() => openDrawer('deposit', { studentId: id })}>Quick Deposit</Button>
+                    <Button fullWidth variant="soft" onClick={() => openDrawer('withdrawal', { studentId: id })}>Quick Withdraw</Button>
+                  </div>
+                )}
               </Card>
-            </div>
-
-            {/* Section 5: Activity Timeline (Restored) */}
-            <div className={styles.orderHistory}>
-              <h3 className="label-sm mt-8 mb-4">Activity Timeline</h3>
-              <div className={styles.timeline}>
-                {/* Simplified version for now */}
-                {transactions?.slice(0, 5).map((t: any) => (
-                  <div key={t.id} className={styles.tlItem}>
-                    <div className={styles.tlContent}>
-                      <div className={styles.tlHeader}>
-                        <span className={styles.tlTitle}>{t.purpose}</span>
-                      </div>
-                      <span className={clsx(styles.tlAmount, t.direction === 'credit' ? "text-success" : "text-danger")}>
-                        {t.direction === 'credit' ? '+' : '-'}₹{Math.abs(Number(t.amount)).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Section 9: Smart Insights (Restored Placeholder) */}
-            <div className={styles.orderInsights}>
-              <h3 className="label-sm mt-8 mb-4">Smart Insights</h3>
-              <div className={styles.insights}>
-                <Card padding="md" className={styles.insightItem}>
-                  <div className={styles.iContent}>
-                    <span className={styles.iLabel}>Status</span>
-                    <strong>{student.health_status}</strong>
-                  </div>
-                </Card>
-              </div>
             </div>
           </section>
         </aside>
       </div>
+
+      {/* Documented Reversal Modal */}
+      <Modal 
+        isOpen={!!txToReverse}
+        onClose={() => {
+          if (!reverseMutation.isPending) {
+            setTxToReverse(null);
+            setReversalReason('');
+          }
+        }}
+        title="Documented Transaction Reversal"
+      >
+        {txToReverse && (
+          <div className="p-4 space-y-4">
+            <div className="p-3 bg-warning/10 border border-warning/30 rounded-lg text-xs text-warning space-y-1">
+              <p className="font-semibold">Authoritative Ledger Correction</p>
+              <p>
+                Reversing transaction <code>{txToReverse.id.slice(0, 8)}...</code> ({txToReverse.direction === 'credit' ? 'Inflow' : 'Outflow'} of ₹{Number(txToReverse.amount).toLocaleString()}) 
+                will post an offsetting <strong>{txToReverse.direction === 'credit' ? 'DEBIT' : 'CREDIT'}</strong> of{' '}
+                <strong>₹{Number(txToReverse.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-secondary mb-1">
+                Documented Reversal Reason (Minimum 10 characters) <span className="text-danger">*</span>
+              </label>
+              <textarea
+                className="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:outline-none"
+                rows={3}
+                placeholder="e.g. Accidental double entry detected during statement reconciliation..."
+                value={reversalReason}
+                onChange={(e) => setReversalReason(e.target.value)}
+                disabled={reverseMutation.isPending}
+              />
+              <div className="flex justify-between text-[11px] text-muted mt-1">
+                <span>Must document an audit justification.</span>
+                <span className={reversalReason.trim().length >= 10 ? "text-success" : "text-danger"}>
+                  {reversalReason.trim().length}/10 chars
+                </span>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <Button 
+                variant="ghost" 
+                onClick={() => setTxToReverse(null)}
+                disabled={reverseMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="danger" 
+                icon={<RotateCcw size={16} />}
+                loading={reverseMutation.isPending}
+                disabled={reversalReason.trim().length < 10}
+                onClick={() => reverseMutation.mutate()}
+              >
+                Confirm Reversal
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </PageContainer>
   );
 };

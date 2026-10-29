@@ -34,6 +34,7 @@ import { UserProfile } from './pages/settings/UserProfile';
 import { BorrowerDashboard } from './pages/borrowers/BorrowerDashboard';
 import { BorrowerProfile } from './pages/borrowers/BorrowerProfile';
 import { TransactionExplorer } from './pages/transactions/TransactionExplorer';
+import { TransactionDetails } from './pages/transactions/TransactionDetails';
 import { EntryPresets } from './pages/presets/EntryPresets';
 import { BatchManagement } from './pages/batches/BatchManagement';
 import { InternalTransfers } from './pages/transfers/InternalTransfers';
@@ -59,39 +60,49 @@ function App() {
               <Route element={<AuthGuard />}>
                 <Route path="/" element={<AppLayout />}>
                   <Route index element={<Dashboard />} />
-                  <Route path="operations" element={<OperationsCenter />} />
                   <Route path="students" element={<AllStudents />} />
                   <Route path="students/:id" element={<StudentProfile />} />
-                  <Route path="internal-transfers" element={<InternalTransfers />} />
-                  <Route path="borrowers" element={<BorrowerDashboard />} />
-                  <Route path="borrowers/:id" element={<BorrowerProfile />} />
                   <Route path="transactions" element={<TransactionExplorer />} />
-                  <Route path="presets" element={<EntryPresets />} />
-                  <Route path="batches" element={<BatchManagement />} />
-                  
-                  <Route path="reports">
-                    <Route index element={<FinancialSummary />} />
-                    <Route path="students" element={<StudentReports />} />
-                    <Route path="monthly" element={<MonthlyReports />} />
-                    <Route path="borrowers" element={<BorrowerReports />} />
-                    <Route path="summary" element={<FinancialSummary />} />
-                    <Route path="analytics" element={<Analytics />} />
+                  <Route path="transactions/:id" element={<TransactionDetails />} />
+                  <Route path="profile" element={<UserProfile />} />
+
+                  {/* Operational Management (Admins & Managers only) */}
+                  <Route element={<AuthGuard allowedRoles={['super_admin', 'admin', 'owner', 'manager']} />}>
+                    <Route path="operations" element={<OperationsCenter />} />
+                    <Route path="internal-transfers" element={<InternalTransfers />} />
+                    <Route path="borrowers" element={<BorrowerDashboard />} />
+                    <Route path="borrowers/:id" element={<BorrowerProfile />} />
+                    <Route path="presets" element={<EntryPresets />} />
+                    <Route path="batches" element={<BatchManagement />} />
+                    <Route path="settings" element={<GlobalSettings />} />
                   </Route>
 
-                  <Route path="administration">
-                    <Route index element={<AdministrationDashboard />} />
-                    <Route path="users" element={<UserManagement />} />
-                    <Route path="global" element={<GlobalSettings />} />
-                    <Route path="periods" element={<AccountingPeriods />} />
-                    <Route path="audit" element={<AuditCenter />} />
-                    <Route path="notifications" element={<NotificationManagement />} />
-                    <Route path="health" element={<SystemHealth />} />
-                    <Route path="data-health" element={<DataHealth />} />
-                    <Route path="import" element={<ImportCenter />} />
+                  {/* Institutional Reports (Admins & Faculty) */}
+                  <Route element={<AuthGuard allowedRoles={['super_admin', 'admin', 'faculty', 'owner', 'manager', 'staff']} />}>
+                    <Route path="reports">
+                      <Route index element={<FinancialSummary />} />
+                      <Route path="students" element={<StudentReports />} />
+                      <Route path="monthly" element={<MonthlyReports />} />
+                      <Route path="borrowers" element={<BorrowerReports />} />
+                      <Route path="summary" element={<FinancialSummary />} />
+                      <Route path="analytics" element={<Analytics />} />
+                    </Route>
                   </Route>
-                  
-                  <Route path="settings" element={<GlobalSettings />} />
-                  <Route path="profile" element={<UserProfile />} />
+
+                  {/* System Administration (Super Admin only) */}
+                  <Route element={<AuthGuard allowedRoles={['super_admin', 'owner']} />}>
+                    <Route path="administration">
+                      <Route index element={<AdministrationDashboard />} />
+                      <Route path="users" element={<UserManagement />} />
+                      <Route path="global" element={<GlobalSettings />} />
+                      <Route path="periods" element={<AccountingPeriods />} />
+                      <Route path="audit" element={<AuditCenter />} />
+                      <Route path="notifications" element={<NotificationManagement />} />
+                      <Route path="health" element={<SystemHealth />} />
+                      <Route path="data-health" element={<DataHealth />} />
+                      <Route path="import" element={<ImportCenter />} />
+                    </Route>
+                  </Route>
 
                   <Route path="*" element={<Navigate to="/404" replace />} />
                 </Route>

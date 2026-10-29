@@ -19,6 +19,7 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
   const [purpose, setPurpose] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [resetKey, setResetKey] = useState(0);
+  const idempotencyKeyRef = React.useRef<string>(crypto.randomUUID());
   
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -46,6 +47,15 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recentOperations'] });
       queryClient.invalidateQueries({ queryKey: ['todaySummary'] });
+      queryClient.invalidateQueries({ queryKey: ['studentsSummary'] });
+      queryClient.invalidateQueries({ queryKey: ['daily-summary'] });
+      queryClient.invalidateQueries({ queryKey: ['recent-transactions-dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['student-health-dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['transactionsUnified'] });
+      if (selectedStudent?.id) {
+        queryClient.invalidateQueries({ queryKey: ['student', selectedStudent.id] });
+        queryClient.invalidateQueries({ queryKey: ['studentTransactions', selectedStudent.id] });
+      }
     },
     onError: (error: any) => {
       toast.error(`Failed to process deposit: ${error.message}`);
@@ -58,11 +68,25 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
     setPurpose('');
     setNotes('');
     setResetKey(prev => prev + 1);
+    idempotencyKeyRef.current = crypto.randomUUID();
   };
 
   const handleSubmit = React.useCallback((shouldClose: boolean = true) => {
-    if (!selectedStudent || !amount || parseFloat(amount) <= 0) {
-      toast.error('Please select a student and enter a valid amount');
+    const parsedAmount = parseFloat(amount);
+    if (!selectedStudent) {
+      toast.error('Please select a student');
+      return;
+    }
+    if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
+      toast.error('Please enter a valid positive deposit amount');
+      return;
+    }
+    if (parsedAmount !== Math.round(parsedAmount * 100) / 100) {
+      toast.error('Amount cannot have more than 2 decimal places');
+      return;
+    }
+    if (!purpose.trim()) {
+      toast.error('Please enter a purpose for the deposit');
       return;
     }
     if (!user) {
@@ -74,9 +98,9 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
       student_id: selectedStudent.id,
       transaction_type: 'deposit',
       direction: 'credit',
-      amount: parseFloat(amount),
-      purpose: purpose || 'Deposit',
-      transaction_date: new Date().toISOString(),
+      amount: parsedAmount,
+      purpose: purpose.trim() + (notes.trim() ? ` (${notes.trim()})` : ''),
+      idempotency_key: idempotencyKeyRef.current,
       created_by: user.id
     }, {
       onSuccess: () => {
@@ -88,7 +112,7 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
         }
       }
     });
-  }, [selectedStudent, amount, purpose, user, createMutation, onClose]);
+  }, [selectedStudent, amount, purpose, notes, user, createMutation, onClose]);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

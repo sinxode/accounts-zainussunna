@@ -3,14 +3,13 @@ import {
   Users, 
   Search, 
   Plus, 
-  Trash2, 
   ArrowDownLeft, 
   ArrowUpRight,
   Eye,
   AlertTriangle,
   AlertCircle
 } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -20,25 +19,24 @@ import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import type { BadgeVariant } from '../../components/ui/Badge';
 import { DataTable } from '../../components/ui/DataTable';
-import { ConfirmationModal } from '../../components/ui/ConfirmationModal';
 import { studentService } from '../../lib/services';
 import { adminService } from '../../lib/adminService';
+import { useAuth } from '../../contexts/AuthContext';
 import styles from './AllStudents.module.scss';
 import { useUIStore } from '../../store/useUIStore';
 import { useOperationsDrawer } from '../../components/operations/drawers/OperationsDrawerContext';
 import { clsx } from 'clsx';
-import toast from 'react-hot-toast';
 
 export const AllStudents: React.FC = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { role } = useAuth();
   const { openDrawer } = useOperationsDrawer();
   const { setActiveModal } = useUIStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [healthFilter, setHealthFilter] = useState<string>('all');
-  
-  // Deletion state
-  const [studentToDelete, setStudentToDelete] = useState<{ id: string, name: string } | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  const canMutate = role && ['super_admin', 'admin', 'owner', 'manager'].includes(role);
 
   const { data: students, isLoading } = useQuery({
     queryKey: ['studentsSummary'],
@@ -55,25 +53,11 @@ export const AllStudents: React.FC = () => {
     return { low: s.low_balance_threshold || 0, critical: s.critical_balance_threshold || -1000 };
   }, [settings]);
 
-  const deleteStudentMutation = useMutation({
-    mutationFn: (id: string) => studentService.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['studentsSummary'] });
-      toast.success('Student deleted successfully');
-      setStudentToDelete(null);
-    },
-    onError: (err: any) => {
-      toast.error(err.message);
-    }
-  });
-
   const getHealthVariant = (balance: number): BadgeVariant => {
     if (balance <= thresholds.critical) return 'error';
     if (balance <= thresholds.low) return 'warning';
     return 'success';
   };
-
-  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const filteredStudents = useMemo(() => {
     if (!students) return [];
@@ -103,12 +87,14 @@ export const AllStudents: React.FC = () => {
   return (
     <PageContainer>
       <PageHeader
-        title="All Students"
-        subtitle="Manage student ledgers and track financial health."
+        title="Student Directory"
+        subtitle="Authoritative student ledger directory and balance overview."
         actions={
-          <Button icon={<Plus size={18} />} onClick={() => setActiveModal('addStudent')}>
-            Add Student
-          </Button>
+          canMutate ? (
+            <Button icon={<Plus size={18} />} onClick={() => setActiveModal('addStudent')}>
+              Add Student
+            </Button>
+          ) : undefined
         }
       />
       <div className={styles.container}>
@@ -116,7 +102,7 @@ export const AllStudents: React.FC = () => {
           <StatCard label="Total Students" value={stats.total} icon={<Users size={20} />} variant="primary" />
           <StatCard label="Low Balance" value={stats.lowBalance} icon={<AlertTriangle size={20} />} variant="warning" />
           <StatCard label="Zero Balance" value={stats.zeroBalance} icon={<AlertCircle size={20} />} variant="error" />
-          <StatCard label="Total Student Funds" value={`₹${stats.totalFunds.toLocaleString()}`} icon={<ArrowDownLeft size={20} />} variant="success" />
+          <StatCard label="Total Student Balances" value={`₹${stats.totalFunds.toLocaleString()}`} icon={<ArrowDownLeft size={20} />} variant="success" />
         </section>
 
         <Card padding="sm">
@@ -125,7 +111,7 @@ export const AllStudents: React.FC = () => {
               <Search size={18} className={styles.searchIcon} />
               <input 
                 type="text" 
-                placeholder="Search by name or enrollment..." 
+                placeholder="Search by name or enrollment number..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -158,7 +144,7 @@ export const AllStudents: React.FC = () => {
         <Card padding="none">
           {isLoading ? (
             <div className={`flex-center ${styles.loading}`}>
-              <p>Loading student records...</p>
+              <p>Loading authoritative student records...</p>
             </div>
           ) : (
             <DataTable 
@@ -200,8 +186,8 @@ export const AllStudents: React.FC = () => {
                   align: 'right',
                   accessor: (s) => (
                     <div className="flex flex-col items-end">
-                      <span className={clsx(styles.balance, s.current_balance < 0 && "text-error")}>
-                        ₹{s.current_balance.toLocaleString()}
+                      <span className={clsx(styles.balance, s.current_balance < 0 && "text-error font-semibold")}>
+                        ₹{Number(s.current_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </span>
                       <div className="mobile-only-flex items-center gap-1 mt-1">
                         <Badge variant={getHealthVariant(s.current_balance)} size="sm" pill>
@@ -238,20 +224,14 @@ export const AllStudents: React.FC = () => {
                   header: 'Actions', 
                   align: 'right',
                   accessor: (s) => (
-                    <div className={styles.actions}>
-                      <button onClick={(e) => { e.stopPropagation(); openDrawer('deposit', { studentId: s.id }); }} title="Deposit"><ArrowDownLeft size={16} /></button>
-                      <button onClick={(e) => { e.stopPropagation(); openDrawer('withdrawal', { studentId: s.id }); }} title="Withdraw"><ArrowUpRight size={16} /></button>
-                      <button onClick={(e) => { e.stopPropagation(); navigate(`/students/${s.id}`); }} title="View Profile"><Eye size={16} /></button>
-                      <button 
-                        onClick={(e) => { 
-                          e.stopPropagation(); 
-                          setStudentToDelete({ id: s.id, name: s.name });
-                        }} 
-                        title="Delete Student"
-                        className={styles.deleteBtn}
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                    <div className={styles.actions} onClick={(e) => e.stopPropagation()}>
+                      {canMutate && (
+                        <>
+                          <button onClick={() => openDrawer('deposit', { studentId: s.id })} title="Deposit"><ArrowDownLeft size={16} /></button>
+                          <button onClick={() => openDrawer('withdrawal', { studentId: s.id })} title="Withdraw"><ArrowUpRight size={16} /></button>
+                        </>
+                      )}
+                      <button onClick={() => navigate(`/students/${s.id}`)} title="View Profile"><Eye size={16} /></button>
                     </div>
                   )
                 }
@@ -261,17 +241,6 @@ export const AllStudents: React.FC = () => {
           )}
         </Card>
       </div>
-
-      <ConfirmationModal 
-        isOpen={!!studentToDelete}
-        onClose={() => setStudentToDelete(null)}
-        onConfirm={() => studentToDelete && deleteStudentMutation.mutate(studentToDelete.id)}
-        title="Delete Student"
-        message={`Are you sure you want to delete ${studentToDelete?.name}? This will permanently remove their ledger record. This action cannot be undone.`}
-        confirmLabel="Delete Permanently"
-        variant="danger"
-        loading={deleteStudentMutation.isPending}
-      />
     </PageContainer>
   );
 };

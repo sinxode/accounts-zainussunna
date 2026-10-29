@@ -4,10 +4,12 @@ import { Search, ArrowRight, User, History, Plus, Minus, Layers3, ArrowLeftRight
 import { useUIStore } from '../../store/useUIStore';
 import { globalSearchService } from '../../lib/globalSearchService';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import styles from './CommandPalette.module.scss';
 
 export const CommandPalette: React.FC = () => {
   const { isCommandPaletteOpen, setCommandPaletteOpen } = useUIStore();
+  const { role } = useAuth();
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const navigate = useNavigate();
@@ -36,20 +38,25 @@ export const CommandPalette: React.FC = () => {
 
   if (!isCommandPaletteOpen) return null;
 
+  const isAdmin = role && ['super_admin', 'admin', 'owner', 'manager'].includes(role);
+  const isFaculty = role && ['faculty', 'staff'].includes(role);
+
   const quickOps = [
-    { id: 'deposit', name: 'Quick Deposit', icon: <Plus size={16} />, path: '/operations' },
-    { id: 'withdrawal', name: 'Quick Withdrawal', icon: <Minus size={16} />, path: '/operations' },
-    { id: 'bulk', name: 'New Bulk Operation', icon: <Layers3 size={16} />, path: '/operations' },
-    { id: 'transfer', name: 'New Internal Transfer', icon: <ArrowLeftRight size={16} />, path: '/transfers' },
-    { id: 'loan', name: 'New External Loan', icon: <HandCoins size={16} />, path: '/borrowers' },
+    ...(isAdmin ? [
+      { id: 'deposit', name: 'Quick Deposit', icon: <Plus size={16} />, path: '/operations' },
+      { id: 'withdrawal', name: 'Quick Withdrawal', icon: <Minus size={16} />, path: '/operations' },
+      { id: 'bulk', name: 'New Bulk Operation', icon: <Layers3 size={16} />, path: '/operations' },
+      { id: 'transfer', name: 'New Internal Transfer', icon: <ArrowLeftRight size={16} />, path: '/internal-transfers' },
+      { id: 'loan', name: 'New External Loan', icon: <HandCoins size={16} />, path: '/borrowers' },
+    ] : [])
   ];
 
   const navigations = [
     { name: 'Dashboard', path: '/' },
-    { name: 'Operations Center', path: '/operations' },
+    ...(isAdmin ? [{ name: 'Operations Center', path: '/operations' }] : []),
     { name: 'Students', path: '/students' },
     { name: 'Transactions', path: '/transactions' },
-    { name: 'Reports', path: '/reports' },
+    ...(isAdmin || isFaculty ? [{ name: 'Reports', path: '/reports' }] : []),
   ];
 
   const handleAction = (item: any) => {
