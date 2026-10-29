@@ -207,6 +207,7 @@ ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Audit logs viewable by staff" ON public.audit_logs;
 DROP POLICY IF EXISTS "Audit logs manageable by staff" ON public.audit_logs;
+DROP POLICY IF EXISTS "Audit logs insertable by staff" ON public.audit_logs;
 DROP POLICY IF EXISTS "Audit logs viewable by admins only" ON public.audit_logs;
 
 CREATE POLICY "Audit logs viewable by admins only" ON public.audit_logs
@@ -227,6 +228,10 @@ CREATE POLICY "Audit logs viewable by admins only" ON public.audit_logs
 ALTER TABLE public.saved_batches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.batch_members ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Batches viewable by authenticated" ON public.saved_batches;
+DROP POLICY IF EXISTS "Users can insert batches" ON public.saved_batches;
+DROP POLICY IF EXISTS "Users can update own batches" ON public.saved_batches;
+DROP POLICY IF EXISTS "Users can delete own batches" ON public.saved_batches;
 DROP POLICY IF EXISTS "Saved batches viewable by staff" ON public.saved_batches;
 DROP POLICY IF EXISTS "Saved batches manageable by admins" ON public.saved_batches;
 
@@ -260,6 +265,9 @@ CREATE POLICY "Saved batches manageable by admins" ON public.saved_batches
     )
   );
 
+DROP POLICY IF EXISTS "Batch members viewable by authenticated" ON public.batch_members;
+DROP POLICY IF EXISTS "Staff can insert batch members" ON public.batch_members;
+DROP POLICY IF EXISTS "Staff can delete batch members" ON public.batch_members;
 DROP POLICY IF EXISTS "Batch members viewable by staff" ON public.batch_members;
 DROP POLICY IF EXISTS "Batch members manageable by admins" ON public.batch_members;
 
@@ -336,6 +344,8 @@ ALTER TABLE public.borrowers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.borrower_loans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.recoveries ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Borrowers viewable by authenticated" ON public.borrowers;
+DROP POLICY IF EXISTS "Staff can manage borrowers" ON public.borrowers;
 DROP POLICY IF EXISTS "Borrowers viewable by money managers" ON public.borrowers;
 DROP POLICY IF EXISTS "Borrowers manageable by money managers" ON public.borrowers;
 DROP POLICY IF EXISTS "Borrowers updatable by money managers" ON public.borrowers;
@@ -381,6 +391,8 @@ CREATE POLICY "Borrowers updatable by money managers" ON public.borrowers
     )
   );
 
+DROP POLICY IF EXISTS "Borrower loans viewable by authenticated" ON public.borrower_loans;
+DROP POLICY IF EXISTS "Staff can manage borrower loans" ON public.borrower_loans;
 DROP POLICY IF EXISTS "Borrower loans viewable by money managers" ON public.borrower_loans;
 DROP POLICY IF EXISTS "Borrower loans insertable by money managers" ON public.borrower_loans;
 
@@ -406,6 +418,8 @@ CREATE POLICY "Borrower loans insertable by money managers" ON public.borrower_l
     )
   );
 
+DROP POLICY IF EXISTS "Recoveries viewable by authenticated" ON public.recoveries;
+DROP POLICY IF EXISTS "Staff can manage recoveries" ON public.recoveries;
 DROP POLICY IF EXISTS "Recoveries viewable by money managers" ON public.recoveries;
 CREATE POLICY "Recoveries viewable by money managers" ON public.recoveries
   FOR SELECT TO authenticated
@@ -422,8 +436,16 @@ CREATE POLICY "Recoveries viewable by money managers" ON public.recoveries
 -- 7. SETTINGS RLS & RPC
 ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Settings viewable by authenticated users" ON public.settings;
+DROP POLICY IF EXISTS "Staff can manage settings" ON public.settings;
 DROP POLICY IF EXISTS "Settings viewable by authenticated" ON public.settings;
 DROP POLICY IF EXISTS "Settings manageable by admins" ON public.settings;
+
+-- Also clean up legacy unversioned event policies
+DROP POLICY IF EXISTS "Event participants viewable by authenticated" ON public.event_participants;
+DROP POLICY IF EXISTS "Staff can manage event participants" ON public.event_participants;
+DROP POLICY IF EXISTS "Event templates viewable by authenticated" ON public.event_templates;
+DROP POLICY IF EXISTS "Staff can manage event templates" ON public.event_templates;
 
 CREATE POLICY "Settings viewable by authenticated" ON public.settings
   FOR SELECT TO authenticated
