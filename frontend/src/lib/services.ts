@@ -89,34 +89,20 @@ export const borrowerService = {
     return data;
   },
   createRecovery: async (recovery: any) => {
-    const { data, error } = await supabase
-      .from('recoveries')
-      .insert([recovery])
-      .select()
-      .single();
+    const { data, error } = await (supabase.rpc as any)('rpc_record_borrower_recovery', {
+      p_loan_id: recovery.loan_id,
+      p_amount: Number(recovery.amount),
+      p_recovery_date: recovery.recovery_date || new Date().toISOString().split('T')[0],
+      p_notes: recovery.notes || null
+    });
     if (error) throw error;
     return data;
   },
-  deleteLoan: async (id: string) => {
-    // Delete any associated recovery repayments first to avoid foreign key violations
-    const { error: recoveryError } = await supabase
-      .from('recoveries')
-      .delete()
-      .eq('loan_id', id);
-    if (recoveryError) throw recoveryError;
-
-    const { error } = await supabase
-      .from('borrower_loans')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+  deleteLoan: async (_id: string) => {
+    throw new Error('UNSUPPORTED_OPERATION: External loan deletion is prohibited by ledger integrity rules.');
   },
-  deleteRecovery: async (id: string) => {
-    const { error } = await supabase
-      .from('recoveries')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+  deleteRecovery: async (_id: string) => {
+    throw new Error('UNSUPPORTED_OPERATION: Loan recovery deletion is prohibited by ledger integrity rules.');
   }
 };
 
@@ -490,13 +476,14 @@ export const transactionService = {
       repaymentsThisMonth 
     };
   },
-  settleInternalTransfer: async (operationId: string) => {
-    const { error } = await supabase
-      .from('transactions')
-      .update({ is_reversed: true })
-      .or(`id.eq.${operationId},operation_id.eq.${operationId}`);
+  settleInternalTransfer: async (loanId: string, amount: number, notes?: string) => {
+    const { data, error } = await (supabase.rpc as any)('rpc_repay_internal_loan', {
+      p_loan_id: loanId,
+      p_amount: amount,
+      p_notes: notes || 'Settlement of internal student loan'
+    });
     if (error) throw error;
-    return { success: true };
+    return data;
   },
   listInternalTransfers: async () => {
     const { data, error } = await supabase
@@ -548,19 +535,41 @@ export const transactionService = {
     return data;
   },
   create: async (transaction: any) => {
-    const { data, error } = await supabase
-      .from('transactions')
-      .insert([transaction])
-      .select()
-      .single();
+    const { data, error } = await (supabase.rpc as any)('rpc_post_transaction', {
+      p_student_id: transaction.student_id,
+      p_transaction_type: transaction.transaction_type,
+      p_direction: transaction.direction,
+      p_amount: Number(transaction.amount),
+      p_purpose: transaction.purpose,
+      p_idempotency_key: transaction.idempotency_key || null,
+      p_operation_id: transaction.operation_id || null
+    });
     if (error) throw error;
-    return data;
+    const result = data as any;
+    return result?.transaction || result;
   },
-  createBulk: async (transactions: any[]) => {
-    const { data, error } = await supabase
-      .from('transactions')
-      .insert(transactions)
-      .select();
+  createBulk: async (transactions: any[], operationId?: string, idempotencyKey?: string) => {
+    const payload = transactions.map(t => ({
+      student_id: t.student_id,
+      transaction_type: t.transaction_type,
+      direction: t.direction,
+      amount: Number(t.amount),
+      purpose: t.purpose
+    }));
+    const { data, error } = await (supabase.rpc as any)('rpc_post_bulk_transactions', {
+      p_transactions: payload,
+      p_operation_id: operationId || null,
+      p_idempotency_key: idempotencyKey || null
+    });
+    if (error) throw error;
+    const result = data as any;
+    return result?.transactions || result;
+  },
+  reverse: async (transactionId: string, reason: string) => {
+    const { data, error } = await (supabase.rpc as any)('rpc_reverse_transaction', {
+      p_transaction_id: transactionId,
+      p_reason: reason
+    });
     if (error) throw error;
     return data;
   },
@@ -569,72 +578,43 @@ export const transactionService = {
     to_student_id: string; 
     amount: number; 
     purpose: string; 
-    operation_id: string; 
-    created_by: string; 
+    operation_id?: string;
+    idempotency_key?: string;
   }) => {
-    const timestamp = new Date().toISOString();
-    
-    // Debit Lender
-    const { error: debitError } = await supabase
-      .from('transactions')
-      .insert({
-        student_id: params.from_student_id,
-        operation_id: params.operation_id,
-        transaction_type: 'adjustment',
-        direction: 'debit',
-        amount: params.amount,
-        purpose: `Lender: ${params.purpose}`,
-        transaction_date: timestamp,
-        created_by: params.created_by
-      });
-      
-    if (debitError) throw debitError;
-
-    // Credit Borrower
-    const { error: creditError } = await supabase
-      .from('transactions')
-      .insert({
-        student_id: params.to_student_id,
-        operation_id: params.operation_id,
-        transaction_type: 'adjustment',
-        direction: 'credit',
-        amount: params.amount,
-        purpose: `Borrower: ${params.purpose}`,
-        transaction_date: timestamp,
-        created_by: params.created_by
-      });
-
-    if (creditError) throw creditError;
-    return { success: true };
-  },
-  delete: async (id: string) => {
-    console.log('Backend Service: Attempting to delete transaction with ID:', id);
-    const { error } = await supabase
-      .from('transactions')
-      .delete()
-      .eq('id', id);
-    if (error) {
-      console.error('Backend Service: Delete error:', error);
-      throw error;
-    }
-    console.log('Backend Service: Successfully deleted transaction with ID:', id);
-  },
-  deleteOperation: async (operationId: string) => {
-    const { error } = await supabase
-      .from('transactions')
-      .delete()
-      .or(`id.eq.${operationId},operation_id.eq.${operationId}`);
-    if (error) throw error;
-  },
-  update: async (id: string, updates: any) => {
-    const { data, error } = await supabase
-      .from('transactions')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await (supabase.rpc as any)('rpc_post_internal_transfer', {
+      p_lender_student_id: params.from_student_id,
+      p_borrower_student_id: params.to_student_id,
+      p_amount: Number(params.amount),
+      p_purpose: params.purpose,
+      p_operation_id: params.operation_id || null,
+      p_idempotency_key: params.idempotency_key || null
+    });
     if (error) throw error;
     return data;
+  },
+  repayInternalLoan: async (params: {
+    loan_id: string;
+    amount: number;
+    notes?: string;
+    idempotency_key?: string;
+  }) => {
+    const { data, error } = await (supabase.rpc as any)('rpc_repay_internal_loan', {
+      p_loan_id: params.loan_id,
+      p_amount: Number(params.amount),
+      p_notes: params.notes || null,
+      p_idempotency_key: params.idempotency_key || null
+    });
+    if (error) throw error;
+    return data;
+  },
+  delete: async (_id: string) => {
+    throw new Error('UNSUPPORTED_OPERATION: Direct transaction deletion is prohibited by financial ledger invariants. Use reverse instead.');
+  },
+  deleteOperation: async (_operationId: string) => {
+    throw new Error('UNSUPPORTED_OPERATION: Bulk operation deletion is prohibited by financial ledger invariants. Reverse individual transactions with documented reasons.');
+  },
+  update: async (_id: string, _updates: any) => {
+    throw new Error('UNSUPPORTED_OPERATION: Direct transaction update is prohibited by financial ledger invariants. Post a compensating adjustment or reversal.');
   }
 };
 
