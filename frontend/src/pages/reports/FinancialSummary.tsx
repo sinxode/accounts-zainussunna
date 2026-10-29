@@ -1,190 +1,187 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { ChartCard } from '../../components/reports/ChartCard';
-import styles from './FinancialSummary.module.scss';
 import { StatCard } from '../../components/ui/StatCard';
 import { 
   Wallet, 
-  TrendingUp, 
-  TrendingDown, 
   Scale, 
   Download, 
-  Filter, 
-  PieChart, 
   BarChart3, 
-  Zap,
+  Info,
+  ArrowDownLeft,
   ArrowUpRight,
-  ArrowDownRight
+  RotateCcw
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { ReportTabs } from '../../components/reports/ReportTabs';
 import { useUIStore } from '../../store/useUIStore';
 import { reportingService } from '../../lib/reportingService';
-import { clsx } from 'clsx';
 
 export const FinancialSummary: React.FC = () => {
-    const { setActiveModal, setExportData } = useUIStore();
+  const { setActiveModal, setExportData } = useUIStore();
+  const [dateRange, setDateRange] = useState({
+    start: `${new Date().getFullYear()}-01-01`,
+    end: new Date().toISOString().split('T')[0]
+  });
 
-    const { data: summary, isLoading } = useQuery({
-      queryKey: ['financialSummaryData'],
-      queryFn: reportingService.getFinancialSummaryData
+  const { data: summary, isLoading } = useQuery({
+    queryKey: ['financialActivitySummary', dateRange],
+    queryFn: () => reportingService.getFinancialActivitySummary(dateRange.start, dateRange.end)
+  });
+
+  const handleExport = () => {
+    if (!summary) return;
+    setExportData({
+      title: 'Institutional Financial Activity Summary',
+      filename: `Financial_Activity_Summary_${dateRange.start}_to_${dateRange.end}`,
+      type: 'report',
+      columns: ['Metric', 'Amount', 'Description'],
+      rows: [
+        ['Total Recorded Student Balances Pool', `₹${summary.totalStudentBalances.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, 'Current net balance of all student accounts'],
+        ['Gross Recorded Inflows (Credits)', `₹${summary.grossInflows.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, 'Total deposits and collections in period'],
+        ['Gross Recorded Outflows (Debits)', `₹${summary.grossOutflows.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, 'Total withdrawals and distributions in period'],
+        ['Compensating Reversals Volume', `₹${summary.reversalVolume.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, `${summary.reversalCount} correction entries in period`],
+        ['Net Period Movement', `₹${summary.netLedgerMovement.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, 'Net change in central ledger']
+      ]
     });
+    setActiveModal('printExport');
+  };
 
-    const handleExport = () => {
-      if (!summary) return;
-      setExportData({
-        title: 'Global Financial Health Summary',
-        filename: `Financial_Summary_${new Date().toISOString().split('T')[0]}`,
-        type: 'report',
-        columns: ['Metric', 'Value'],
-        rows: [
-          ['Total Student Funds', `₹${summary.totalStudentFunds.toLocaleString()}`],
-          ['Income (YTD)', `₹${summary.incomeYTD.toLocaleString()}`],
-          ['Expenses (YTD)', `₹${summary.expensesYTD.toLocaleString()}`],
-          ['Operating Margin', `${summary.operatingMargin.toFixed(1)}%`]
-        ]
-      });
-      setActiveModal('printExport');
-    };
+  const chartData = summary ? Object.entries(summary.typeVolumes).map(([type, v]) => ({
+    name: type.replace('_', ' ').toUpperCase(),
+    Inflows: v.credits,
+    Outflows: v.debits
+  })) : [];
 
-    return (
-        <PageContainer>
-            <PageHeader
-                title="Financial Summary"
-                subtitle="High-level overview of the academy's financial health and cash flow."
-                actions={
-                  <div className="flex gap-2">
-                    <Button variant="soft" icon={<Filter size={16} />}>Filters</Button>
-                    <Button variant="soft" icon={<Download size={16} />} onClick={handleExport} disabled={isLoading}>Export PDF</Button>
-                  </div>
-                }
+  return (
+    <PageContainer>
+      <PageHeader
+        title="Financial Activity Summary"
+        subtitle="Neutral overview of recorded inflows, disbursements, corrections, and total student balance pools."
+        actions={
+          <Button variant="soft" icon={<Download size={16} />} onClick={handleExport} disabled={isLoading}>
+            Export Summary
+          </Button>
+        }
+      />
+      
+      <ReportTabs />
+
+      {/* Date Range Selector */}
+      <Card padding="sm" style={{ marginBottom: '20px' }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '13px', fontWeight: 600, color: '#334155' }}>Reporting Scope:</span>
+          <input
+            type="date"
+            value={dateRange.start}
+            onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+            style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+          />
+          <span style={{ fontSize: '13px', color: '#64748B' }}>to</span>
+          <input
+            type="date"
+            value={dateRange.end}
+            onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+            style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+          />
+        </div>
+      </Card>
+
+      {/* Neutral Accounting Disclaimer */}
+      <div style={{
+        backgroundColor: '#EFF6FF',
+        border: '1px solid #BFDBFE',
+        borderRadius: '8px',
+        padding: '12px 16px',
+        marginBottom: '20px',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '10px'
+      }}>
+        <Info size={18} style={{ color: '#2563EB', flexShrink: 0, marginTop: '2px' }} />
+        <div style={{ fontSize: '12.5px', color: '#1E40AF', lineHeight: 1.5 }}>
+          <strong>Classification Note:</strong> {summary?.disclaimer} Figures represent actual recorded double-entry movements; student deposits are tracked as student trust obligations rather than institutional profit.
+        </div>
+      </div>
+      
+      {isLoading ? (
+        <div className="glass-effect p-8 text-center text-muted">Aggregating Financial Metrics...</div>
+      ) : (
+        <div>
+          {/* Global Stats Strip */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+            <StatCard 
+              label="Student Balances Pool" 
+              value={`₹${(summary?.totalStudentBalances || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+              icon={<Wallet size={20} />} 
+              variant="primary" 
             />
-            
-            <ReportTabs />
-            
-            {isLoading ? (
-              <div className={styles.loadingWrapper}>
-                <div className={clsx("glass-effect", styles.loadingBox)}>Aggregating Financial Metrics...</div>
-              </div>
-            ) : (
-              <div className={styles.reportsGrid}>
-                  {/* Global Stats Strip */}
-                  <div className={styles.statsRow}>
-                    <StatCard label="Total Student Funds" value={`₹${(summary?.totalStudentFunds || 0).toLocaleString()}`} icon={<Wallet size={20} />} variant="primary" />
-                    <StatCard label="Income (YTD)" value={`₹${(summary?.incomeYTD || 0).toLocaleString()}`} icon={<TrendingUp size={20} />} variant="success" />
-                    <StatCard label="Expenses (YTD)" value={`₹${(summary?.expensesYTD || 0).toLocaleString()}`} icon={<TrendingDown size={20} />} variant="danger" />
-                    <StatCard label="Operating Margin" value={`${(summary?.operatingMargin || 0).toFixed(1)}%`} icon={<Scale size={20} />} variant="neutral" />
-                  </div>
+            <StatCard 
+              label="Gross Inflows (Credits)" 
+              value={`+₹${(summary?.grossInflows || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+              icon={<ArrowDownLeft size={20} />} 
+              variant="success" 
+            />
+            <StatCard 
+              label="Gross Outflows (Debits)" 
+              value={`-₹${(summary?.grossOutflows || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+              icon={<ArrowUpRight size={20} />} 
+              variant="danger" 
+            />
+            <StatCard 
+              label="Compensating Reversals" 
+              value={`${summary?.reversalCount || 0} (₹${(summary?.reversalVolume || 0).toLocaleString()})`} 
+              icon={<RotateCcw size={20} />} 
+              variant="warning" 
+            />
+            <StatCard 
+              label="Net Ledger Movement" 
+              value={`${(summary?.netLedgerMovement || 0) >= 0 ? '+' : ''}₹${(summary?.netLedgerMovement || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+              icon={<Scale size={20} />} 
+              variant="neutral" 
+            />
+          </div>
 
-                  <div className={styles.chartsLayout}>
-                    {/* Left Column: Primary Charts */}
-                    <div className={styles.mainChart}>
-                      <ChartCard
-                        title={
-                          <div className="flex items-center gap-2">
-                            <BarChart3 size={16} className="text-primary" />
-                            <span>Income vs. Expenses Trend</span>
-                          </div>
-                        }
-                        type="bar"
-                        data={summary?.monthlyTrend || []}
-                        dataKeys={['income', 'outcome']}
-                        colors={['#10b981', '#ef4444']}
-                      />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+            {/* Chart */}
+            <ChartCard
+              title={
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <BarChart3 size={16} style={{ color: '#1E3A5F' }} />
+                  <span>Activity Volume by Transaction Type</span>
+                </div>
+              }
+              type="bar"
+              data={chartData}
+              dataKeys={['Inflows', 'Outflows']}
+              colors={['#10B981', '#EF4444']}
+            />
 
-                      <div className="grid grid-cols-2 gap-6">
-                        <Card padding="lg" className="flex flex-col gap-2">
-                          <span className="text-xs text-muted font-bold uppercase tracking-wider">Top Income Source</span>
-                          <div className="flex items-end justify-between">
-                            <h4 className="text-xl font-bold">{summary?.topIncomeName || 'None'}</h4>
-                            <div className="flex items-center text-success text-xs font-bold gap-0.5">
-                              <ArrowUpRight size={14} /> {summary?.topIncomePercentage?.toFixed(1) || '0'}% YTD
-                            </div>
-                          </div>
-                          <div className={styles.progressContainer}>
-                            <div className={clsx(styles.progressBar, styles.income)} style={{ width: `${summary?.topIncomePercentage || 0}%` }} />
-                          </div>
-                        </Card>
-
-                        <Card padding="lg" className="flex flex-col gap-2">
-                          <span className="text-xs text-muted font-bold uppercase tracking-wider">Major Expense Stream</span>
-                          <div className="flex items-end justify-between">
-                            <h4 className="text-xl font-bold">{summary?.topExpenseName || 'None'}</h4>
-                            <div className="flex items-center text-danger text-xs font-bold gap-0.5">
-                              <ArrowDownRight size={14} /> {summary?.topExpensePercentage?.toFixed(1) || '0'}% YTD
-                            </div>
-                          </div>
-                          <div className={styles.progressContainer}>
-                            <div className={clsx(styles.progressBar, styles.expense)} style={{ width: `${summary?.topExpensePercentage || 0}%` }} />
-                          </div>
-                        </Card>
-                      </div>
+            {/* Type Breakdown Card */}
+            <Card padding="md">
+              <h3 className="label-sm" style={{ marginBottom: '14px' }}>Transaction Volume Distribution</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {summary && Object.entries(summary.typeVolumes).map(([type, stats]) => (
+                  <div key={type} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', backgroundColor: '#F8FAFC', borderRadius: '6px' }}>
+                    <div>
+                      <span style={{ fontWeight: 600, fontSize: '13px', color: '#0F172A' }}>{type.replace('_', ' ').toUpperCase()}</span>
+                      <span style={{ fontSize: '11px', color: '#64748B', display: 'block' }}>{stats.count} transactions</span>
                     </div>
-
-                    {/* Right Column: Breakdown & Insights */}
-                    <div className={styles.sideColumn}>
-                      <ChartCard
-                        title={
-                          <div className="flex items-center gap-2">
-                            <PieChart size={16} className="text-warning" />
-                            <span>Resource Allocation</span>
-                          </div>
-                        }
-                        type="pie"
-                        data={summary?.allocation || []}
-                        dataKeys={['value']}
-                      />
-
-                      <Card padding="lg">
-                        <div className={styles.sectionTitle}>
-                          <Zap size={16} className="text-primary" />
-                          <span>Financial Insights</span>
-                        </div>
-                        <div className="flex flex-col gap-4">
-                          <div className="flex gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-success-soft flex-center flex-shrink-0">
-                              <TrendingUp size={16} className="text-success" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold">Surplus Status</p>
-                              <p className="text-xs text-secondary mt-0.5">
-                                Net surplus of ₹{((summary?.incomeYTD || 0) - (summary?.expensesYTD || 0)).toLocaleString()} for this calendar year.
-                              </p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-warning-soft flex-center flex-shrink-0">
-                              <Scale size={16} className="text-warning" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold">Ledger Health</p>
-                              <p className="text-xs text-secondary mt-0.5">
-                                Operating margin stands at {summary?.operatingMargin.toFixed(1)}%.
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-info-soft flex-center flex-shrink-0">
-                              <ArrowUpRight size={16} className="text-info" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold">Capital Allocation</p>
-                              <p className="text-xs text-secondary mt-0.5">
-                                Funds are diversified across {summary?.allocation.length || 0} active transaction channels.
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
+                        ₹{(stats.credits + stats.debits).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </span>
                     </div>
                   </div>
+                ))}
               </div>
-            )}
-        </PageContainer>
-    );
+            </Card>
+          </div>
+        </div>
+      )}
+    </PageContainer>
+  );
 };

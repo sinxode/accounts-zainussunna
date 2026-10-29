@@ -5,7 +5,7 @@ export interface ExportData {
   filename: string;
   columns: string[];
   rows: any[][];
-  type: 'statement' | 'receipt' | 'report';
+  type: 'statement' | 'receipt' | 'report' | 'cashbook' | 'aging' | 'audit';
 }
 
 export interface ConfirmationConfig {

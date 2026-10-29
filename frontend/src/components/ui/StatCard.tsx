@@ -6,6 +6,7 @@ import styles from './StatCard.module.scss';
 interface StatCardProps {
   label: string;
   value: string | number;
+  subValue?: React.ReactNode;
   icon?: React.ReactNode;
   trend?: {
     value: number;
@@ -17,6 +18,7 @@ interface StatCardProps {
 export const StatCard: React.FC<StatCardProps> = ({
   label,
   value,
+  subValue,
   icon,
   trend,
   variant = 'neutral'
@@ -39,6 +41,11 @@ export const StatCard: React.FC<StatCardProps> = ({
       <div className={styles.content}>
         <span className={styles.label}>{label}</span>
         <h3 className={styles.value}>{value}</h3>
+        {subValue && (
+          <span className="text-xs text-muted" style={{ display: 'block', marginTop: '3px' }}>
+            {subValue}
+          </span>
+        )}
       </div>
     </Card>
   );

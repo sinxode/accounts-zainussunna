@@ -6,6 +6,7 @@ import styles from './Card.module.scss';
 interface CardProps {
   children?: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
   variant?: 'default' | 'interactive';
   padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   onClick?: () => void;
@@ -15,6 +16,7 @@ interface CardProps {
 export const Card: React.FC<CardProps> = ({
   children,
   className,
+  style,
   variant = 'default',
   padding = 'md',
   onClick,
@@ -24,6 +26,7 @@ export const Card: React.FC<CardProps> = ({
   
   return (
     <Component
+      style={style}
       className={clsx(
         styles.card,
         styles[variant],

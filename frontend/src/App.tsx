@@ -10,10 +10,17 @@ import { AppLayout } from './components/layout/AppLayout';
 import { Dashboard } from './pages/Dashboard';
 import { AllStudents } from './pages/students/AllStudents';
 import { StudentProfile } from './pages/students/StudentProfile';
+import { ReportsHub } from './pages/reports/ReportsHub';
 import { StudentReports } from './pages/reports/StudentReports';
+import { StudentBalanceSummaryReport } from './pages/reports/StudentBalanceSummaryReport';
 import { MonthlyReports } from './pages/reports/MonthlyReports';
 import { BorrowerReports } from './pages/reports/BorrowerReports';
+import { BorrowerAgingReport } from './pages/reports/BorrowerAgingReport';
 import { FinancialSummary } from './pages/reports/FinancialSummary';
+import { CashbookReconciliationReport } from './pages/reports/CashbookReconciliationReport';
+import { AuditActivityReport } from './pages/reports/AuditActivityReport';
+import { TransactionTypesReport } from './pages/reports/TransactionTypesReport';
+import { ReconciliationExceptionsReport } from './pages/reports/ReconciliationExceptionsReport';
 import { Analytics } from './pages/reports/Analytics';
 import { AdministrationDashboard } from './pages/settings/AdministrationDashboard';
 import { UserManagement } from './pages/settings/UserManagement';
@@ -51,22 +58,31 @@ function App() {
           <BrowserRouter>
             <ScrollToTop />
             <Routes>
+              {/* Public Portfolio Route */}
               <Route path="/portfolio" element={<Portfolio />} />
+
+              {/* Public Auth Routes */}
               <Route path="/login" element={<LoginV2 />} />
               <Route path="/forgot-password" element={<ForgotPasswordV2 />} />
               <Route path="/reset-password" element={<ResetPasswordV2 />} />
               <Route path="/access-denied" element={<AccessDeniedV2 />} />
-              
+
+              {/* Authenticated Application Skeleton */}
               <Route element={<AuthGuard />}>
-                <Route path="/" element={<AppLayout />}>
-                  <Route index element={<Dashboard />} />
+                <Route element={<AppLayout />}>
+                  {/* Dashboard - All Authenticated Staff */}
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/profile" element={<UserProfile />} />
+
+                  {/* Student Ledger Explorer */}
                   <Route path="students" element={<AllStudents />} />
                   <Route path="students/:id" element={<StudentProfile />} />
+
+                  {/* Transaction History & Audit Details */}
                   <Route path="transactions" element={<TransactionExplorer />} />
                   <Route path="transactions/:id" element={<TransactionDetails />} />
-                  <Route path="profile" element={<UserProfile />} />
 
-                  {/* Operational Management (Admins & Managers only) */}
+                  {/* Operations & Money Movement (Restricted to Money Managers) */}
                   <Route element={<AuthGuard allowedRoles={['super_admin', 'admin', 'owner', 'manager']} />}>
                     <Route path="operations" element={<OperationsCenter />} />
                     <Route path="internal-transfers" element={<InternalTransfers />} />
@@ -77,14 +93,20 @@ function App() {
                     <Route path="settings" element={<GlobalSettings />} />
                   </Route>
 
-                  {/* Institutional Reports (Admins & Faculty) */}
+                  {/* Institutional Reports Hub & Reports (Admins, Faculty, Staff) */}
                   <Route element={<AuthGuard allowedRoles={['super_admin', 'admin', 'faculty', 'owner', 'manager', 'staff']} />}>
                     <Route path="reports">
-                      <Route index element={<FinancialSummary />} />
-                      <Route path="students" element={<StudentReports />} />
+                      <Route index element={<ReportsHub />} />
+                      <Route path="student-statement" element={<StudentReports />} />
+                      <Route path="students" element={<StudentBalanceSummaryReport />} />
                       <Route path="monthly" element={<MonthlyReports />} />
-                      <Route path="borrowers" element={<BorrowerReports />} />
                       <Route path="summary" element={<FinancialSummary />} />
+                      <Route path="cashbook" element={<CashbookReconciliationReport />} />
+                      <Route path="borrowers" element={<BorrowerReports />} />
+                      <Route path="borrower-aging" element={<BorrowerAgingReport />} />
+                      <Route path="audit" element={<AuditActivityReport />} />
+                      <Route path="transaction-types" element={<TransactionTypesReport />} />
+                      <Route path="reconciliation-exceptions" element={<ReconciliationExceptionsReport />} />
                       <Route path="analytics" element={<Analytics />} />
                     </Route>
                   </Route>

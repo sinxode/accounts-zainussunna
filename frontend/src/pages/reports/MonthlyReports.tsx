@@ -1,40 +1,34 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { clsx } from 'clsx';
 import { 
   Download, 
   ArrowDownLeft, 
   ArrowUpRight, 
-  ShoppingBag, 
-  Package, 
   TrendingUp,
-  Printer,
-  Share2,
-  RefreshCw,
-  Receipt
+  RotateCcw,
+  Info,
+  Calendar
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { StatCard } from '../../components/ui/StatCard';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
+import { Badge } from '../../components/ui/Badge';
+import { DataTable } from '../../components/ui/DataTable';
 import { ReportTabs } from '../../components/reports/ReportTabs';
 import { reportingService } from '../../lib/reportingService';
 import { useUIStore } from '../../store/useUIStore';
-import styles from './MonthlyReports.module.scss';
-import { ChartCard } from '../../components/reports/ChartCard';
 
 export const MonthlyReports: React.FC = () => {
   const now = new Date();
-  const navigate = useNavigate();
   const { setActiveModal, setExportData } = useUIStore();
   const [selectedPeriod, setSelectedPeriod] = useState({ 
     month: now.getMonth() + 1, 
     year: now.getFullYear() 
   });
 
-  const { data: summary, isLoading, refetch } = useQuery({
+  const { data: summary, isLoading } = useQuery({
     queryKey: ['monthlyReport', selectedPeriod],
     queryFn: () => reportingService.getMonthlySummary(selectedPeriod.year, selectedPeriod.month)
   });
@@ -48,183 +42,209 @@ export const MonthlyReports: React.FC = () => {
     if (!summary) return;
     
     setExportData({
-      title: `Monthly Financial Report: ${months[selectedPeriod.month - 1]} ${selectedPeriod.year}`,
-      filename: `Monthly_Report_${selectedPeriod.month}_${selectedPeriod.year}`,
+      title: `Monthly Transaction Summary: ${months[selectedPeriod.month - 1]} ${selectedPeriod.year}`,
+      filename: `Monthly_Summary_${selectedPeriod.month}_${selectedPeriod.year}`,
       type: 'report',
-      columns: ['Category', 'Amount'],
-      rows: [
-        ['Collections', `₹${summary.collections.toLocaleString()}`],
-        ['Withdrawals', `₹${summary.withdrawals.toLocaleString()}`],
-        ['Distributions', `₹${summary.distributions.toLocaleString()}`],
-        ['Store Bills', `₹${summary.storeBills.toLocaleString()}`],
-        ['Net Movement', `₹${summary.netMovement.toLocaleString()}`]
-      ]
+      columns: ['Date', 'Reference ID', 'Student', 'Type', 'Direction', 'Purpose', 'Amount', 'Status'],
+      rows: summary.transactions.map(t => [
+        new Date(t.transaction_date).toLocaleDateString(),
+        t.id,
+        (t.students as any)?.name || 'N/A',
+        t.transaction_type,
+        t.direction,
+        t.purpose,
+        `${t.direction === 'credit' ? '+' : '-'}₹${Number(t.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+        t.is_reversed || t.reversal_of_id ? 'Reversed' : 'Active'
+      ])
     });
     setActiveModal('printExport');
   };
 
-  const handleRefresh = () => {
-    refetch();
-  };
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    alert("Monthly report link copied to clipboard!");
-  };
-
-  const handlePrint = () => {
-    handleExport();
-  };
-
-  const handleViewLedger = () => {
-    navigate(`/transactions?month=${selectedPeriod.month}&year=${selectedPeriod.year}`);
-  };
-
-  const chartData = [
-    { name: 'Collections', value: summary?.collections || 0 },
-    { name: 'Distributions', value: summary?.distributions || 0 },
-    { name: 'Withdrawals', value: summary?.withdrawals || 0 },
-    { name: 'Store Bills', value: summary?.storeBills || 0 },
-  ];
-
   return (
     <PageContainer>
       <PageHeader
-        title="Monthly Management Reports"
-        subtitle="High-level financial overview for the academic month."
+        title="Monthly Transaction Summary"
+        subtitle="Gross receipts, disbursements, reversals, and net ledger movements for the selected calendar month."
         actions={
-          <div className="flex gap-2 items-center flex-wrap">
-            <Button 
-              variant="ghost" 
-              icon={<RefreshCw size={16} />}
-              onClick={handleRefresh}
-              title="Sync Ledger Data"
-              disabled={isLoading}
-            />
-            <Button 
-              variant="ghost" 
-              icon={<Printer size={16} />}
-              onClick={handlePrint}
-              disabled={isLoading}
-            >
-              Print
-            </Button>
-            <Button 
-              variant="ghost" 
-              icon={<Share2 size={16} />}
-              onClick={handleShare}
-              disabled={isLoading}
-            >
-              Share
-            </Button>
-            <Button 
-              variant="soft" 
-              icon={<Receipt size={16} />}
-              onClick={handleViewLedger}
-              disabled={isLoading}
-            >
-              View Transactions
-            </Button>
-            <Button 
-              variant="primary" 
-              icon={<Download size={16} />}
-              onClick={handleExport}
-              disabled={isLoading}
-            >
-              Export CSV
-            </Button>
-          </div>
+          <Button 
+            variant="soft" 
+            icon={<Download size={16} />} 
+            onClick={handleExport} 
+            disabled={isLoading || !summary?.transactions.length}
+          >
+            Export Monthly Report
+          </Button>
         }
       />
 
       <ReportTabs />
 
-      <Card className={styles.periodCard} padding="sm">
-        <div className={styles.periodSelectors}>
-          <div className={styles.selectorItem}>
-            <label>Reporting Month</label>
-            <select 
-              value={selectedPeriod.month} 
-              onChange={(e) => setSelectedPeriod({ ...selectedPeriod, month: parseInt(e.target.value) })}
-            >
-              {months.map((m, i) => (
-                <option key={m} value={i + 1}>{m}</option>
-              ))}
-            </select>
+      {/* Month/Year Filter */}
+      <Card padding="sm" style={{ marginBottom: '20px' }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Calendar size={16} style={{ color: '#1E3A5F' }} />
+            <span style={{ fontSize: '13px', fontWeight: 600, color: '#334155' }}>Select Accounting Month:</span>
           </div>
-          <div className={styles.selectorItem}>
-            <label>Year</label>
-            <select 
-              value={selectedPeriod.year} 
-              onChange={(e) => setSelectedPeriod({ ...selectedPeriod, year: parseInt(e.target.value) })}
-            >
-              {[2024, 2025, 2026, 2027].map(y => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
-          </div>
+
+          <select
+            value={selectedPeriod.month}
+            onChange={(e) => setSelectedPeriod({ ...selectedPeriod, month: Number(e.target.value) })}
+            style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+          >
+            {months.map((m, idx) => (
+              <option key={m} value={idx + 1}>{m}</option>
+            ))}
+          </select>
+
+          <select
+            value={selectedPeriod.year}
+            onChange={(e) => setSelectedPeriod({ ...selectedPeriod, year: Number(e.target.value) })}
+            style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+          >
+            {[2024, 2025, 2026, 2027].map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
         </div>
       </Card>
 
-      {isLoading ? (
-        <div className={styles.loadingWrapper}>
-          <div className={clsx("glass-effect", styles.loadingBox)}>Aggregating Monthly Data...</div>
+      {/* Financial Scope Note */}
+      <div style={{
+        backgroundColor: '#EFF6FF',
+        border: '1px solid #DBEAFE',
+        borderRadius: '8px',
+        padding: '12px 16px',
+        marginBottom: '20px',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '10px'
+      }}>
+        <Info size={18} style={{ color: '#2563EB', flexShrink: 0, marginTop: '2px' }} />
+        <div style={{ fontSize: '12.5px', color: '#1E40AF', lineHeight: 1.5 }}>
+          <strong>Classification Note:</strong> {summary?.clarificationNote} Figures distinguish gross receipts and disbursements from reversals and net ledger effects.
         </div>
-      ) : (
-        <>
-          <div className={styles.statsGrid}>
-            <StatCard label="Total Collections" value={`₹${summary?.collections.toLocaleString()}`} icon={<ArrowDownLeft />} variant="success" />
-            <StatCard label="Total Distributions" value={`₹${summary?.distributions.toLocaleString()}`} icon={<Package />} variant="primary" />
-            <StatCard label="Total Withdrawals" value={`₹${summary?.withdrawals.toLocaleString()}`} icon={<ArrowUpRight />} variant="error" />
-            <StatCard label="Store Bill Expenses" value={`₹${summary?.storeBills.toLocaleString()}`} icon={<ShoppingBag />} variant="warning" />
-          </div>
+      </div>
 
-          <div className={styles.summaryVisuals}>
-            <ChartCard 
-              title="Operational Breakdown" 
-              type="pie" 
-              data={chartData} 
-              dataKeys={['value']} 
-              colors={['#10b981', '#8b5cf6', '#ef4444', '#f59e0b']}
-            />
-            <Card className={styles.netCard}>
-              <h3 className="label-sm mb-2">Net Cash Movement</h3>
-              <div className={styles.netValue}>
-                <span className={summary && summary.netMovement >= 0 ? "text-success" : "text-error"}>
-                  {summary && summary.netMovement >= 0 ? '+' : ''}₹{summary?.netMovement.toLocaleString()}
+      {/* Summary Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+        <StatCard 
+          label="Gross Inflows (Credits)" 
+          value={`+₹${(summary?.grossCredits || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+          icon={<ArrowDownLeft />} 
+          variant="success" 
+        />
+        <StatCard 
+          label="Gross Outflows (Debits)" 
+          value={`-₹${(summary?.grossDebits || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+          icon={<ArrowUpRight />} 
+          variant="error" 
+        />
+        <StatCard 
+          label="Compensating Reversals" 
+          value={`${summary?.reversalCount || 0} (₹${(summary?.reversalAmount || 0).toLocaleString()})`} 
+          icon={<RotateCcw />} 
+          variant="warning" 
+        />
+        <StatCard 
+          label="Net Ledger Movement" 
+          value={`${(summary?.netLedgerMovement || 0) >= 0 ? '+' : ''}₹${(summary?.netLedgerMovement || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+          icon={<TrendingUp />} 
+          variant={(summary?.netLedgerMovement || 0) >= 0 ? "primary" : "neutral"} 
+        />
+      </div>
+
+      {/* Transaction Type Breakdown Matrix */}
+      <Card padding="md" style={{ marginBottom: '24px' }}>
+        <h3 className="label-sm" style={{ marginBottom: '12px' }}>Activity Breakdown by Transaction Type</h3>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
+                <th style={{ textAlign: 'left', padding: '10px 14px', color: '#475569' }}>Transaction Type</th>
+                <th style={{ textAlign: 'center', padding: '10px 14px', color: '#475569' }}>Entry Count</th>
+                <th style={{ textAlign: 'right', padding: '10px 14px', color: '#475569' }}>Recorded Credits</th>
+                <th style={{ textAlign: 'right', padding: '10px 14px', color: '#475569' }}>Recorded Debits</th>
+                <th style={{ textAlign: 'right', padding: '10px 14px', color: '#475569' }}>Total Volume</th>
+              </tr>
+            </thead>
+            <tbody>
+              {summary && Object.entries(summary.typeBreakdown).length > 0 ? (
+                Object.entries(summary.typeBreakdown).map(([type, stats]) => (
+                  <tr key={type} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                    <td style={{ padding: '10px 14px', fontWeight: 600, color: '#0F172A' }}>
+                      <Badge variant="neutral" size="sm">{type.replace('_', ' ')}</Badge>
+                    </td>
+                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>{stats.count}</td>
+                    <td style={{ padding: '10px 14px', textAlign: 'right', color: '#16A34A' }}>
+                      ₹{stats.credits.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </td>
+                    <td style={{ padding: '10px 14px', textAlign: 'right', color: '#E11D48' }}>
+                      ₹{stats.debits.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </td>
+                    <td style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 600 }}>
+                      ₹{stats.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} style={{ padding: '20px', textAlign: 'center', color: '#94A3B8' }}>
+                    No transactions recorded for {months[selectedPeriod.month - 1]} {selectedPeriod.year}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {/* Itemized Transactions Table */}
+      <Card padding="md">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <h3 className="label-sm">Recorded Ledger Entries ({months[selectedPeriod.month - 1]} {selectedPeriod.year})</h3>
+          <span style={{ fontSize: '12px', color: '#64748B' }}>
+            {summary?.transactions.length || 0} total entries
+          </span>
+        </div>
+
+        <DataTable
+          columns={[
+            { header: 'Date', accessor: (t) => new Date(t.transaction_date).toLocaleDateString() },
+            { 
+              header: 'Student', 
+              accessor: (t) => (t.students as any)?.name || 'N/A'
+            },
+            { 
+              header: 'Type', 
+              accessor: (t) => <Badge variant="neutral" size="sm">{t.transaction_type.replace('_', ' ')}</Badge>,
+              align: 'center'
+            },
+            { header: 'Purpose', accessor: 'purpose' },
+            { 
+              header: 'Amount', 
+              accessor: (t) => (
+                <span className={t.direction === 'credit' ? "text-success font-semibold" : "text-error font-semibold"}>
+                  {t.direction === 'credit' ? '+' : '-'}₹{Number(t.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
-                <TrendingUp size={24} className={summary && summary.netMovement >= 0 ? "text-success" : "text-error"} />
-              </div>
-              <p className={styles.netDesc}>
-                Total incoming (Collections + Distributions) vs Total outgoing (Withdrawals + Store Bills) for this period.
-              </p>
-            </Card>
-          </div>
-
-          <Card className={styles.highlightsCard}>
-            <h3 className="label-sm mb-2">Monthly Highlights</h3>
-            <div className={styles.highlightGrid}>
-              <div className={styles.hItem}>
-                <span className={styles.hLabel}>Most Active Student</span>
-                <span className={styles.hValue}>{summary?.highlights?.activeStudentName || 'None'}</span>
-                <span className={styles.hMeta}>{summary?.highlights?.activeStudentCount || 0} transactions</span>
-              </div>
-              <div className={styles.hDivider} />
-              <div className={styles.hItem}>
-                <span className={styles.hLabel}>Highest Deposit</span>
-                <span className={styles.hValue}>₹{Number(summary?.highlights?.highestDepositAmount || 0).toLocaleString()}</span>
-                <span className={styles.hMeta}>By {summary?.highlights?.highestDepositStudent || 'N/A'}</span>
-              </div>
-              <div className={styles.hDivider} />
-              <div className={styles.hItem}>
-                <span className={styles.hLabel}>Largest Event</span>
-                <span className={styles.hValue}>₹{Number(summary?.highlights?.largestEventAmount || 0).toLocaleString()}</span>
-                <span className={styles.hMeta}>Event: {summary?.highlights?.largestEventName || 'None'}</span>
-              </div>
-            </div>
-          </Card>
-        </>
-      )}
+              ),
+              align: 'right'
+            },
+            {
+              header: 'Status',
+              accessor: (t) => (
+                t.is_reversed || t.reversal_of_id ? (
+                  <Badge variant="danger" size="sm">Reversed</Badge>
+                ) : (
+                  <Badge variant="success" size="sm">Active</Badge>
+                )
+              ),
+              align: 'center'
+            }
+          ]}
+          data={summary?.transactions || []}
+        />
+      </Card>
     </PageContainer>
   );
 };
