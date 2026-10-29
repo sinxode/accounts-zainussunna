@@ -13,10 +13,13 @@ import {
   AlertTriangle,
   Layers
 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 import styles from './ReportTabs.module.scss';
 
 export const ReportTabs: React.FC = () => {
-  const tabs = [
+  const { role } = useAuth();
+
+  const allTabs = [
     { title: 'Reports Hub', path: '/reports', exact: true, icon: <LayoutDashboard size={15} /> },
     { title: 'Student Statement', path: '/reports/student-statement', icon: <FileText size={15} /> },
     { title: 'Student Balances', path: '/reports/students', icon: <Users size={15} /> },
@@ -28,6 +31,10 @@ export const ReportTabs: React.FC = () => {
     { title: 'Type Matrix', path: '/reports/transaction-types', icon: <Layers size={15} /> },
     { title: 'Exceptions', path: '/reports/reconciliation-exceptions', icon: <AlertTriangle size={15} /> },
   ];
+
+  const tabs = role === 'parent' 
+    ? allTabs.filter(t => t.path === '/reports/student-statement')
+    : allTabs;
 
   return (
     <div className={styles.tabsContainer} style={{ overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: '4px' }}>

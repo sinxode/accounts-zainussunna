@@ -93,11 +93,15 @@ function App() {
                     <Route path="settings" element={<GlobalSettings />} />
                   </Route>
 
+                  {/* Student Account Statement (Staff, Faculty, and Parents for linked child) */}
+                  <Route element={<AuthGuard allowedRoles={['super_admin', 'admin', 'faculty', 'owner', 'manager', 'staff', 'parent']} />}>
+                    <Route path="reports/student-statement" element={<StudentReports />} />
+                  </Route>
+
                   {/* Institutional Reports Hub & Reports (Admins, Faculty, Staff) */}
                   <Route element={<AuthGuard allowedRoles={['super_admin', 'admin', 'faculty', 'owner', 'manager', 'staff']} />}>
                     <Route path="reports">
                       <Route index element={<ReportsHub />} />
-                      <Route path="student-statement" element={<StudentReports />} />
                       <Route path="students" element={<StudentBalanceSummaryReport />} />
                       <Route path="monthly" element={<MonthlyReports />} />
                       <Route path="summary" element={<FinancialSummary />} />
