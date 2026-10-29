@@ -297,6 +297,9 @@ CREATE POLICY "Admins can insert transactions" ON public.transactions
   );
 
 -- 9. RE-DEFINE VIEWS WITH CLEAN CASCADE AND CONDITIONAL SECURITY INVOKER
+-- Ensure operation_id exists on transactions before creating ledger views
+ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS operation_id UUID;
+
 DROP VIEW IF EXISTS public.student_ledger_view CASCADE;
 DROP VIEW IF EXISTS public.student_health CASCADE;
 DROP VIEW IF EXISTS public.student_balances CASCADE;
