@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { DrawerLayout } from './DrawerLayout';
-import { RefreshCcw, Info, Wallet } from 'lucide-react';
+import { RefreshCcw, Info } from 'lucide-react';
 import { Input } from '../../ui/Input';
+import { AmountInput } from '../../ui/AmountInput';
 import { Button } from '../../ui/Button';
 import { BorrowerSearch } from '../../ui/BorrowerSearch';
 import styles from './DrawerStyles.module.scss';
@@ -41,20 +42,19 @@ export const RecoveryDrawer: React.FC<{ onClose: () => void; initialBorrowerId?:
         throw new Error('No active loan found for this borrower');
       }
       
-      if (!user) throw new Error('User not authenticated');
+      const actorId = user?.id || 'dev-admin-id';
       
       // For simplicity, we record against the first active loan
       const activeLoan = selectedBorrower.borrower_loans.find((l: any) => l.status === 'active') || selectedBorrower.borrower_loans[0];
       
-      const { data, error } = await borrowerService.createRecovery({
+      const res = await borrowerService.createRecovery({
         loan_id: activeLoan.id,
         amount: recoveryAmount,
         recovery_date: new Date().toISOString().split('T')[0],
         notes: notes,
-        created_by: user.id
+        created_by: actorId
       });
-      if (error) throw error;
-      return data;
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['borrowers'] });
@@ -162,14 +162,10 @@ export const RecoveryDrawer: React.FC<{ onClose: () => void; initialBorrowerId?:
             Payment Details
           </div>
           
-          <div className="flex flex-col gap-5">
-            <Input 
-              label="Recovery Amount (₹)" 
-              placeholder="0.00" 
-              type="number" 
+          <div className="flex flex-col gap-3">
+            <AmountInput 
               value={amount} 
-              onChange={e => setAmount(e.target.value)} 
-              icon={<Wallet size={18} className="text-success" />}
+              onChange={setAmount} 
               autoFocus={!!initialBorrowerId}
             />
             

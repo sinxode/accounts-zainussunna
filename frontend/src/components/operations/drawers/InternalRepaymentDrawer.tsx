@@ -2,6 +2,7 @@ import React, { useState, useRef, useMemo } from 'react';
 import { DrawerLayout } from './DrawerLayout';
 import { ArrowLeftRight, CheckCircle2, Info } from 'lucide-react';
 import { Input } from '../../ui/Input';
+import { AmountInput } from '../../ui/AmountInput';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { Badge } from '../../ui/Badge';
@@ -180,39 +181,39 @@ export const InternalRepaymentDrawer: React.FC<InternalRepaymentDrawerProps> = (
 
         {/* Selected Loan Details Card */}
         {selectedLoan && (
-          <Card padding="md" className="bg-slate-50 border border-slate-200">
+          <Card padding="md" className="bg-[var(--bg-raised)] border border-[var(--border-default)]">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">Loan Summary</span>
+              <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Loan Summary</span>
               <Badge variant="warning" size="sm">Active Loan</Badge>
             </div>
             
             <div className="grid grid-cols-2 gap-3 text-xs mb-3">
               <div>
-                <span className="text-gray-400 block">Lender (Creditor)</span>
-                <span className="font-semibold text-gray-900">{selectedLoan.lender_name}</span>
-                <span className="text-[11px] text-gray-400 font-mono block">
+                <span className="text-[var(--text-muted)] block">Lender (Creditor)</span>
+                <span className="font-semibold text-[var(--text-primary)]">{selectedLoan.lender_name}</span>
+                <span className="text-[11px] text-[var(--text-muted)] font-mono block">
                   {selectedLoan.lender?.enrolment_no}
                 </span>
               </div>
               <div>
-                <span className="text-gray-400 block">Borrower (Debtor)</span>
-                <span className="font-semibold text-gray-900">{selectedLoan.borrower_name}</span>
-                <span className="text-[11px] text-gray-400 font-mono block">
+                <span className="text-[var(--text-muted)] block">Borrower (Debtor)</span>
+                <span className="font-semibold text-[var(--text-primary)]">{selectedLoan.borrower_name}</span>
+                <span className="text-[11px] text-[var(--text-muted)] font-mono block">
                   {selectedLoan.borrower?.enrolment_no}
                 </span>
               </div>
             </div>
 
-            <div className="border-t border-slate-200 pt-2 flex justify-between items-center text-xs">
+            <div className="border-t border-[var(--border-subtle)] pt-2 flex justify-between items-center text-xs">
               <div>
-                <span className="text-gray-500">Original Principal:</span>
-                <span className="font-mono font-medium ml-1">
+                <span className="text-[var(--text-secondary)]">Original Principal:</span>
+                <span className="font-mono font-medium ml-1 text-[var(--text-primary)]">
                   {formatCurrency(Number(selectedLoan.principal_amount))}
                 </span>
               </div>
               <div>
-                <span className="text-gray-700 font-semibold">Remaining Due:</span>
-                <span className="font-mono font-bold text-amber-700 ml-1">
+                <span className="text-[var(--text-secondary)] font-semibold">Remaining Due:</span>
+                <span className="font-mono font-bold text-[var(--warning)] ml-1">
                   {formatCurrency(outstanding)}
                 </span>
               </div>
@@ -235,14 +236,9 @@ export const InternalRepaymentDrawer: React.FC<InternalRepaymentDrawerProps> = (
                 Full Repayment ({formatCurrency(outstanding)})
               </button>
             </div>
-            <Input 
-              type="number"
-              step="0.01"
-              min="0.01"
-              max={outstanding}
-              placeholder="0.00"
+            <AmountInput 
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={setAmount}
               autoFocus
             />
           </div>

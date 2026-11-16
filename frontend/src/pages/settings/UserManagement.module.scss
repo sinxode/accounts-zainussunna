@@ -1,8 +1,9 @@
 @import '../../styles/design-system/mixins';
+
 .container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 12px;
 }
 
 .header {
@@ -12,17 +13,19 @@
 .userInfo {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 8px;
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
   background: $bg-secondary;
   @include flex-center;
   font-weight: 700;
   color: $primary;
+  font-size: 0.75rem;
+  flex-shrink: 0;
 }
 
 .details {
@@ -32,21 +35,23 @@
 
 .name {
   font-weight: 600;
+  font-size: 0.8125rem;
+  color: $text-primary;
 }
 
 .meta {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
+  gap: 4px;
+  font-size: 0.7rem;
   color: $text-muted;
 }
 
 .roleBadge {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+  gap: 4px;
+  font-size: 0.75rem;
   font-weight: 500;
 
   span {
@@ -55,18 +60,21 @@
 }
 
 .loading {
-  padding: 3rem;
+  padding: 2rem;
 }
 
 .roleSelect {
-  background: $bg-secondary;
+  background: var(--bg-surface);
   border: 1px solid $border-color;
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
+  padding: 0 8px;
+  height: 30px;
+  border-radius: 4px;
   color: $text-primary;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   width: 100%;
-  max-width: 200px;
+  max-width: 180px;
+  outline: none;
+  cursor: pointer;
   
   &:focus { border-color: $primary; }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -75,35 +83,34 @@
 .modalForm {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  padding: 0.5rem 0;
+  gap: 10px;
+  padding: 0.25rem 0;
 }
 
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 4px;
 
   label {
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: 0.75rem;
+    font-weight: 600;
     color: $text-secondary;
   }
 
   input, select {
     width: 100%;
-    padding: 0.65rem 0.85rem;
+    padding: 0.35rem 0.65rem;
+    height: 32px;
     border-radius: 6px;
     border: 1px solid $border-color;
-    background: $bg-secondary;
+    background: var(--bg-surface);
     color: $text-primary;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
+    font-size: 0.8125rem;
+    outline: none;
 
     &:focus {
       border-color: $primary;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba($primary, 0.15);
     }
   }
 }

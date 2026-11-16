@@ -14,21 +14,23 @@
 .overlay {
   position: absolute;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(15, 23, 42, 0.25);
   backdrop-filter: blur(8px);
 }
 
 .modal {
-  background-color: white;
-  border-radius: 28px;
-  box-shadow: $shadow-lg;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card, 20px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   max-height: 90vh;
   width: 100%;
-  animation: modalEnter 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modalEnter 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-primary, #F3F6FA);
 
   // Size variations
   &.sm { max-width: 440px; }
@@ -41,7 +43,7 @@
   }
 
   @include mobile {
-    border-radius: 24px;
+    border-radius: var(--radius-xl, 18px);
     max-height: 100%;
     margin-bottom: env(safe-area-inset-bottom);
     
@@ -57,47 +59,47 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem 1.5rem 1rem;
-  border-bottom: 1px solid $border-color;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--border-subtle, #1E2836);
 }
 
 .title {
-  font-size: 1.25rem;
+  font-size: 16px;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary, #F3F6FA);
   margin: 0;
 }
 
 .closeBtn {
-  background: $bg-tertiary;
-  border: 1px solid $border-color;
-  color: $text-primary;
-  border-radius: 10px;
-  padding: 6px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-default, #2B3747);
+  color: var(--text-secondary, #A4B0C0);
+  border-radius: var(--radius-sm, 8px);
+  padding: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   cursor: pointer;
 
   &:hover {
-    background-color: $danger-soft;
-    border-color: $danger-soft;
-    color: $danger;
+    background-color: var(--danger-soft, rgba(255, 113, 133, 0.12));
+    border-color: var(--danger, #FF7185);
+    color: var(--danger, #FF7185);
   }
 }
 
 .content {
   flex: 1;
   overflow-y: auto;
-  padding: 1.5rem;
+  padding: 18px;
   @include custom-scrollbar;
 }
 
 @keyframes modalEnter {
   from {
     opacity: 0;
-    transform: scale(0.95) translateY(10px);
+    transform: scale(0.96) translateY(8px);
   }
   to {
     opacity: 1;

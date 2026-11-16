@@ -10,7 +10,7 @@
   top: calc(100% + 0.5rem);
   left: 0;
   right: 0;
-  background: white;
+  background: var(--bg-surface);
   border: 1px solid $border-color;
   border-radius: 16px;
   box-shadow: $shadow-lg;
@@ -34,7 +34,7 @@
   
   &:hover {
     background: var(--primary-soft);
-    .avatar { background: white; }
+    .avatar { background: var(--bg-surface); }
   }
 }
 

@@ -1,9 +1,10 @@
 import React from 'react';
 import { clsx } from 'clsx';
+import { ArrowUpRight } from 'lucide-react';
 import { Card } from './Card';
 import styles from './StatCard.module.scss';
 
-interface StatCardProps {
+export interface StatCardProps {
   label: string;
   value: string | number;
   subValue?: React.ReactNode;
@@ -11,8 +12,11 @@ interface StatCardProps {
   trend?: {
     value: number;
     isPositive: boolean;
+    label?: string;
   };
-  variant?: 'primary' | 'success' | 'warning' | 'error' | 'neutral' | 'danger' | 'info';
+  variant?: 'primary' | 'success' | 'warning' | 'error' | 'neutral' | 'danger' | 'info' | 'hero' | 'surface';
+  onActionClick?: () => void;
+  className?: string;
 }
 
 export const StatCard: React.FC<StatCardProps> = ({
@@ -21,32 +25,62 @@ export const StatCard: React.FC<StatCardProps> = ({
   subValue,
   icon,
   trend,
-  variant = 'neutral'
+  variant = 'surface',
+  onActionClick,
+  className
 }) => {
-  const mappedVariant = variant === 'error' ? 'danger' : variant;
+  const isHero = variant === 'hero';
 
   return (
-    <Card className={styles.card} padding="lg">
-      <div className={styles.header}>
-        <div className={clsx(styles.iconWrapper, styles[mappedVariant])}>
-          {icon}
+    <Card 
+      variant={isHero ? 'hero' : 'surface'} 
+      padding="none" 
+      className={clsx(
+        styles.statCard, 
+        isHero && styles.heroCard, 
+        styles[variant], 
+        className
+      )}
+    >
+      <div className={styles.topRow}>
+        <span className={styles.label} title={label}>{label}</span>
+        <div className={styles.actions}>
+          {icon && <div className={styles.icon}>{icon}</div>}
+          {onActionClick && (
+            <button 
+              type="button" 
+              onClick={onActionClick} 
+              className={styles.circleArrowBtn}
+              aria-label={`View details for ${label}`}
+            >
+              <ArrowUpRight size={16} strokeWidth={2} />
+            </button>
+          )}
         </div>
-        {trend && (
-          <div className={clsx(styles.trend, trend.isPositive ? styles.positive : styles.negative)}>
-            <span>{trend.isPositive ? '+' : '-'}{Math.abs(trend.value)}%</span>
-          </div>
-        )}
       </div>
-      
-      <div className={styles.content}>
-        <span className={styles.label}>{label}</span>
-        <h3 className={styles.value}>{value}</h3>
-        {subValue && (
-          <span className="text-xs text-muted" style={{ display: 'block', marginTop: '3px' }}>
-            {subValue}
-          </span>
-        )}
+
+      <div className={styles.valueRow}>
+        <span className={styles.value}>{value}</span>
       </div>
+
+      {(trend || subValue) && (
+        <div className={styles.bottomRow}>
+          {trend && (
+            <div className={clsx(
+              styles.deltaChip,
+              trend.isPositive ? styles.positive : styles.negative
+            )}>
+              <span>{trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%</span>
+              {trend.label && <span className={styles.deltaLabel}>{trend.label}</span>}
+            </div>
+          )}
+          {subValue && !trend && (
+            <div className={styles.subValue}>
+              {subValue}
+            </div>
+          )}
+        </div>
+      )}
     </Card>
   );
 };

@@ -1,10 +1,37 @@
-// ZLS Radius System
+// ZLS Cash Ledger Geometry System (Spec 1.3)
+:root {
+  --radius-shell: 28px;
+  --radius-card: 20px;
+  --radius-tile: 14px;
+  --radius-input: 12px;
+  --radius-pill: 999px;
+  --radius-drawer: 24px;
+  --radius-modal: 20px;
+  --radius-full: 9999px;
 
-$radius-card: var(--radius-card, 24px);
-$radius-button: 16px;
-$radius-input: 16px;
-$radius-sidebar: 32px;
-$radius-drawer: 28px;
-$radius-modal: 28px;
-$radius-badge: 999px;
+  /* Aliases */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+}
+
+$radius-shell: var(--radius-shell, 28px);
+$radius-card: var(--radius-card, 20px);
+$radius-tile: var(--radius-tile, 14px);
+$radius-input: var(--radius-input, 12px);
+$radius-pill: var(--radius-pill, 999px);
+$radius-drawer: var(--radius-drawer, 24px);
+$radius-modal: var(--radius-modal, 20px);
 $radius-full: 9999px;
+
+$radius-xs: 6px;
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 14px;
+$radius-xl: 20px;
+$radius-2xl: 28px;
+$radius-button: 999px;
+$radius-badge: 999px;

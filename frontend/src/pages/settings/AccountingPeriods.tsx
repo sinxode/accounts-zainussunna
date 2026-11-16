@@ -61,12 +61,8 @@ export const AccountingPeriods: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <div>
-          <h1 className="page-title">Accounting Periods</h1>
-          <p className="text-muted">Database-enforced period locking to preserve immutable historical financial data.</p>
-        </div>
-        <div className="flex gap-2 items-center">
+      {(isFinancialAdmin || currentPeriodExists) && (
+        <div className="flex justify-between items-center mb-3">
           {isFinancialAdmin && (
             <Badge variant="primary" icon={<Shield size={14} />}>Admin Period Control Active</Badge>
           )}
@@ -82,7 +78,7 @@ export const AccountingPeriods: React.FC = () => {
             </Button>
           )}
         </div>
-      </header>
+      )}
 
       <Card className={styles.tableCard}>
         <div className={styles.infoBox}>

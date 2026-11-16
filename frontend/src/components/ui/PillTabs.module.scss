@@ -1,0 +1,122 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/mixins';
+
+.pillTabsContainer {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--bg-subtle);
+  padding: 4px;
+  border-radius: var(--radius-pill, 999px);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.fullWidth {
+  display: flex;
+  width: 100%;
+
+  .tab {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-pill, 999px);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  &:hover:not(.active) {
+    color: var(--text-strong);
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+}
+
+.countBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: var(--bg-muted);
+  color: var(--text-muted);
+}
+
+// Sizes
+.sm .tab {
+  padding: 4px 12px;
+  font-size: 12px;
+  height: 28px;
+}
+
+.md .tab {
+  padding: 6px 16px;
+  font-size: 13px;
+  height: 34px;
+}
+
+// Variants
+.lime {
+  .tab.active {
+    background-color: var(--lime-500);
+    color: var(--green-900);
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(11, 59, 38, 0.08);
+
+    .countBadge {
+      background: var(--green-900);
+      color: var(--lime-300);
+    }
+  }
+}
+
+.dark {
+  .tab.active {
+    background-color: var(--green-900);
+    color: var(--text-on-dark);
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(11, 59, 38, 0.15);
+
+    .countBadge {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--text-on-dark);
+    }
+  }
+}
+
+.subtle {
+  .tab.active {
+    background-color: var(--bg-surface);
+    color: var(--green-700);
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+    .countBadge {
+      background: var(--green-100);
+      color: var(--green-800);
+    }
+  }
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

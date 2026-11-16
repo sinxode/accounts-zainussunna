@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { ChartCard } from '../../components/reports/ChartCard';
 import { StatCard } from '../../components/ui/StatCard';
+import { StatGrid } from '../../components/ui/StatGrid';
 import { 
   Wallet, 
   Scale, 
@@ -58,18 +58,14 @@ export const FinancialSummary: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title="Financial Activity Summary"
-        subtitle="Neutral overview of recorded inflows, disbursements, corrections, and total student balance pools."
+      <ReportTabs 
         actions={
-          <Button variant="soft" icon={<Download size={16} />} onClick={handleExport} disabled={isLoading}>
+          <Button variant="soft" size="sm" icon={<Download size={15} />} onClick={handleExport} disabled={isLoading}>
             Export Summary
           </Button>
         }
       />
       
-      <ReportTabs />
-
       {/* Date Range Selector */}
       <Card padding="sm" style={{ marginBottom: '20px' }}>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -112,38 +108,38 @@ export const FinancialSummary: React.FC = () => {
       ) : (
         <div>
           {/* Global Stats Strip */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+          <StatGrid columns={5}>
             <StatCard 
               label="Student Balances Pool" 
               value={`₹${(summary?.totalStudentBalances || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
-              icon={<Wallet size={20} />} 
+              icon={<Wallet size={18} />} 
               variant="primary" 
             />
             <StatCard 
               label="Gross Inflows (Credits)" 
               value={`+₹${(summary?.grossInflows || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
-              icon={<ArrowDownLeft size={20} />} 
+              icon={<ArrowDownLeft size={18} />} 
               variant="success" 
             />
             <StatCard 
               label="Gross Outflows (Debits)" 
               value={`-₹${(summary?.grossOutflows || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
-              icon={<ArrowUpRight size={20} />} 
+              icon={<ArrowUpRight size={18} />} 
               variant="danger" 
             />
             <StatCard 
               label="Compensating Reversals" 
               value={`${summary?.reversalCount || 0} (₹${(summary?.reversalVolume || 0).toLocaleString()})`} 
-              icon={<RotateCcw size={20} />} 
+              icon={<RotateCcw size={18} />} 
               variant="warning" 
             />
             <StatCard 
               label="Net Ledger Movement" 
               value={`${(summary?.netLedgerMovement || 0) >= 0 ? '+' : ''}₹${(summary?.netLedgerMovement || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
-              icon={<Scale size={20} />} 
+              icon={<Scale size={18} />} 
               variant="neutral" 
             />
-          </div>
+          </StatGrid>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
             {/* Chart */}

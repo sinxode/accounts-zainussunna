@@ -16,7 +16,11 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './ReportTabs.module.scss';
 
-export const ReportTabs: React.FC = () => {
+interface ReportTabsProps {
+  actions?: React.ReactNode;
+}
+
+export const ReportTabs: React.FC<ReportTabsProps> = ({ actions }) => {
   const { role } = useAuth();
 
   const allTabs = [
@@ -37,19 +41,25 @@ export const ReportTabs: React.FC = () => {
     : allTabs;
 
   return (
-    <div className={styles.tabsContainer} style={{ overflowX: 'auto', whiteSpace: 'nowrap', paddingBottom: '4px' }}>
-      {tabs.map((tab) => (
-        <NavLink
-          key={tab.path}
-          to={tab.path}
-          end={tab.exact}
-          className={({ isActive }) => clsx(styles.tab, isActive && styles.active)}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-        >
-          <span className={styles.tabIcon}>{tab.icon}</span>
-          <span className={styles.tabTitle}>{tab.title}</span>
-        </NavLink>
-      ))}
+    <div className={styles.reportNavWrapper}>
+      <div className={styles.tabsContainer}>
+        {tabs.map((tab) => (
+          <NavLink
+            key={tab.path}
+            to={tab.path}
+            end={tab.exact}
+            className={({ isActive }) => clsx(styles.tab, isActive && styles.active)}
+          >
+            <span className={styles.tabIcon}>{tab.icon}</span>
+            <span className={styles.tabTitle}>{tab.title}</span>
+          </NavLink>
+        ))}
+      </div>
+      {actions && (
+        <div className={styles.reportActions}>
+          {actions}
+        </div>
+      )}
     </div>
   );
 };

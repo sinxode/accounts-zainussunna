@@ -1,30 +1,31 @@
 .sectionHeader {
   @include flex-between;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
 }
 
 .sectionTitle {
-  font-size: 15px;
+  font-size: 0.8125rem;
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   color: var(--text-primary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 20px;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
 }
 
 .sortSelect {
-  padding: 6px 12px;
-  border-radius: 10px;
+  padding: 4px 8px;
+  border-radius: 6px;
   border: 1px solid var(--border-color);
   background-color: var(--bg-primary);
   font-family: var(--font-family);
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   outline: none;
   cursor: pointer;
+  height: 30px;
   transition: border-color $transition-fast;
 
   &:focus, &:hover {
@@ -35,7 +36,7 @@
 .outstandingGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 8px;
 
   @include tablet {
     grid-template-columns: repeat(2, 1fr);
@@ -43,54 +44,53 @@
 
   @include mobile {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 8px;
   }
 }
 
 .outstandingItem {
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 18px;
-  padding: 20px;
+  border-radius: 8px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  transition: all $transition-base;
+  gap: 8px;
+  transition: all $transition-fast;
+  box-shadow: $shadow-xs;
 
   &:hover {
-    border-color: var(--primary-soft);
-    background-color: white;
-    box-shadow: var(--shadow-sm);
-    transform: translateY(-2px);
+    border-color: var(--primary);
   }
 }
 
 .outstandingHeader {
   @include flex-between;
   border-bottom: 1px dashed var(--border-color);
-  padding-bottom: 12px;
+  padding-bottom: 6px;
 }
 
 .borrowerName {
-  font-size: 14px;
+  font-size: 0.8125rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .transferId {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 0.7rem;
+  font-weight: 600;
   color: var(--text-muted);
+  font-family: monospace;
 }
 
 .outstandingBody {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .amountLabel {
-  font-size: 11px;
+  font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-muted);

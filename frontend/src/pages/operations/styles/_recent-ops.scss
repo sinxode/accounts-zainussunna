@@ -1,27 +1,28 @@
 .recentOpsCard {
-  background-color: var(--bg-primary);
-  border-radius: 24px;
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-soft);
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-card, 16px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   height: 100%;
 }
 
 .cardHeader {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
   @include flex-between;
 }
 
 .cardTitle {
-  font-size: 15px;
+  font-family: var(--font-body);
+  font-size: 13px;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--text-primary);
+  color: var(--text-strong);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
 }
 
 .opsList {
@@ -31,45 +32,48 @@
 
 .opItem {
   @include flex-between;
-  padding: 14px 24px;
-  border-bottom: 1px solid var(--border-color);
-  transition: background-color $transition-fast;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-light);
+  transition: background-color var(--duration-fast, 150ms) ease;
 
   &:last-child {
     border-bottom: none;
   }
 
   &:hover {
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-subtle);
+  }
+
+  @include mobile {
+    padding: 12px 14px;
   }
 }
 
 .opInfo {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .opIcon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background-color: var(--bg-secondary);
-  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--bg-subtle);
+  color: var(--text-muted);
   @include flex-center;
   flex-shrink: 0;
-  border: 1px solid transparent;
 }
 
 // Standalone modifier classes exported as CSS Module keys
-.deposit { color: var(--success); background-color: var(--success-soft); border-color: rgba(16, 185, 129, 0.1); }
-.withdrawal { color: var(--danger); background-color: var(--danger-soft); border-color: rgba(239, 68, 68, 0.1); }
-.transfer { color: var(--info); background-color: var(--info-soft); border-color: rgba(59, 130, 246, 0.1); }
-.loan { color: var(--primary); background-color: var(--primary-soft); border-color: rgba(30, 58, 95, 0.1); }
-.recovery { color: var(--success); background-color: var(--success-soft); border-color: rgba(16, 185, 129, 0.1); }
-.bulk { color: var(--primary); background-color: var(--primary-soft); border-color: rgba(124, 58, 237, 0.1); }
-.distribution { color: #f59e0b; background-color: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.1); }
-.quick { color: #6366f1; background-color: rgba(99, 102, 241, 0.05); border-color: rgba(99, 102, 241, 0.1); }
+.deposit { color: var(--credit); background-color: var(--credit-soft); }
+.withdrawal { color: var(--debit); background-color: var(--debit-soft); }
+.transfer { color: var(--transfer); background-color: var(--transfer-soft); }
+.loan { color: var(--green-700); background-color: var(--green-100); }
+.recovery { color: var(--credit); background-color: var(--credit-soft); }
+.bulk { color: var(--green-700); background-color: var(--green-100); }
+.distribution { color: var(--warning); background-color: var(--warning-soft); }
+.quick { color: var(--green-700); background-color: var(--green-100); }
 
 .opDetails {
   display: flex;
@@ -78,21 +82,24 @@
 }
 
 .opTitle {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-strong);
 }
 
 .opSub {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
 }
 
 .opAmount {
+  font-family: var(--font-display);
   font-size: 14px;
   font-weight: 700;
-  color: var(--text-primary);
-  background-color: var(--bg-secondary);
-  padding: 4px 8px;
-  border-radius: 8px;
+  color: var(--text-strong);
+  font-variant-numeric: tabular-nums;
+  background-color: var(--bg-subtle);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill, 999px);
 }

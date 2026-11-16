@@ -6,31 +6,44 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 1rem 0;
+  padding: 12px 0 6px;
 }
 
 .iconArea {
-  width: 72px;
-  height: 72px;
-  border-radius: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-xl, 18px);
   @include flex-center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 16px;
   
-  &.danger { background-color: $danger-soft; color: $danger; }
-  &.warning { background-color: $warning-soft; color: $warning; }
-  &.info { background-color: $primary-soft; color: $primary; }
+  &.danger { 
+    background-color: var(--danger-soft, rgba(255, 113, 133, 0.12)); 
+    color: var(--danger, #FF7185); 
+    border: 1px solid rgba(255, 113, 133, 0.28);
+  }
+  &.warning { 
+    background-color: var(--warning-soft, rgba(244, 198, 106, 0.12)); 
+    color: var(--warning, #F4C66A); 
+    border: 1px solid rgba(244, 198, 106, 0.28);
+  }
+  &.info { 
+    background-color: var(--primary-soft, rgba(138, 180, 248, 0.12)); 
+    color: var(--green-700); 
+    border: 1px solid rgba(138, 180, 248, 0.28);
+  }
 }
 
 .message {
-  font-size: 1rem;
-  color: $text-secondary;
-  line-height: 1.6;
-  margin-bottom: 2.5rem;
+  font-size: 14px;
+  color: var(--text-secondary, #A4B0C0);
+  line-height: 1.5;
+  margin-bottom: 24px;
+  max-width: 380px;
 }
 
 .actions {
   display: flex;
-  gap: 1rem;
+  gap: 12px;
   width: 100%;
   
   button { flex: 1; }

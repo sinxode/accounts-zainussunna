@@ -20,7 +20,6 @@ import { Card } from '../../components/ui/Card';
 import { StatCard } from '../../components/ui/StatCard';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { DataTable } from '../../components/ui/DataTable';
 import { borrowerService } from '../../lib/services';
 import { useOperationsDrawer } from '../../components/operations/drawers/OperationsDrawerContext';
 import { useUIStore } from '../../store/useUIStore';
@@ -222,69 +221,55 @@ _Thank you for your cooperation!_
 
           <section className={styles.section}>
             <h3 className="label-sm mb-4">Active Loan Portfolio</h3>
-            <DataTable 
-              columns={[
-                { 
-                  header: 'Issue Date', 
-                  width: '120px',
-                  accessor: (l: any) => (
-                    <div className="flex flex-col">
-                      <span>{new Date(l.loan_date).toLocaleDateString()}</span>
-                      <span className="mobile-only-inline text-muted text-xs mt-1">
-                        {l.purpose}
+            {loans.length === 0 ? (
+              <div className={styles.emptyLoanList}>No active loans recorded for this borrower.</div>
+            ) : (
+              <div className={styles.loanCardList}>
+                {loans.map((l: any) => (
+                  <div key={l.id} className={styles.loanItemCard}>
+                    <div className={styles.loanItemInfo}>
+                      <span className={styles.loanPurpose}>{l.purpose || 'General Loan'}</span>
+                      <span className={styles.loanDate}>
+                        Issued: {l.loan_date ? new Date(l.loan_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Active Term'}
                       </span>
                     </div>
-                  )
-                },
-                { 
-                  header: 'Purpose', 
-                  responsiveHidden: 'mobile',
-                  accessor: 'purpose' 
-                },
-                { 
-                  header: 'Loan Amount', 
-                  accessor: (l: any) => (
-                    <div className="flex flex-col items-end">
-                      <span>₹{Number(l.loan_amount).toLocaleString()}</span>
-                      <div className="mobile-only-flex mt-1">
-                        <Badge variant={l.status === 'active' ? 'success' : 'danger'} size="sm">{l.status}</Badge>
-                      </div>
+
+                    <div className={styles.loanStatusBadge}>
+                      <Badge variant={l.status === 'active' ? 'success' : 'danger'} size="sm" pill>
+                        {l.status}
+                      </Badge>
                     </div>
-                  ), 
-                  align: 'right' 
-                },
-                { 
-                  header: 'Status', 
-                  responsiveHidden: 'mobile',
-                  accessor: (l: any) => <Badge variant={l.status === 'active' ? 'success' : 'danger'} size="sm">{l.status}</Badge>, 
-                  align: 'right' 
-                },
-                { 
-                  header: 'Actions', 
-                  width: '60px',
-                  accessor: (l: any) => (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-danger"
-                      onClick={() => {
-                        openConfirmation({
-                          title: 'Delete Loan Record?',
-                          message: 'Are you sure you want to delete this loan record? This action cannot be undone.',
-                          confirmLabel: 'Delete',
-                          variant: 'danger',
-                          onConfirm: () => deleteLoanMutation.mutate(l.id)
-                        });
-                      }}
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  ),
-                  align: 'right'
-                }
-              ]}
-              data={loans}
-            />
+
+                    <div className={styles.loanAmount}>
+                      <span className={styles.amountLabel}>Principal</span>
+                      <strong className={styles.amountValue}>
+                        ₹{Number(l.loan_amount).toLocaleString('en-IN')}
+                      </strong>
+                    </div>
+
+                    <div className={styles.loanActions}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-danger"
+                        title="Delete loan record"
+                        onClick={() => {
+                          openConfirmation({
+                            title: 'Delete Loan Record?',
+                            message: 'Are you sure you want to delete this loan record? This action cannot be undone.',
+                            confirmLabel: 'Delete',
+                            variant: 'danger',
+                            onConfirm: () => deleteLoanMutation.mutate(l.id)
+                          });
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
         </div>
 

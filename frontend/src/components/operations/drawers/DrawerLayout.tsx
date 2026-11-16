@@ -1,7 +1,6 @@
 import React from 'react';
 import { Drawer } from '../../ui/Drawer';
 import { Button } from '../../ui/Button';
-import { Trash2 } from 'lucide-react';
 
 interface DrawerLayoutProps {
   title: string;
@@ -18,31 +17,21 @@ interface DrawerLayoutProps {
 export const DrawerLayout: React.FC<DrawerLayoutProps> = ({ 
   title, 
   icon, 
-  subtitle, 
+  subtitle: _subtitle, 
   isOpen = true,
   onClose, 
-  onClear,
+  onClear: _onClear,
   children, 
   footer,
   size = 'md'
 }) => {
   const footerContent = (
-    <div className="flex w-full items-center gap-2">
-      {onClear && (
-        <Button 
-          variant="danger" 
-          onClick={onClear} 
-          icon={<Trash2 size={16} />}
-          className="flex items-center justify-center shrink-0"
-        />
+    <div style={{ display: 'flex', width: '100%', gap: '8px', alignItems: 'center' }}>
+      {footer ? (
+        footer
+      ) : (
+        <Button variant="primary" fullWidth>Submit</Button>
       )}
-      <div className="flex w-full gap-2 items-center">
-        {footer ? (
-          footer
-        ) : (
-          <Button variant="primary" className="flex-1">Submit</Button>
-        )}
-      </div>
     </div>
   );
 
@@ -51,24 +40,22 @@ export const DrawerLayout: React.FC<DrawerLayoutProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={
-        <span className="flex items-center gap-3">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '38px',
-            height: '38px',
-            borderRadius: '10px',
-            backgroundColor: 'rgba(255, 255, 255, 0.12)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            backgroundColor: 'var(--bg-subtle)',
             flexShrink: 0
           }}>
             {icon}
           </div>
-          {title}
-        </span>
+          <span style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-strong)', letterSpacing: '-0.01em' }}>{title}</span>
+        </div>
       }
-      subtitle={subtitle}
       footer={footerContent}
       size={size}
     >

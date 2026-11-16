@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
 import { DataTable } from '../../components/ui/DataTable';
 import { Badge } from '../../components/ui/Badge';
@@ -27,16 +26,11 @@ export const ReversalCenter: React.FC = () => {
   return (
     <PageContainer>
       <div className={styles.navBar}>
-        <Link to="/transactions/explorer" className={styles.backLink}>
+        <Link to="/transactions" className={styles.backLink}>
           <ArrowLeft size={18} />
-          <span>Back to Explorer</span>
+          <span>Back to Transactions</span>
         </Link>
       </div>
-
-      <PageHeader 
-        title="Reversal Center" 
-        subtitle="Immutable log of all corrected financial transactions."
-      />
 
       <div className={styles.container}>
         <Card padding="lg" className={styles.infoCard}>

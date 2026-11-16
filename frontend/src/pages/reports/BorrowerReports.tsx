@@ -11,9 +11,9 @@ import {
 import { useUIStore } from '../../store/useUIStore';
 import { Card } from '../../components/ui/Card';
 import { StatCard } from '../../components/ui/StatCard';
+import { StatGrid } from '../../components/ui/StatGrid';
 import { DataTable } from '../../components/ui/DataTable';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { ReportTabs } from '../../components/reports/ReportTabs';
@@ -51,69 +51,68 @@ export const BorrowerReports: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title="Borrower Exposure & Loan Outstanding Report"
-        subtitle="Institutional loan receivables portfolio, recovery progress, risk classification, and reconciliation disclosures."
+      <ReportTabs 
         actions={
           <Button 
             variant="soft" 
-            icon={<Download size={16} />} 
+            size="sm"
+            icon={<Download size={15} />} 
             onClick={handleExport} 
             disabled={isLoading || !data?.loans.length}
           >
-            Export Loan Portfolio
+            Export Portfolio
           </Button>
         }
       />
 
-      <ReportTabs />
-
       {/* Historical Loan Reconciliation Notice */}
-      <div style={{
-        backgroundColor: '#FFFBEB',
-        border: '1px solid #FDE68A',
-        borderRadius: '8px',
-        padding: '14px 16px',
-        marginBottom: '20px',
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: '12px'
-      }}>
-        <Info size={18} style={{ color: '#D97706', flexShrink: 0, marginTop: '2px' }} />
-        <div style={{ fontSize: '12.5px', color: '#92400E', lineHeight: 1.5 }}>
-          <strong>Historical Loan Reconciliation Notice:</strong> {data?.historicalDisclaimer}
+      {data?.historicalDisclaimer && (
+        <div style={{
+          backgroundColor: 'var(--bg-subtle)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-tile, 14px)',
+          padding: '10px 14px',
+          marginBottom: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          fontSize: '12px',
+          color: 'var(--text-body)'
+        }}>
+          <Info size={16} style={{ color: 'var(--green-700)', flexShrink: 0 }} />
+          <span><strong>Notice:</strong> {data.historicalDisclaimer}</span>
         </div>
-      </div>
+      )}
 
       {/* Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+      <StatGrid columns={4}>
         <StatCard 
           label="Total Recorded Principal" 
           value={`₹${(data?.totalPrincipal || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
           subValue={`${data?.loans.length || 0} total loans`}
-          icon={<HandCoins />} 
+          icon={<HandCoins size={18} />} 
           variant="primary" 
         />
         <StatCard 
           label="Total Recorded Recoveries" 
           value={`₹${(data?.totalRecovered || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
-          icon={<CheckCircle2 />} 
+          icon={<CheckCircle2 size={18} />} 
           variant="success" 
         />
         <StatCard 
           label="Outstanding Exposure" 
           value={`₹${(data?.totalOutstanding || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
           subValue={`${data?.activeCount || 0} active loans`}
-          icon={<TrendingDown />} 
+          icon={<TrendingDown size={18} />} 
           variant="danger" 
         />
         <StatCard 
           label="High Risk Loans" 
           value={data?.highRiskCount || 0} 
-          icon={<AlertCircle />} 
+          icon={<AlertCircle size={18} />} 
           variant="warning" 
         />
-      </div>
+      </StatGrid>
 
       {/* Main Table */}
       <Card padding="md">

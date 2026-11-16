@@ -28,3 +28,5 @@ frontend/.env.local
 # System files
 .DS_Store
 Thumbs.db
+scratch/
+

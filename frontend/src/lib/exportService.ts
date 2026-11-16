@@ -121,7 +121,7 @@ export const exportService = {
     columns: string[],
     rows: (string | number | boolean | null)[][],
     fileName: string,
-    type?: 'statement' | 'receipt' | 'report' | 'cashbook' | 'aging' | 'audit'
+    type?: 'statement' | 'receipt' | 'report' | 'cashbook' | 'aging' | 'audit' | 'student_directory' | string
   ) {
     // Replace all Rupee symbols with 'Rs. ' to prevent font glyph rendering artifacts in jsPDF Helvetica
     const cleanTitle = title.replace(/₹/g, 'Rs. ');

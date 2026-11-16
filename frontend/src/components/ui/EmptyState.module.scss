@@ -1,37 +1,47 @@
+@import '../../styles/design-system/variables';
 @import '../../styles/design-system/mixins';
+
 .container {
-  @include flex-center;
+  display: flex;
   flex-direction: column;
-  padding: 4rem 2rem;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
   text-align: center;
-  background-color: white;
-  border-radius: $radius-card;
-  border: 1px solid $border-color;
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-card, 20px);
+  border: 1px dashed var(--border-strong);
 }
 
 .iconWrapper {
-  width: 80px;
-  height: 80px;
-  border-radius: $radius-full;
-  background-color: $bg-tertiary;
-  color: $text-muted;
-  @include flex-center;
-  margin-bottom: 1.5rem;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--green-100);
+  color: var(--green-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
 }
 
 .title {
-  @include h3;
-  color: $text-primary;
-  margin-bottom: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: 6px;
 }
 
 .description {
-  @include body-text;
-  color: $text-secondary;
-  max-width: 400px;
-  margin-bottom: 2rem;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 360px;
+  margin-bottom: 20px;
+  line-height: 1.4;
 }
 
 .button {
-  min-width: 160px;
+  min-width: 140px;
 }

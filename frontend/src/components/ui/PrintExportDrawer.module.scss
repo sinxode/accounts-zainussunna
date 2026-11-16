@@ -1,55 +1,320 @@
 @import '../../styles/design-system/variables';
 @import '../../styles/design-system/mixins';
+@import '../../styles/design-system/layout';
 
-.settings {
-  padding: 1.5rem;
+.container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 18px;
+  padding: 4px 0;
 }
 
 .section {
-  .label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: $text-muted;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 1rem;
-    display: block;
-  }
-}
-
-.optionGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
-.formatBtn {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  background-color: $bg-secondary;
-  border: 2px solid transparent;
-  border-radius: 12px;
-  transition: $transition-fast;
-  cursor: pointer;
+  gap: 10px;
+}
 
-  svg { color: $text-muted; transition: $transition-fast; }
-  span { font-size: 0.875rem; font-weight: 600; color: $text-secondary; }
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.sectionHint {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.formatGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.formatCard {
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-tile, 14px);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
+  position: relative;
+  outline: none;
 
   &:hover {
-    border-color: $border-color;
-    svg { color: $text-primary; }
+    border-color: var(--border-hover);
+    background-color: var(--bg-subtle);
+    transform: translateY(-1px);
   }
 
-  &.active {
-    border-color: $primary;
-    background-color: $primary-soft;
-    svg { color: $primary; }
-    span { color: $primary; }
+  &.selected {
+    border-color: var(--green-600);
+    background-color: var(--lime-100);
+
+    .formatName {
+      color: var(--green-900);
+      font-weight: 700;
+    }
+
+    .formatExt {
+      color: var(--green-800);
+    }
+  }
+
+  @include mobile {
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 14px;
+    gap: 12px;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  @include mobile {
+    width: auto;
+  }
+}
+
+.iconBox {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-subtle);
+  color: var(--text-strong);
+  transition: all 150ms ease;
+
+  @include mobile {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.excelIcon {
+  background-color: #E8F7EC;
+  color: #1A8F4E;
+}
+
+.csvIcon {
+  background-color: #EBF3FE;
+  color: #2F6FED;
+}
+
+.pdfIcon {
+  background-color: #FCEBEA;
+  color: #D9483B;
+}
+
+.checkBadge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--green-700);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @include mobile {
+    order: 3;
+    margin-left: auto;
+  }
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.formatName {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.formatExt {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+// Summary inspection card
+.summaryCard {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card, 16px);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.summaryTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reportTitle {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.reportFilename {
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.filterBanner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill, 999px);
+  font-size: 11.5px;
+  color: var(--text-strong);
+
+  .filterIcon {
+    color: var(--green-700);
+    flex-shrink: 0;
+  }
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 4px;
+}
+
+.metaStat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .statLabel {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  .statNumber {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-strong);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .statStatus {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--credit);
+  }
+}
+
+.statDivider {
+  width: 1px;
+  height: 28px;
+  background-color: var(--border);
+}
+
+.columnsPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+  border-top: 1px dashed var(--border);
+
+  .columnsLabel {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+}
+
+.columnPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.colPill {
+  font-size: 10.5px;
+  padding: 2px 7px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill, 999px);
+  color: var(--text-strong);
+}
+
+.notice {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-faint);
+  padding: 0 4px;
+}
+
+.drawerFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
+
+  @include mobile {
+    button {
+      flex: 1;
+    }
   }
 }

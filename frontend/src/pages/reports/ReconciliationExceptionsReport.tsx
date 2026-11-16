@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
   AlertTriangle, 
@@ -6,25 +6,41 @@ import {
   ShieldAlert, 
   CheckCircle2, 
   Info,
-  FileSearch
+  FileSearch,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { StatCard } from '../../components/ui/StatCard';
+import { StatGrid } from '../../components/ui/StatGrid';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { ReportTabs } from '../../components/reports/ReportTabs';
 import { reportingService } from '../../lib/reportingService';
 import { useUIStore } from '../../store/useUIStore';
 
+const formatStatusLabel = (status: string) => {
+  switch (status) {
+    case 'UNRESOLVED_PENDING_COMMITTEE_AUDIT': return 'Pending Audit';
+    case 'PRESERVED_HISTORICAL_ARTIFACT': return 'Preserved';
+    case 'RESOLVED': return 'Resolved';
+    default: return status.replace(/_/g, ' ');
+  }
+};
+
 export const ReconciliationExceptionsReport: React.FC = () => {
   const { setActiveModal, setExportData } = useUIStore();
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['reconciliationExceptionsReport'],
     queryFn: reportingService.getReconciliationExceptionsReport
   });
+
+  const toggleExpand = (id: string) => {
+    setExpandedId(prev => prev === id ? null : id);
+  };
 
   const handleExport = () => {
     if (!data) return;
@@ -52,13 +68,12 @@ export const ReconciliationExceptionsReport: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title="Historical Data-Quality & Reconciliation Exceptions"
-        subtitle="Authoritative audit register of legacy anomalies, unverified baselines, and pending physical reconciliations."
+      <ReportTabs 
         actions={
           <Button 
             variant="soft" 
-            icon={<Download size={16} />} 
+            size="sm"
+            icon={<Download size={15} />} 
             onClick={handleExport} 
             disabled={isLoading || !data?.exceptions.length}
           >
@@ -67,102 +82,148 @@ export const ReconciliationExceptionsReport: React.FC = () => {
         }
       />
 
-      <ReportTabs />
-
       {/* Audit Transparency Banner */}
       <div style={{
-        backgroundColor: '#EFF6FF',
-        border: '1px solid #BFDBFE',
-        borderRadius: '8px',
-        padding: '14px 16px',
-        marginBottom: '20px',
+        backgroundColor: 'var(--bg-subtle)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-tile, 14px)',
+        padding: '10px 14px',
+        marginBottom: '16px',
         display: 'flex',
-        alignItems: 'flex-start',
-        gap: '12px'
+        alignItems: 'center',
+        gap: '10px',
+        fontSize: '12px',
+        color: 'var(--text-body)'
       }}>
-        <Info size={18} style={{ color: '#2563EB', flexShrink: 0, marginTop: '2px' }} />
-        <div style={{ fontSize: '12.5px', color: '#1E40AF', lineHeight: 1.5 }}>
-          <strong>Financial Integrity Commitment:</strong> The ZLS rebuild preserves all historical transaction artifacts transparently. We never invent clean opening balances or silently omit legacy anomalies. The register below exposes every documented reconciliation exception requiring physical committee review.
-        </div>
+        <Info size={16} style={{ color: 'var(--green-700)', flexShrink: 0 }} />
+        <span><strong>Notice:</strong> The register below itemizes historical anomalies and unverified balances requiring physical audit review.</span>
       </div>
 
       {/* Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+      <StatGrid columns={4}>
         <StatCard 
           label="Total Tracked Exceptions" 
           value={data?.exceptions.length || 0} 
-          icon={<AlertTriangle />} 
+          icon={<AlertTriangle size={18} />} 
           variant="neutral" 
         />
         <StatCard 
           label="Critical Physical Audits" 
           value={criticalCount} 
           subValue="Borrower loans lacking recoveries"
-          icon={<ShieldAlert />} 
+          icon={<ShieldAlert size={18} />} 
           variant="danger" 
         />
         <StatCard 
           label="Historical Artifact Warnings" 
           value={warningCount} 
           subValue="Preserved legacy data structures"
-          icon={<FileSearch />} 
+          icon={<FileSearch size={18} />} 
           variant="warning" 
         />
         <StatCard 
           label="Reconciliation Status" 
           value="Preserved" 
-          icon={<CheckCircle2 />} 
+          icon={<CheckCircle2 size={18} />} 
           variant="success" 
         />
-      </div>
+      </StatGrid>
 
       {/* Exceptions Item Cards */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        {data?.exceptions.map((exc) => (
-          <Card key={exc.id} padding="md" style={{ borderLeft: exc.severity === 'critical' ? '4px solid #EF4444' : exc.severity === 'warning' ? '4px solid #F59E0B' : '4px solid #3B82F6' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', letterSpacing: '0.05em' }}>
-                    {exc.id} • {exc.category.toUpperCase()}
-                  </span>
-                  <Badge 
-                    variant={exc.severity === 'critical' ? 'danger' : exc.severity === 'warning' ? 'warning' : 'primary'} 
-                    size="sm"
-                  >
-                    {exc.severity.toUpperCase()}
-                  </Badge>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {data?.exceptions.map((exc) => {
+          const isExpanded = expandedId === exc.id;
+          const borderColor = exc.severity === 'critical' ? 'var(--debit)' : exc.severity === 'warning' ? 'var(--warn)' : 'var(--info)';
+
+          return (
+            <Card 
+              key={exc.id} 
+              padding="sm" 
+              style={{ 
+                borderLeft: `4px solid ${borderColor}`,
+                cursor: 'pointer',
+                transition: 'all 180ms ease'
+              }}
+              onClick={() => toggleExpand(exc.id)}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '10.5px', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
+                      {exc.id} • {exc.category.toUpperCase()}
+                    </span>
+                    <Badge 
+                      variant={exc.severity === 'critical' ? 'danger' : exc.severity === 'warning' ? 'warning' : 'primary'} 
+                      size="sm"
+                    >
+                      {exc.severity.toUpperCase()}
+                    </Badge>
+                  </div>
+                  <h3 style={{ 
+                    fontSize: '14px', 
+                    fontWeight: 600, 
+                    color: 'var(--text-strong)', 
+                    margin: 0,
+                    whiteSpace: isExpanded ? 'normal' : 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {exc.title}
+                  </h3>
                 </div>
-                <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#0F172A', margin: 0 }}>
-                  {exc.title}
-                </h3>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                  <Badge variant="neutral" size="sm">{formatStatusLabel(exc.status)}</Badge>
+                  {isExpanded ? (
+                    <ChevronUp size={16} style={{ color: 'var(--text-muted)' }} />
+                  ) : (
+                    <ChevronDown size={16} style={{ color: 'var(--text-muted)' }} />
+                  )}
+                </div>
               </div>
-              <Badge variant="neutral" size="sm">{exc.status.replace(/_/g, ' ')}</Badge>
-            </div>
 
-            <div style={{ fontSize: '13px', color: '#334155', lineHeight: 1.5, marginBottom: '12px' }}>
-              <strong>Accounting Risk:</strong> {exc.accountingRisk}
-            </div>
+              {/* Collapsed short hint or expanded full assessment */}
+              {!isExpanded ? (
+                <div style={{ 
+                  fontSize: '11.5px', 
+                  color: 'var(--text-muted)', 
+                  marginTop: '4px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  {exc.accountingRisk}
+                </div>
+              ) : (
+                <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid var(--border)' }}>
+                  <div style={{ fontSize: '12.5px', color: 'var(--text-body)', lineHeight: 1.5, marginBottom: '8px' }}>
+                    <strong>Accounting Risk:</strong> {exc.accountingRisk}
+                  </div>
 
-            <div style={{ 
-              backgroundColor: '#F8FAFC', 
-              padding: '10px 12px', 
-              borderRadius: '6px', 
-              fontSize: '12px', 
-              color: '#475569',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <span><strong>Operational Notes:</strong> {exc.notes}</span>
-              {exc.impactAmount && (
-                <span style={{ fontWeight: 700, color: '#E11D48', whiteSpace: 'nowrap', marginLeft: '12px' }}>
-                  Impact: ₹{exc.impactAmount.toLocaleString()}
-                </span>
+                  <div style={{ 
+                    backgroundColor: 'var(--bg-subtle)', 
+                    padding: '8px 12px', 
+                    borderRadius: 'var(--radius-tile, 10px)', 
+                    fontSize: '11.5px', 
+                    color: 'var(--text-body)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '6px'
+                  }}>
+                    <span><strong>Operational Notes:</strong> {exc.notes}</span>
+                    {exc.impactAmount && (
+                      <span style={{ fontWeight: 700, color: 'var(--debit)', whiteSpace: 'nowrap' }}>
+                        Impact: ₹{exc.impactAmount.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
               )}
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
     </PageContainer>
   );

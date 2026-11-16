@@ -38,16 +38,24 @@ $max-page-width: 1440px;
   width: 100%;
   max-width: $max-page-width;
   margin: 0 auto;
-  padding: clamp(12px, 3vw, 40px);
+  padding: 16px 20px 24px 20px;
   box-sizing: border-box;
+
+  @include mobile {
+    padding: 12px 12px 20px 12px;
+  }
 }
 
 @mixin container-fluid {
   width: 100%;
   max-width: $max-page-width;
   margin: 0 auto;
-  padding: clamp(12px, 3vw, 40px);
+  padding: 16px 20px 24px 20px;
   box-sizing: border-box;
+
+  @include mobile {
+    padding: 12px 12px 20px 12px;
+  }
 }
 
 // Compact container for dense layouts (Operations Center, etc.)
@@ -55,8 +63,12 @@ $max-page-width: 1440px;
   width: 100%;
   max-width: $max-page-width;
   margin: 0 auto;
-  padding: clamp(8px, 2vw, 24px);
+  padding: 12px 16px 20px 16px;
   box-sizing: border-box;
+
+  @include mobile {
+    padding: 8px 10px 16px 10px;
+  }
 }
 
 @mixin flex-center {
@@ -93,9 +105,9 @@ $max-page-width: 1440px;
 
 // -- Card System --
 @mixin card-base {
-  background-color: white;
-  border-radius: $radius-card;
-  border: 1px solid $border-color;
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-lg, 14px);
+  border: 1px solid var(--border-default, #2B3747);
   box-shadow: $shadow-soft;
   transition: $transition-base;
 }
@@ -103,11 +115,11 @@ $max-page-width: 1440px;
 @mixin card-compact {
   @include card-base;
   padding: $card-gap-mobile;
-  border-radius: 20px; // Mobile Card Radius: 20px
+  border-radius: var(--radius-lg, 14px);
   
   @media (min-width: 768px) {
     padding: $card-gap;
-    border-radius: $radius-card;
+    border-radius: var(--radius-lg, 14px);
   }
 }
 
@@ -202,7 +214,7 @@ $max-page-width: 1440px;
     position: sticky;
     top: 0;
     z-index: 10;
-    background-color: white;
+    background-color: var(--bg-subtle);
   }
   
   // Sticky first column for horizontal scroll
@@ -212,8 +224,8 @@ $max-page-width: 1440px;
       position: sticky;
       left: 0;
       z-index: 11;
-      background-color: white;
-      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08);
+      background-color: var(--bg-subtle);
+      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.4);
     }
   }
 }
@@ -221,19 +233,19 @@ $max-page-width: 1440px;
 // -- Drawer Responsive --
 @mixin drawer-responsive {
   @include desktop {
-    width: 440px;
+    width: 420px;
     max-width: 90vw;
     height: 100%;
     max-height: 100%;
-    border-radius: $radius-drawer;
+    border-radius: 0;
   }
   
   @include tablet {
-    width: 440px;
+    width: 420px;
     max-width: 90vw;
     height: 100%;
     max-height: 100%;
-    border-radius: $radius-drawer;
+    border-radius: 0;
   }
   
   @include mobile {
@@ -253,27 +265,27 @@ $max-page-width: 1440px;
 // -- Sidebar Responsive --
 @mixin sidebar-responsive {
   position: fixed;
-  top: 16px;
-  left: 16px;
-  bottom: 16px;
-  width: 300px;
-  border-radius: 32px;
-  box-shadow: $shadow-lg;
-  border: 1px solid $border-color;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: $sidebar-width;
+  border-radius: 0;
+  box-shadow: none;
+  border-right: 1px solid $border-color;
   z-index: $z-index-sidebar;
   
   @include mobile {
     top: 0;
     left: 0;
     bottom: 0;
-    width: 280px !important;
-    max-width: 280px !important;
+    width: 250px !important;
+    max-width: 250px !important;
     border-radius: 0;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
-    border: none;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+    border-right: 1px solid $border-color;
     z-index: $z-index-sidebar;
     transform: translateX(-100%);
-    transition: transform 250ms ease-in-out;
+    transition: transform 200ms ease-in-out;
     
     &.isOpen {
       transform: translateX(0) !important;
@@ -283,24 +295,25 @@ $max-page-width: 1440px;
 
 // -- Header Responsive --
 @mixin header-responsive {
-  height: 80px;
-  padding: 0 2rem;
-  background-color: transparent;
+  height: $header-height;
+  padding: 0 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid $border-color;
   position: sticky;
   top: 0;
   z-index: $z-index-header;
   
   @include tablet {
-    height: 72px;
-    padding: 0 1.5rem;
-    background-color: white;
+    height: $header-height;
+    padding: 0 14px;
+    background-color: #ffffff;
     border-bottom: 1px solid $border-color;
   }
   
   @include mobile {
-    height: 64px;
-    padding: 0 1rem;
-    background-color: white;
+    height: $header-height;
+    padding: 0 12px;
+    background-color: #ffffff;
     border-bottom: 1px solid $border-color;
   }
 }
@@ -315,17 +328,13 @@ $max-page-width: 1440px;
     bottom: 0;
     left: 0;
     right: 0;
-    height: calc(64px + env(safe-area-inset-bottom));
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08);
-    z-index: $z-index-header;
+    height: calc($bottom-nav-height + env(safe-area-inset-bottom));
+    background: #ffffff;
+    border-top: 1px solid $border-color;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    z-index: $z-index-bottom-nav;
     align-items: flex-start;
     padding-bottom: env(safe-area-inset-bottom);
-    border-top: 1px solid $border-color;
   }
 }
 

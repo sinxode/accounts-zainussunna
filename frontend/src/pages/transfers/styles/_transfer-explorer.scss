@@ -2,159 +2,153 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  border-radius: var(--radius-card, 16px);
+  border: 1px solid var(--border);
+  background-color: var(--bg-surface);
+  overflow: hidden;
 }
 
 .explorerHeader {
   @include flex-between;
-  padding: 24px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 16px 20px;
+  background-color: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
 
   @include mobile {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
   }
 }
 
 .tableWrapper {
   width: 100%;
-  overflow-x: auto;
-  max-height: 500px;
-  @include custom-scrollbar();
+  padding: 12px;
 }
 
-.explorerTable {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-
-  thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: var(--bg-secondary);
-  }
-
-  th {
-    text-align: left;
-    @include label-sm;
-    color: var(--text-muted);
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border-color);
-    white-space: nowrap;
-  }
-
-  td {
-    padding: 16px;
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: middle;
-  }
-
-  tbody tr {
-    transition: background-color 0.2s ease;
-    
-    &:hover {
-      background-color: var(--bg-tertiary);
-    }
-    
-    &:last-child td {
-      border-bottom: none;
-    }
-  }
-}
-
-.mobileTransferCard {
-  background-color: white;
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
-  padding: 16px;
+.transferCardList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  box-shadow: $shadow-soft;
+  gap: 8px;
+}
+
+.transferCard {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-tile, 14px);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
+
+  &:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  @include tablet {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+  }
+
+  @include mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+  }
+}
+
+.transferPrimary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 220px;
 }
 
 .cardHeader {
-  @include flex-between;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 8px;
-  
-  .cardId {
-    font-weight: 700;
-    color: var(--primary);
-    font-size: 0.875rem;
-  }
-  
-  .cardDate {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-weight: 500;
-  }
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardDate {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.cardId {
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--text-muted);
 }
 
 .cardParticipants {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
-  background-color: var(--bg-secondary);
-  padding: 10px 14px;
-  border-radius: 16px;
-  
-  .participant {
-    display: flex;
-    flex-direction: column;
-    
-    .label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      margin-bottom: 2px;
-    }
-    
-    .value {
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
+  font-size: 13px;
+  font-weight: 600;
+
+  .lenderName {
+    color: var(--debit);
   }
-  
+
   .divider {
     color: var(--text-muted);
-    font-weight: bold;
+  }
+
+  .borrowerName {
+    color: var(--credit);
   }
 }
 
-.cardDetails {
+.transferStatus {
   display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  
-  .detail {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    
-    .label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-    
-    .value {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
+  align-items: center;
+}
+
+.transferAmount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 120px;
+
+  @include mobile {
+    align-items: flex-start;
   }
+}
+
+.amountLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.amountValue {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-strong);
+  font-variant-numeric: tabular-nums;
 }
 
 .cardActions {
   display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  border-top: 1px solid var(--border-color);
-  padding-top: 10px;
-}
+  align-items: center;
+  gap: 6px;
 
+  @include mobile {
+    width: 100%;
+    justify-content: flex-end;
+    border-top: 1px solid var(--border-light);
+    padding-top: 8px;
+  }
+}

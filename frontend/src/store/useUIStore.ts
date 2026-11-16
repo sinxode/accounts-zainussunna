@@ -5,7 +5,8 @@ export interface ExportData {
   filename: string;
   columns: string[];
   rows: any[][];
-  type: 'statement' | 'receipt' | 'report' | 'cashbook' | 'aging' | 'audit';
+  type?: 'statement' | 'receipt' | 'report' | 'cashbook' | 'aging' | 'audit' | 'student_directory' | string;
+  filterSummary?: string;
 }
 
 export interface ConfirmationConfig {
@@ -20,6 +21,8 @@ interface UIState {
   isSidebarOpen: boolean;
   isSidebarCollapsed: boolean;
   isCommandPaletteOpen: boolean;
+  isShortcutReferenceOpen: boolean;
+  pendingSequence: string | null;
   isSearchOpen: boolean;
   isNotificationDrawerOpen: boolean;
   activeModal: 'deposit' | 'withdrawal' | 'storeBill' | 'distribution' | 'collection' | 'borrower' | 'recovery' | 'adjustment' | 'addStudent' | 'branch' | 'template' | 'batch' | 'event' | 'printExport' | null;
@@ -34,6 +37,8 @@ interface UIState {
   setSidebarOpen: (open: boolean) => void;
   setSidebarCollapsed: (isCollapsed: boolean) => void;
   setCommandPaletteOpen: (open: boolean) => void;
+  setShortcutReferenceOpen: (open: boolean) => void;
+  setPendingSequence: (seq: string | null) => void;
   setSearchOpen: (open: boolean) => void;
   setNotificationDrawerOpen: (open: boolean) => void;
   setActiveModal: (modal: UIState['activeModal'], studentId?: string) => void;
@@ -50,6 +55,8 @@ export const useUIStore = create<UIState>((set) => ({
   isSidebarOpen: false,
   isSidebarCollapsed: false,
   isCommandPaletteOpen: false,
+  isShortcutReferenceOpen: false,
+  pendingSequence: null,
   isSearchOpen: false,
   isNotificationDrawerOpen: false,
   activeModal: null,
@@ -64,6 +71,8 @@ export const useUIStore = create<UIState>((set) => ({
   setSidebarOpen: (open) => set({ isSidebarOpen: open }),
   setSidebarCollapsed: (isCollapsed) => set({ isSidebarCollapsed: isCollapsed }),
   setCommandPaletteOpen: (open) => set({ isCommandPaletteOpen: open }),
+  setShortcutReferenceOpen: (open) => set({ isShortcutReferenceOpen: open }),
+  setPendingSequence: (seq) => set({ pendingSequence: seq }),
   setSearchOpen: (open) => set({ isSearchOpen: open }),
   setNotificationDrawerOpen: (open) => set({ isNotificationDrawerOpen: open }),
   setActiveModal: (modal, studentId) => set({ activeModal: modal, selectedStudentId: studentId || null, currentWizardStep: 1 }),
@@ -75,6 +84,8 @@ export const useUIStore = create<UIState>((set) => ({
   closeConfirmation: () => set({ confirmationConfig: null }),
   closeAll: () => set({ 
     isCommandPaletteOpen: false, 
+    isShortcutReferenceOpen: false,
+    pendingSequence: null,
     isSearchOpen: false, 
     isNotificationDrawerOpen: false,
     activeModal: null,

@@ -1,14 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ArrowRight, User, History, Plus, Minus, Layers3, ArrowLeftRight, HandCoins, ArrowLeft } from 'lucide-react';
+import { 
+  Search, 
+  ArrowRight, 
+  User, 
+  History, 
+  Plus, 
+  Minus, 
+  Layers3, 
+  ArrowLeftRight, 
+  HandCoins, 
+  ArrowLeft,
+  Keyboard
+} from 'lucide-react';
 import { useUIStore } from '../../store/useUIStore';
+import { useOperationsDrawer } from '../operations/drawers/OperationsDrawerContext';
 import { globalSearchService } from '../../lib/globalSearchService';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { KeyBadge } from './KeyBadge';
+import { ShortcutRegistry } from '../../lib/shortcuts/shortcutRegistry';
 import styles from './CommandPalette.module.scss';
 
 export const CommandPalette: React.FC = () => {
-  const { isCommandPaletteOpen, setCommandPaletteOpen } = useUIStore();
+  const { isCommandPaletteOpen, setCommandPaletteOpen, setShortcutReferenceOpen } = useUIStore();
+  const { openDrawer } = useOperationsDrawer();
   const { role } = useAuth();
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<any[]>([]);
@@ -43,24 +59,81 @@ export const CommandPalette: React.FC = () => {
 
   const quickOps = [
     ...(isAdmin ? [
-      { id: 'deposit', name: 'Quick Deposit', icon: <Plus size={16} />, path: '/operations' },
-      { id: 'withdrawal', name: 'Quick Withdrawal', icon: <Minus size={16} />, path: '/operations' },
-      { id: 'bulk', name: 'New Bulk Operation', icon: <Layers3 size={16} />, path: '/operations' },
-      { id: 'transfer', name: 'New Internal Transfer', icon: <ArrowLeftRight size={16} />, path: '/internal-transfers' },
-      { id: 'loan', name: 'New External Loan', icon: <HandCoins size={16} />, path: '/borrowers' },
-    ] : [])
+      { 
+        id: 'deposit', 
+        name: 'Quick Deposit', 
+        icon: <Plus size={16} />, 
+        action: () => openDrawer('deposit'),
+        shortcut: ShortcutRegistry.getShortcutById('op.deposit')
+      },
+      { 
+        id: 'withdrawal', 
+        name: 'Quick Withdrawal', 
+        icon: <Minus size={16} />, 
+        action: () => openDrawer('withdrawal'),
+        shortcut: ShortcutRegistry.getShortcutById('op.withdrawal')
+      },
+      { 
+        id: 'transfer', 
+        name: 'New Internal Transfer', 
+        icon: <ArrowLeftRight size={16} />, 
+        action: () => openDrawer('internal'),
+        shortcut: ShortcutRegistry.getShortcutById('op.transfer')
+      },
+      { 
+        id: 'bulk', 
+        name: 'New Bulk Operation', 
+        icon: <Layers3 size={16} />, 
+        action: () => openDrawer('bulk')
+      },
+      { 
+        id: 'loan', 
+        name: 'New External Loan', 
+        icon: <HandCoins size={16} />, 
+        action: () => openDrawer('external')
+      },
+    ] : []),
+    {
+      id: 'shortcuts_help',
+      name: 'Keyboard Shortcuts Help',
+      icon: <Keyboard size={16} />,
+      action: () => setShortcutReferenceOpen(true),
+      shortcut: ShortcutRegistry.getShortcutById('global.shortcuts')
+    }
   ];
 
   const navigations = [
-    { name: 'Dashboard', path: '/' },
-    ...(isAdmin ? [{ name: 'Operations Center', path: '/operations' }] : []),
-    { name: 'Students', path: '/students' },
-    { name: 'Transactions', path: '/transactions' },
-    ...(isAdmin || isFaculty ? [{ name: 'Reports', path: '/reports' }] : []),
+    { 
+      name: 'Dashboard', 
+      path: '/', 
+      shortcut: ShortcutRegistry.getShortcutById('nav.dashboard') 
+    },
+    ...(isAdmin ? [{ 
+      name: 'Operations Center', 
+      path: '/operations', 
+      shortcut: ShortcutRegistry.getShortcutById('nav.operations') 
+    }] : []),
+    { 
+      name: 'Students', 
+      path: '/students', 
+      shortcut: ShortcutRegistry.getShortcutById('nav.students') 
+    },
+    { 
+      name: 'Transactions', 
+      path: '/transactions', 
+      shortcut: ShortcutRegistry.getShortcutById('nav.transactions') 
+    },
+    ...(isAdmin || isFaculty ? [{ 
+      name: 'Reports', 
+      path: '/reports', 
+      shortcut: ShortcutRegistry.getShortcutById('nav.reports') 
+    }] : []),
   ];
 
   const handleAction = (item: any) => {
-    if (item.path) {
+    if (item.action) {
+      item.action();
+    } else if (item.path) {
       navigate(item.path);
     }
     setCommandPaletteOpen(false);
@@ -110,8 +183,13 @@ export const CommandPalette: React.FC = () => {
                   <div className={styles.list}>
                     {quickOps.map((op) => (
                       <button key={op.id} className={styles.item} onClick={() => handleAction(op)}>
-                        <div className={styles.itemIcon}>{op.icon}</div>
-                        <span className={styles.itemName}>{op.name}</span>
+                        <div className={styles.itemContent}>
+                          <div className={styles.itemIcon}>{op.icon}</div>
+                          <span className={styles.itemName}>{op.name}</span>
+                        </div>
+                        {op.shortcut && (
+                          <KeyBadge shortcut={op.shortcut} size="sm" />
+                        )}
                       </button>
                     ))}
                   </div>
@@ -121,8 +199,13 @@ export const CommandPalette: React.FC = () => {
                   <div className={styles.list}>
                     {navigations.map((nav) => (
                       <button key={nav.path} className={styles.item} onClick={() => handleAction(nav)}>
-                        <div className={styles.itemIcon}><ArrowRight size={14} /></div>
-                        <span className={styles.itemName}>{nav.name}</span>
+                        <div className={styles.itemContent}>
+                          <div className={styles.itemIcon}><ArrowRight size={14} /></div>
+                          <span className={styles.itemName}>{nav.name}</span>
+                        </div>
+                        {nav.shortcut && (
+                          <KeyBadge shortcut={nav.shortcut} size="sm" />
+                        )}
                       </button>
                     ))}
                   </div>

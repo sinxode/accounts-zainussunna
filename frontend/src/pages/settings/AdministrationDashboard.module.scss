@@ -4,13 +4,13 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 12px;
 }
 
 .statsRow {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
+  gap: 8px;
 
   @include tablet {
     grid-template-columns: repeat(2, 1fr);
@@ -18,14 +18,14 @@
 
   @include mobile {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 8px;
   }
 }
 
 .mainLayout {
   display: grid;
   grid-template-columns: 1.8fr 1fr;
-  gap: 2.5rem;
+  gap: 12px;
   align-items: flex-start;
 
   @include tablet {
@@ -36,7 +36,7 @@
 .leftColumn, .rightColumn {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 12px;
 }
 
 .section {
@@ -45,32 +45,39 @@
 
 .controlGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
 }
 
 .controlCard {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 8px;
+  padding: 8px 10px;
   border: 1px solid $border-color;
+  border-radius: 6px;
+  background: var(--bg-surface);
   transition: $transition-fast;
 
   &:hover {
     border-color: $primary;
-    transform: translateY(-2px);
-    box-shadow: $shadow-md;
+    box-shadow: $shadow-xs;
     
-    .cArrow { transform: translateX(4px); opacity: 1; color: $primary; }
+    .cArrow { transform: translateX(2px); opacity: 1; color: $primary; }
   }
 }
 
 .cIcon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
   @include flex-center;
   flex-shrink: 0;
+
+  svg {
+    width: 15px;
+    height: 15px;
+  }
 
   &.primary { background-color: $primary-soft; color: $primary; }
   &.danger { background-color: $danger-soft; color: $danger; }
@@ -80,8 +87,8 @@
 
 .cLabel {
   flex: 1;
-  font-weight: 700;
-  font-size: 0.9375rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
   color: $text-primary;
 }
 
@@ -99,8 +106,8 @@
 .activityRow {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  padding: 1.25rem 1.5rem;
+  gap: 8px;
+  padding: 8px 12px;
   border-bottom: 1px solid $border-color;
   transition: $transition-fast;
 
@@ -114,15 +121,15 @@
 
   @include mobile {
     flex-wrap: wrap;
-    gap: 0.75rem;
-    padding: 1rem;
+    gap: 6px;
+    padding: 8px 10px;
     position: relative;
 
     button,
     [class*='button'] {
       position: absolute;
-      top: 1rem;
-      right: 1rem;
+      top: 8px;
+      right: 8px;
     }
   }
 }
@@ -130,73 +137,75 @@
 .aUser {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  width: 200px;
+  gap: 8px;
+  width: 180px;
 
   @include mobile {
     width: 100%;
-    padding-right: 40px;
+    padding-right: 36px;
     box-sizing: border-box;
   }
 }
 
 .uAvatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
   background-color: $primary;
   color: white;
   @include flex-center;
-  font-weight: 800;
-  font-size: 0.8125rem;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
 }
 
 .uInfo {
   display: flex;
   flex-direction: column;
-  strong { font-size: 0.875rem; color: $text-primary; }
-  span { font-size: 0.75rem; color: $text-muted; }
+  strong { font-size: 0.8125rem; color: $text-primary; }
+  span { font-size: 0.7rem; color: $text-muted; }
 }
 
 .aAction {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 8px;
 
   @include mobile {
     width: 100%;
-    margin-left: calc(32px + 1rem);
+    margin-left: calc(26px + 8px);
   }
 }
 
 .aEntity {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: $text-secondary;
   font-weight: 500;
 }
 
 .healthCard {
   border: 1px solid $border-color;
-  background-color: white;
+  border-radius: 8px;
+  background-color: var(--bg-surface);
 }
 
 .healthGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: 10px;
+  margin-bottom: 10px;
 
   @include mobile {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: 6px;
   }
 }
 
 .healthItem {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .hIcon {

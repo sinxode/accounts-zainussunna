@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Plus } from 'lucide-react';
 import styles from './BatchManagement.module.scss';
@@ -22,20 +21,16 @@ export const BatchManagement: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader 
-        title="Batch Management" 
-        subtitle="Reusable student groups for faster financial operations."
-        actions={
-          <div className="flex gap-4 items-center">
-            <Button 
-              icon={<Plus size={16} />}
-              onClick={() => setIsBatchDrawerOpen(true)}
-            >
-              Create Batch
-            </Button>
-          </div>
-        }
-      />
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+        <Button 
+          variant="primary"
+          size="sm"
+          icon={<Plus size={15} />}
+          onClick={() => setIsBatchDrawerOpen(true)}
+        >
+          Create Batch
+        </Button>
+      </div>
 
       <div className={styles.batchesGrid}>
         <div className={styles.fullWidthSection}>

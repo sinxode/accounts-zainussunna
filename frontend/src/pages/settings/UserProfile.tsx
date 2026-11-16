@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { KeyboardShortcutsSettings } from '../../components/settings/KeyboardShortcutsSettings';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { User, Mail, Shield, Save } from 'lucide-react';
@@ -45,7 +45,6 @@ export const UserProfile: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader title="User Profile" subtitle="Manage your account details and security settings." />
       <div className={styles.profileWrapper}>
         <Card padding="lg" className={styles.profileCard}>
           <div className={styles.avatarSection}>
@@ -114,6 +113,10 @@ export const UserProfile: React.FC = () => {
             </div>
           </form>
         </Card>
+
+        <div style={{ marginTop: '20px' }}>
+          <KeyboardShortcutsSettings />
+        </div>
       </div>
     </PageContainer>
   );

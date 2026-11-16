@@ -1,246 +1,451 @@
 import React, { useState, useMemo } from 'react';
 import { 
-  Users, 
-  Search, 
   Plus, 
   ArrowDownLeft, 
-  ArrowUpRight,
-  Eye,
-  AlertTriangle,
-  AlertCircle
+  ArrowUpRight, 
+  ArrowRight, 
+  Search,
+  Filter,
+  X
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
-import { Button } from '../../components/ui/Button';
-import { StatCard } from '../../components/ui/StatCard';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
-import type { BadgeVariant } from '../../components/ui/Badge';
-import { DataTable } from '../../components/ui/DataTable';
+import { Button } from '../../components/ui/Button';
+import { PillTabs } from '../../components/ui/PillTabs';
+import { Avatar } from '../../components/ui/Avatar';
 import { studentService } from '../../lib/services';
-import { adminService } from '../../lib/adminService';
 import { useAuth } from '../../contexts/AuthContext';
-import styles from './AllStudents.module.scss';
+import { ExportMenu } from '../../components/ui/ExportMenu';
+import { exportService } from '../../lib/exportService';
 import { useUIStore } from '../../store/useUIStore';
 import { useOperationsDrawer } from '../../components/operations/drawers/OperationsDrawerContext';
+import { StudentFilterDrawer } from './StudentFilterDrawer';
+import type { StudentFilterState } from './StudentFilterDrawer';
+import styles from './AllStudents.module.scss';
 import { clsx } from 'clsx';
 
 export const AllStudents: React.FC = () => {
   const navigate = useNavigate();
   const { role } = useAuth();
   const { openDrawer } = useOperationsDrawer();
-  const { setActiveModal } = useUIStore();
+  const { setActiveModal, setExportData } = useUIStore();
   const [searchTerm, setSearchTerm] = useState('');
-  const [healthFilter, setHealthFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+
+  // Full Advanced Multi-Criteria Filter State
+  const [filters, setFilters] = useState<StudentFilterState>({
+    status: 'all',
+    health: 'all',
+    category: 'all',
+    customMin: '',
+    customMax: ''
+  });
 
   const canMutate = role && ['super_admin', 'admin', 'owner', 'manager'].includes(role);
 
-  const { data: students, isLoading } = useQuery({
+  const { data: students = [], isLoading } = useQuery({
     queryKey: ['studentsSummary'],
     queryFn: studentService.getHealthSummary
   });
 
-  const { data: settings = [] } = useQuery({
-    queryKey: ['settings'],
-    queryFn: adminService.getSettings
-  });
+  // Extract available categories from student dataset
+  const availableCategories = useMemo(() => {
+    const set = new Set<string>();
+    students.forEach((s: any) => {
+      if (s.category) set.add(s.category);
+    });
+    return Array.from(set);
+  }, [students]);
 
-  const thresholds = useMemo(() => {
-    const s = settings.reduce((acc, curr) => ({...acc, [curr.key]: Number(curr.value)}), {} as any);
-    return { low: s.low_balance_threshold || 0, critical: s.critical_balance_threshold || -1000 };
-  }, [settings]);
+  // Comprehensive multi-factor filtering
+  const filteredStudents = useMemo(() => {
+    return students.filter(s => {
+      const term = searchTerm.toLowerCase();
+      const matchesSearch = !term || 
+        (s.name?.toLowerCase().includes(term)) ||
+        (s.enrolment_no?.toLowerCase().includes(term));
+      
+      const balance = Number(s.current_balance) || 0;
+      
+      // Health & threshold filtering
+      let matchesHealth = true;
+      if (filters.health === 'negative') matchesHealth = balance < 0;
+      else if (filters.health === 'positive') matchesHealth = balance > 0;
+      else if (filters.health === 'zero') matchesHealth = balance === 0;
+      else if (filters.health === 'under_200') matchesHealth = balance <= 200;
+      else if (filters.health === 'under_500') matchesHealth = balance <= 500;
 
-  const getHealthVariant = (balance: number): BadgeVariant => {
-    if (balance <= thresholds.critical) return 'error';
-    if (balance <= thresholds.low) return 'warning';
-    return 'success';
+      // Custom numeric range
+      let matchesCustomRange = true;
+      if (filters.customMin !== '') {
+        matchesCustomRange = matchesCustomRange && balance >= Number(filters.customMin);
+      }
+      if (filters.customMax !== '') {
+        matchesCustomRange = matchesCustomRange && balance <= Number(filters.customMax);
+      }
+
+      // Status
+      const matchesStatus = filters.status === 'all' || s.status === filters.status;
+
+      // Category / Sheet
+      const cat = (s.category || 'General').toLowerCase();
+      const matchesCategory = filters.category === 'all' || cat === filters.category.toLowerCase();
+
+      return matchesSearch && matchesHealth && matchesCustomRange && matchesStatus && matchesCategory;
+    });
+  }, [students, searchTerm, filters]);
+
+  // Aggregate numbers computed strictly from the filtered view
+  const totalBalance = filteredStudents.reduce((sum, s) => sum + (Number(s.current_balance) || 0), 0);
+  const activeCount = filteredStudents.filter(s => s.status === 'active').length;
+  const overdrawnCount = filteredStudents.filter(s => (Number(s.current_balance) || 0) < 0).length;
+
+  // Active filter count (for badge on Filters button)
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filters.health !== 'all') count++;
+    if (filters.category !== 'all') count++;
+    if (filters.status !== 'all') count++;
+    if (filters.customMin || filters.customMax) count++;
+    return count;
+  }, [filters]);
+
+  // Active filter tags for 1-click removal
+  const activeFilterTags = useMemo(() => {
+    const tags = [];
+    if (filters.health === 'under_200') {
+      tags.push({ label: 'Balance ≤ ₹200', onClear: () => setFilters(prev => ({ ...prev, health: 'all', customMax: '' })) });
+    } else if (filters.health === 'under_500') {
+      tags.push({ label: 'Balance ≤ ₹500', onClear: () => setFilters(prev => ({ ...prev, health: 'all', customMax: '' })) });
+    } else if (filters.health === 'negative') {
+      tags.push({ label: 'Overdrawn (< ₹0)', onClear: () => setFilters(prev => ({ ...prev, health: 'all' })) });
+    } else if (filters.health === 'positive') {
+      tags.push({ label: 'Positive (> ₹0)', onClear: () => setFilters(prev => ({ ...prev, health: 'all' })) });
+    } else if (filters.health === 'zero') {
+      tags.push({ label: 'Zero Balance (= ₹0)', onClear: () => setFilters(prev => ({ ...prev, health: 'all' })) });
+    } else if (filters.customMin || filters.customMax) {
+      const minTxt = filters.customMin ? `₹${filters.customMin}` : '₹0';
+      const maxTxt = filters.customMax ? `₹${filters.customMax}` : '∞';
+      tags.push({ label: `Balance: ${minTxt} – ${maxTxt}`, onClear: () => setFilters(prev => ({ ...prev, health: 'all', customMin: '', customMax: '' })) });
+    }
+
+    if (filters.category !== 'all') {
+      tags.push({ label: `Category: ${filters.category}`, onClear: () => setFilters(prev => ({ ...prev, category: 'all' })) });
+    }
+
+    if (filters.status !== 'all') {
+      tags.push({ label: `Status: ${filters.status}`, onClear: () => setFilters(prev => ({ ...prev, status: 'all' })) });
+    }
+
+    return tags;
+  }, [filters]);
+
+  const handleResetFilters = () => {
+    setFilters({
+      status: 'all',
+      health: 'all',
+      category: 'all',
+      customMin: '',
+      customMax: ''
+    });
   };
 
-  const filteredStudents = useMemo(() => {
-    if (!students) return [];
-    return students.filter(s => {
-      const matchesSearch = (s.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (s.enrolment_no?.toLowerCase().includes(searchTerm.toLowerCase()));
-      
-      const balance = s.current_balance || 0;
-      let matchesHealth = true;
-      if (healthFilter === 'low') matchesHealth = balance <= thresholds.low && balance > thresholds.critical;
-      else if (healthFilter === 'critical') matchesHealth = balance <= thresholds.critical;
-      else if (healthFilter === 'healthy') matchesHealth = balance > thresholds.low;
+  // Compute dynamic export metadata reflecting exact active filters
+  const { exportTitle, exportFilename, exportFilterSummary } = useMemo(() => {
+    const parts = [];
+    if (filters.health === 'under_200') parts.push('Balance_Under_200');
+    else if (filters.health === 'under_500') parts.push('Balance_Under_500');
+    else if (filters.health === 'negative') parts.push('Overdrawn');
+    else if (filters.health === 'positive') parts.push('Positive_Balance');
+    else if (filters.customMax) parts.push(`Balance_Under_${filters.customMax}`);
 
-      const matchesStatus = statusFilter === 'all' || s.status === statusFilter;
-      return matchesSearch && matchesHealth && matchesStatus;
+    if (filters.category !== 'all') parts.push(filters.category);
+    if (filters.status !== 'all') parts.push(filters.status);
+
+    const dateStr = new Date().toISOString().split('T')[0];
+    const desc = parts.length > 0 ? parts.join(' • ') : '';
+    const filename = `ZLS_Students_${parts.length > 0 ? parts.join('_') + '_' : ''}${dateStr}`;
+    const title = desc ? `Student Directory (${desc.replace(/_/g, ' ')})` : 'Student Directory';
+
+    return {
+      exportTitle: title,
+      exportFilename: filename,
+      exportFilterSummary: desc.replace(/_/g, ' ') || 'All Registered Students'
+    };
+  }, [filters]);
+
+  const exportColumns = ['Enrolment No', 'Name', 'Category', 'Balance', 'Status'];
+  const exportRows = useMemo(() => {
+    return filteredStudents.map((s: any) => [
+      s.enrolment_no || '',
+      s.name,
+      s.category || 'General',
+      `₹${(Number(s.current_balance) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
+      s.status || 'active'
+    ]);
+  }, [filteredStudents]);
+
+  const handleExportCSV = () => {
+    exportService.exportToCSV(exportTitle, exportColumns, exportRows, exportFilename);
+  };
+
+  const handleExportExcel = () => {
+    exportService.exportToExcel(exportTitle, exportColumns, exportRows, exportFilename);
+  };
+
+  const handleExportPDF = () => {
+    exportService.exportToPDF(exportTitle, exportColumns, exportRows, exportFilename, 'student_directory');
+  };
+
+  const handleOpenExportDrawer = () => {
+    setExportData({
+      title: exportTitle,
+      filename: exportFilename,
+      type: 'student_directory',
+      filterSummary: exportFilterSummary,
+      columns: exportColumns,
+      rows: exportRows
     });
-  }, [students, searchTerm, healthFilter, statusFilter, thresholds]);
-
-  const stats = {
-    total: students?.length || 0,
-    active: students?.filter(s => s.status === 'active').length || 0,
-    lowBalance: students?.filter(s => s.health_status === 'low' || s.health_status === 'critical').length || 0,
-    zeroBalance: students?.filter(s => s.health_status === 'empty').length || 0,
-    totalFunds: students?.reduce((acc, s) => acc + (Number(s.current_balance) || 0), 0) || 0
+    setActiveModal('printExport');
   };
 
   return (
-    <PageContainer>
-      <PageHeader
-        title="Student Directory"
-        subtitle="Authoritative student ledger directory and balance overview."
-        actions={
-          canMutate ? (
-            <Button icon={<Plus size={18} />} onClick={() => setActiveModal('addStudent')}>
+    <div className={styles.container}>
+      {/* Top Controls Row */}
+      <div className={styles.controlsRow}>
+        <div className={styles.navGroup}>
+          <PillTabs
+            value={filters.status}
+            onChange={(val) => setFilters(prev => ({ ...prev, status: val }))}
+            variant="lime"
+            options={[
+              { value: 'all', label: 'All Students', count: students.length },
+              { value: 'active', label: 'Active', count: activeCount },
+              { value: 'archived', label: 'Archived' },
+            ]}
+          />
+
+          <PillTabs
+            value={filters.health}
+            onChange={(val) => setFilters(prev => ({ 
+              ...prev, 
+              health: val, 
+              customMax: val === 'under_200' ? '200' : val === 'under_500' ? '500' : '' 
+            }))}
+            variant="subtle"
+            size="sm"
+            options={[
+              { value: 'all', label: 'All Ledgers' },
+              { value: 'under_200', label: '≤ ₹200 (Low)' },
+              { value: 'negative', label: 'Overdrawn', count: students.filter(s => (Number(s.current_balance) || 0) < 0).length },
+              { value: 'positive', label: 'Positive' },
+            ]}
+          />
+        </div>
+
+        <div className={styles.actionGroup}>
+          <div className={styles.searchWrapper}>
+            <Search size={16} className={styles.searchIcon} />
+            <input 
+              type="text" 
+              className={styles.inlineSearch}
+              placeholder="Search by name or enrolment..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          {/* Advanced Filters Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            icon={<Filter size={14} />}
+            onClick={() => setFilterDrawerOpen(true)}
+          >
+            Filters
+            {activeFilterCount > 0 && (
+              <span className={styles.filterCountBadge}>{activeFilterCount}</span>
+            )}
+          </Button>
+
+          {/* Export Menu with Direct Downloads & Universal Drawer Access */}
+          <ExportMenu
+            onExportCSV={handleExportCSV}
+            onExportExcel={handleExportExcel}
+            onExportPDF={handleExportPDF}
+            onOpenDrawer={handleOpenExportDrawer}
+            size="sm"
+          />
+
+          {canMutate && (
+            <Button 
+              variant="primary" 
+              size="sm" 
+              icon={<Plus size={16} />} 
+              onClick={() => setActiveModal('addStudent')}
+            >
               Add Student
             </Button>
-          ) : undefined
-        }
-      />
-      <div className={styles.container}>
-        <section className={styles.statsRow}>
-          <StatCard label="Total Students" value={stats.total} icon={<Users size={20} />} variant="primary" />
-          <StatCard label="Low Balance" value={stats.lowBalance} icon={<AlertTriangle size={20} />} variant="warning" />
-          <StatCard label="Zero Balance" value={stats.zeroBalance} icon={<AlertCircle size={20} />} variant="error" />
-          <StatCard label="Total Student Balances" value={`₹${stats.totalFunds.toLocaleString()}`} icon={<ArrowDownLeft size={20} />} variant="success" />
-        </section>
+          )}
+        </div>
+      </div>
 
-        <Card padding="sm">
-          <div className={styles.filters}>
-            <div className={styles.searchBox}>
-              <Search size={18} className={styles.searchIcon} />
-              <input 
-                type="text" 
-                placeholder="Search by name or enrollment number..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className={styles.filterActions}>
-              <select 
-                value={statusFilter} 
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="p-2 border rounded-lg mr-2"
+      {/* Active Filter Removable Tags Bar */}
+      {activeFilterTags.length > 0 && (
+        <div className={styles.activeFiltersBar}>
+          <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)' }}>
+            Active:
+          </span>
+          {activeFilterTags.map((tag, idx) => (
+            <span key={idx} className={styles.filterTagPill}>
+              <span>{tag.label}</span>
+              <button 
+                type="button" 
+                className={styles.removeTagBtn}
+                onClick={tag.onClear}
+                aria-label={`Remove filter ${tag.label}`}
               >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="archived">Archived</option>
-              </select>
-              <select 
-                value={healthFilter} 
-                onChange={(e) => setHealthFilter(e.target.value)}
-                className="p-2 border rounded-lg"
-              >
-                <option value="all">All Health</option>
-                <option value="healthy">Healthy</option>
-                <option value="low">Low Balance</option>
-                <option value="critical">Critical</option>
-                <option value="empty">Empty</option>
-              </select>
-            </div>
+                <X size={12} />
+              </button>
+            </span>
+          ))}
+          <button 
+            type="button" 
+            className={styles.clearAllBtn}
+            onClick={handleResetFilters}
+          >
+            Clear All
+          </button>
+        </div>
+      )}
+
+      {/* Compact Summary Strip */}
+      <div className={styles.summaryStrip}>
+        <div className={styles.summaryItem}>
+          <span className={styles.summaryLabel}>Total Students</span>
+          <span className={styles.summaryValue}>{filteredStudents.length}</span>
+        </div>
+        <div className={styles.summaryDivider} />
+        <div className={styles.summaryItem}>
+          <span className={styles.summaryLabel}>Total Ledger Funds</span>
+          <span className={clsx(styles.summaryValue, styles.credit)}>
+            ₹{totalBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          </span>
+        </div>
+        <div className={styles.summaryDivider} />
+        <div className={styles.summaryItem}>
+          <span className={styles.summaryLabel}>Overdrawn Accounts</span>
+          <span className={clsx(styles.summaryValue, overdrawnCount > 0 ? styles.debit : styles.neutral)}>
+            {overdrawnCount} {overdrawnCount > 0 ? 'requiring recovery' : 'healthy'}
+          </span>
+        </div>
+      </div>
+
+      {/* Students Card List Container */}
+      <Card padding="none" className={styles.tableCard}>
+        {isLoading ? (
+          <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
+            Loading student directory...
           </div>
-        </Card>
+        ) : filteredStudents.length === 0 ? (
+          <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
+            No students found matching your search.
+          </div>
+        ) : (
+          <div className={styles.studentList}>
+            {filteredStudents.map((s: any) => {
+              const bal = Number(s.current_balance || 0);
+              const isNeg = bal < 0;
 
-        <Card padding="none">
-          {isLoading ? (
-            <div className={`flex-center ${styles.loading}`}>
-              <p>Loading authoritative student records...</p>
-            </div>
-          ) : (
-            <DataTable 
-              onRowClick={(s) => navigate(`/students/${s.id}`)}
-              renderCard={(s) => (
-                <div key={s.id} className={styles.studentCard} onClick={() => navigate(`/students/${s.id}`)}>
-                  <div className={styles.studentInfo}>
-                    <div className={styles.avatar}>{s.name.charAt(0)}</div>
+              return (
+                <div 
+                  key={s.id} 
+                  className={styles.studentRowCard}
+                  onClick={() => navigate(`/students/${s.id}`)}
+                >
+                  <div className={styles.studentPrimary}>
+                    <Avatar name={s.name} size="sm" />
                     <div className={styles.details}>
                       <span className={styles.name}>{s.name}</span>
-                      <span className={styles.enrollment}>{s.enrolment_no}</span>
+                      <div className={styles.metaLine}>
+                        <span className={styles.enrollment}>{s.enrolment_no}</span>
+                        <span className={styles.mobileCategory}>• {s.category || 'General'}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className={styles.cardRow}>
-                    <span className={clsx(styles.balance, s.current_balance < 0 && "text-error")}>
-                      ₹{s.current_balance.toLocaleString()}
-                    </span>
-                    <Badge variant={getHealthVariant(s.current_balance)} size="sm" pill>
-                      {s.health_status}
+
+                  <div className={styles.studentCategory}>
+                    <Badge variant={s.category === "da'wa" ? 'da_wa' : 'hifz'} size="sm">
+                      {s.category || 'General'}
                     </Badge>
+                  </div>
+
+                  <div className={styles.studentBalance}>
+                    <span className={styles.balanceLabel}>Current Balance</span>
+                    <span className={clsx(styles.balanceValue, isNeg ? styles.debit : styles.credit)}>
+                      {isNeg ? '−' : ''}₹{Math.abs(bal).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </span>
+                    {isNeg && (
+                      <span className={styles.overdrawnTag}>Overdrawn</span>
+                    )}
+                  </div>
+
+                  <div className={styles.studentStatus}>
+                    <Badge variant={s.status === 'active' ? 'active' : 'neutral'} size="sm">
+                      {s.status}
+                    </Badge>
+                  </div>
+
+                  <div className={styles.actions} onClick={(e) => e.stopPropagation()}>
+                    {canMutate && (
+                      <>
+                        <button 
+                          type="button"
+                          className={styles.actionBtn}
+                          onClick={() => openDrawer('deposit', { studentId: s.id })} 
+                          title="Record Deposit"
+                        >
+                          <ArrowDownLeft size={15} />
+                        </button>
+                        <button 
+                          type="button"
+                          className={styles.actionBtn}
+                          onClick={() => openDrawer('withdrawal', { studentId: s.id })} 
+                          title="Record Withdrawal"
+                        >
+                          <ArrowUpRight size={15} />
+                        </button>
+                      </>
+                    )}
+                    <button 
+                      type="button"
+                      className={styles.actionBtn}
+                      onClick={() => navigate(`/students/${s.id}`)} 
+                      title="View Student Profile"
+                    >
+                      <ArrowRight size={15} />
+                    </button>
                   </div>
                 </div>
-              )}
-              columns={[
-                { 
-                  header: 'Student', 
-                  accessor: (s) => (
-                    <div className={styles.studentInfo}>
-                      <div className={styles.avatar}>{s.name.charAt(0)}</div>
-                      <div className={styles.details}>
-                        <span className={styles.name}>{s.name}</span>
-                        <span className={styles.enrollment}>{s.enrolment_no}</span>
-                      </div>
-                    </div>
-                  )
-                },
-                { 
-                  header: 'Current Balance', 
-                  align: 'right',
-                  accessor: (s) => (
-                    <div className="flex flex-col items-end">
-                      <span className={clsx(styles.balance, s.current_balance < 0 && "text-error font-semibold")}>
-                        ₹{Number(s.current_balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                      </span>
-                      <div className="mobile-only-flex items-center gap-1 mt-1">
-                        <Badge variant={getHealthVariant(s.current_balance)} size="sm" pill>
-                          {s.health_status}
-                        </Badge>
-                        <span className="text-muted text-xs">
-                          {s.last_transaction_date 
-                            ? new Date(s.last_transaction_date).toLocaleDateString() 
-                            : 'No activity'}
-                        </span>
-                      </div>
-                    </div>
-                  )
-                },
-                { 
-                  header: 'Health Status', 
-                  responsiveHidden: 'mobile',
-                  align: 'center',
-                  accessor: (s) => (
-                    <Badge variant={getHealthVariant(s.current_balance)} size="sm" pill>
-                      {s.health_status}
-                    </Badge>
-                  )
-                },
-                { 
-                  header: 'Last Activity', 
-                  responsiveHidden: 'mobile',
-                  align: 'center',
-                  accessor: (s) => s.last_transaction_date 
-                    ? new Date(s.last_transaction_date).toLocaleDateString() 
-                    : 'No activity' 
-                },
-                { 
-                  header: 'Actions', 
-                  align: 'right',
-                  accessor: (s) => (
-                    <div className={styles.actions} onClick={(e) => e.stopPropagation()}>
-                      {canMutate && (
-                        <>
-                          <button onClick={() => openDrawer('deposit', { studentId: s.id })} title="Deposit"><ArrowDownLeft size={16} /></button>
-                          <button onClick={() => openDrawer('withdrawal', { studentId: s.id })} title="Withdraw"><ArrowUpRight size={16} /></button>
-                        </>
-                      )}
-                      <button onClick={() => navigate(`/students/${s.id}`)} title="View Profile"><Eye size={16} /></button>
-                    </div>
-                  )
-                }
-              ]}
-              data={filteredStudents}
-            />
-          )}
-        </Card>
-      </div>
-    </PageContainer>
+              );
+            })}
+          </div>
+        )}
+      </Card>
+
+      {/* Advanced Filter Slide-over Drawer */}
+      <StudentFilterDrawer
+        isOpen={filterDrawerOpen}
+        onClose={() => setFilterDrawerOpen(false)}
+        filters={filters}
+        onChange={setFilters}
+        onReset={handleResetFilters}
+        matchingCount={filteredStudents.length}
+        totalCount={students.length}
+        availableCategories={availableCategories}
+      />
+    </div>
   );
 };

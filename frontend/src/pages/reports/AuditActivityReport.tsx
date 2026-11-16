@@ -11,9 +11,9 @@ import {
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { StatCard } from '../../components/ui/StatCard';
+import { StatGrid } from '../../components/ui/StatGrid';
 import { DataTable } from '../../components/ui/DataTable';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { ReportTabs } from '../../components/reports/ReportTabs';
@@ -64,13 +64,12 @@ export const AuditActivityReport: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title="Transaction Audit & Correction Activity Report"
-        subtitle="Immutable audit log of all financial modifications, transaction reversals with mandatory reasons, and security events."
+      <ReportTabs 
         actions={
           <Button 
             variant="soft" 
-            icon={<Download size={16} />} 
+            size="sm"
+            icon={<Download size={15} />} 
             onClick={handleExport} 
             disabled={isLoading || !data?.logs.length}
           >
@@ -78,8 +77,6 @@ export const AuditActivityReport: React.FC = () => {
           </Button>
         }
       />
-
-      <ReportTabs />
 
       {/* Historical Audit Infrastructure Disclaimer */}
       <div style={{
@@ -140,33 +137,33 @@ export const AuditActivityReport: React.FC = () => {
       </Card>
 
       {/* Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+      <StatGrid columns={4}>
         <StatCard 
           label="Total Audited Events" 
           value={data?.logs.length || 0} 
-          icon={<ShieldAlert />} 
+          icon={<ShieldAlert size={18} />} 
           variant="primary" 
         />
         <StatCard 
           label="Compensating Reversals" 
           value={reversalCount} 
           subValue="Requires >= 10 char reason"
-          icon={<FileCheck2 />} 
+          icon={<FileCheck2 size={18} />} 
           variant="warning" 
         />
         <StatCard 
           label="Period Lock Actions" 
           value={periodLockCount} 
-          icon={<Clock />} 
+          icon={<Clock size={18} />} 
           variant="neutral" 
         />
         <StatCard 
           label="User Access Modifications" 
           value={userAdminCount} 
-          icon={<UserCheck />} 
+          icon={<UserCheck size={18} />} 
           variant="success" 
         />
-      </div>
+      </StatGrid>
 
       {/* Audit Logs Table */}
       <Card padding="md">

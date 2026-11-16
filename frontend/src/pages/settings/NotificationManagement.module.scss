@@ -75,7 +75,7 @@
   transition: $transition-fast;
   
   &.active {
-    background-color: white;
+    background-color: var(--bg-surface);
     color: $primary;
     box-shadow: $shadow-sm;
   }
@@ -105,7 +105,7 @@
     padding: 0.5rem 1rem 0.5rem 2.5rem;
     border-radius: 10px;
     font-size: 0.875rem;
-    &:focus { background-color: white; border-color: $primary; }
+    &:focus { background-color: var(--bg-surface); border-color: $primary; }
   }
 }
 

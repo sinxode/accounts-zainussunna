@@ -11,7 +11,7 @@
   @include glass-card($opacity: 0.1);
   padding: 3rem;
   border-radius: 32px;
-  background-color: white;
+  background-color: var(--bg-surface);
   border: 1px solid $border-color;
   box-shadow: $shadow-md;
 }

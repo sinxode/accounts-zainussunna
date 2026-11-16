@@ -1,171 +1,410 @@
-@import '../../styles/design-system/mixins';
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/layout';
 
 .container {
   display: flex;
   flex-direction: column;
-  gap: $section-gap;
+  gap: 16px;
 }
 
-.statsRow {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: $card-gap;
-
-  @include tablet {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @include mobile {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-}
-
-.filters {
-  @include flex-between;
-  gap: $card-gap;
+.controlsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 
   @include mobile {
     flex-direction: column;
     align-items: stretch;
-    gap: $element-gap;
+    gap: 12px;
   }
 }
 
-.searchBox {
-  flex: 1;
+.navGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+}
+
+.actionGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  @include mobile {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.searchWrapper {
   position: relative;
   display: flex;
   align-items: center;
-  
+
   .searchIcon {
     position: absolute;
-    left: 1rem;
-    color: $text-muted;
+    left: 12px;
+    color: var(--text-muted);
+    pointer-events: none;
   }
 
-  input {
-    width: 100%;
-    background-color: $bg-tertiary;
-    border: 1px solid transparent;
-    padding: 0.5rem 1rem 0.5rem 2.75rem;
-    border-radius: 12px;
-    font-size: 0.9375rem;
-    transition: $transition-fast;
-    
+  .inlineSearch {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill, 999px);
+    padding: 7px 14px 7px 34px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text-strong);
+    width: 220px;
+    outline: none;
+    transition: all var(--duration-fast, 150ms) ease;
+
     &:focus {
-      background-color: white;
-      border-color: $primary;
+      border-color: var(--green-600);
+      box-shadow: 0 0 0 2px var(--green-100);
+    }
+
+    @include mobile {
+      width: 100%;
     }
   }
 }
 
-.filterActions {
-  display: flex;
+.filterCountBadge {
+  display: inline-flex;
   align-items: center;
-  gap: 1rem;
-}
-
-.tableCard {
-  border: 1px solid $border-color;
-  box-shadow: $shadow-sm;
-}
-
-.studentInfo {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, $primary, $info);
-  color: white;
-  @include flex-center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--green-700);
+  color: #ffffff;
+  font-size: 10px;
   font-weight: 700;
+  margin-left: 4px;
 }
 
-.details {
+.activeFiltersBar {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 4px 2px;
 }
 
-.name {
+.filterTagPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: var(--lime-100);
+  border: 1px solid var(--green-300);
+  border-radius: var(--radius-pill, 999px);
+  font-family: var(--font-body);
+  font-size: 11.5px;
   font-weight: 600;
-  color: $text-primary;
+  color: var(--green-900);
+}
 
-  @include mobile {
-    max-width: 105px;
-    white-space: normal;
-    word-break: break-word;
+.removeTagBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--green-800);
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+
+  &:hover {
+    color: var(--debit);
   }
 }
 
-.enrollment {
-  font-size: 0.75rem;
-  color: $text-muted;
+.clearAllBtn {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px 6px;
+
+  &:hover {
+    color: var(--text-strong);
+  }
 }
 
-.balance {
+.summaryStrip {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 20px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card, 16px);
+  overflow-x: auto;
+
+  @include mobile {
+    gap: 16px;
+    padding: 12px 14px;
+  }
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+
+  .summaryLabel {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+
+  .summaryValue {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+
+    &.credit { color: var(--credit); }
+    &.debit { color: var(--debit); }
+    &.neutral { color: var(--text-strong); }
+  }
+}
+
+.summaryDivider {
+  width: 1px;
+  height: 28px;
+  background-color: var(--border);
+  flex-shrink: 0;
+}
+
+.tableCard {
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-card, 16px);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  padding: 8px;
+
+  @include mobile {
+    padding: 6px;
+    border-radius: var(--radius-tile, 14px);
+  }
+}
+
+.studentList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  @include mobile {
+    gap: 4px;
+  }
+}
+
+.studentRowCard {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-tile, 14px);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  cursor: pointer;
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
+
+  &:hover {
+    border-color: var(--border-hover);
+    background-color: var(--bg-subtle);
+    transform: translateY(-1px);
+  }
+
+  @include tablet {
+    display: grid;
+    grid-template-columns: 1.5fr auto auto;
+    gap: 12px;
+  }
+
+  @include mobile {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    gap: 10px;
+    border-radius: var(--radius-tile, 12px);
+  }
+}
+
+.studentPrimary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+
+  @include mobile {
+    min-width: 0;
+    flex: 1;
+    gap: 8px;
+  }
+
+  .details {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  .name {
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-strong);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .metaLine {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  .enrollment {
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .mobileCategory {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--text-faint);
+
+    @media (min-width: 769px) {
+      display: none;
+    }
+  }
+}
+
+.studentCategory {
+  display: flex;
+  align-items: center;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.studentBalance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 130px;
+  gap: 1px;
+
+  @include mobile {
+    align-items: flex-end;
+    min-width: 0;
+    flex-shrink: 0;
+  }
+}
+
+.balanceLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  font-weight: 600;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.balanceValue {
+  font-family: var(--font-display);
   font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 14.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 13.5px;
+  }
+
+  &.credit { color: var(--credit); }
+  &.debit { color: var(--debit); }
+}
+
+.overdrawnTag {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--debit);
+  background-color: var(--debit-bg);
+  padding: 1px 5px;
+  border-radius: var(--radius-pill, 999px);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.studentStatus {
+  display: flex;
+  align-items: center;
+
+  @include mobile {
+    display: none;
+  }
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: flex-end;
+  gap: 6px;
 
   @include mobile {
-    gap: 0.125rem;
-  }
-
-  button {
-    color: $text-muted;
-    padding: 0.35rem;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-
-    @include mobile {
-      padding: 0.25rem;
-    }
-
-    &:hover {
-      background: $bg-secondary;
-      color: $primary;
-    }
-
-    &.deleteBtn {
-      color: $danger;
-      &:hover {
-        background-color: rgba($danger, 0.1);
-      }
-    }
+    display: none;
   }
 }
 
-// Styles for the mobile card view
-.studentCard {
-  background-color: $bg-secondary;
-  border-radius: $radius-card - 8px;
-  padding: $element-gap;
+.actionBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
-  flex-direction: column;
-  gap: $element-gap;
-  border: 1px solid $border-color;
-}
-
-.cardRow {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-}
+  justify-content: center;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast, 150ms) ease;
 
-.loading {
-  padding: 4rem;
+  &:hover {
+    background-color: var(--green-100);
+    color: var(--green-700);
+    border-color: var(--green-300);
+  }
 }

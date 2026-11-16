@@ -1,0 +1,43 @@
+@import '../../styles/design-system/variables';
+
+.badgeContainer {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  user-select: none;
+  vertical-align: middle;
+}
+
+.keyCap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 20px;
+  padding: 0 5px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-strong, #D3D8D0);
+  border-radius: 5px;
+  box-shadow: 0 1px 0 rgba(11, 59, 38, 0.1);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-body);
+  line-height: 1;
+  text-transform: none;
+
+  &.sm {
+    min-width: 16px;
+    height: 17px;
+    padding: 0 4px;
+    font-size: 10px;
+    border-radius: 4px;
+  }
+}
+
+.separator {
+  font-size: 10px;
+  color: var(--text-faint);
+  font-weight: 500;
+  margin: 0 1px;
+}

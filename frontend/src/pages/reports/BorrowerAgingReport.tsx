@@ -10,9 +10,9 @@ import {
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { StatCard } from '../../components/ui/StatCard';
+import { StatGrid } from '../../components/ui/StatGrid';
 import { DataTable } from '../../components/ui/DataTable';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { ReportTabs } from '../../components/reports/ReportTabs';
@@ -52,13 +52,12 @@ export const BorrowerAgingReport: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title="Borrower Loan Aging Report"
-        subtitle="Itemized active loan exposure categorized by calendar days elapsed since recorded loan creation date."
+      <ReportTabs 
         actions={
           <Button 
             variant="soft" 
-            icon={<Download size={16} />} 
+            size="sm"
+            icon={<Download size={15} />} 
             onClick={handleExport} 
             disabled={isLoading || !data?.loans.length}
           >
@@ -67,56 +66,56 @@ export const BorrowerAgingReport: React.FC = () => {
         }
       />
 
-      <ReportTabs />
-
       {/* Policy Limitation Disclaimer */}
-      <div style={{
-        backgroundColor: '#EFF6FF',
-        border: '1px solid #BFDBFE',
-        borderRadius: '8px',
-        padding: '14px 16px',
-        marginBottom: '20px',
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: '12px'
-      }}>
-        <Info size={18} style={{ color: '#2563EB', flexShrink: 0, marginTop: '2px' }} />
-        <div style={{ fontSize: '12.5px', color: '#1E40AF', lineHeight: 1.5 }}>
-          <strong>Aging Policy Notice:</strong> {data?.policyDisclaimer} Brackets represent elapsed calendar time rather than legal breach of contract or default declarations.
+      {data?.policyDisclaimer && (
+        <div style={{
+          backgroundColor: 'var(--bg-subtle)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-tile, 14px)',
+          padding: '10px 14px',
+          marginBottom: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          fontSize: '12px',
+          color: 'var(--text-body)'
+        }}>
+          <Info size={16} style={{ color: 'var(--green-700)', flexShrink: 0 }} />
+          <span><strong>Notice:</strong> {data.policyDisclaimer} Brackets represent elapsed calendar time.</span>
         </div>
-      </div>
+      )}
 
       {/* Aging Bracket Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+      <StatGrid columns={4}>
         <StatCard 
           label="0 – 30 Days (Current)" 
           value={`₹${(data?.agingBuckets.under30Days.outstanding || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
           subValue={`${data?.agingBuckets.under30Days.count || 0} loans`}
-          icon={<Clock />} 
+          icon={<Clock size={18} />} 
           variant="success" 
         />
         <StatCard 
           label="31 – 90 Days (Aging)" 
           value={`₹${(data?.agingBuckets.days31to90.outstanding || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
           subValue={`${data?.agingBuckets.days31to90.count || 0} loans`}
-          icon={<Calendar />} 
+          icon={<Calendar size={18} />} 
           variant="neutral" 
         />
         <StatCard 
           label="91 – 180 Days (Extended)" 
           value={`₹${(data?.agingBuckets.days91to180.outstanding || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
           subValue={`${data?.agingBuckets.days91to180.count || 0} loans`}
-          icon={<AlertCircle />} 
+          icon={<AlertCircle size={18} />} 
           variant="warning" 
         />
         <StatCard 
           label="> 180 Days (Historical)" 
           value={`₹${(data?.agingBuckets.over180Days.outstanding || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
           subValue={`${data?.agingBuckets.over180Days.count || 0} loans`}
-          icon={<Layers />} 
+          icon={<Layers size={18} />} 
           variant="danger" 
         />
-      </div>
+      </StatGrid>
 
       {/* Active Aging Loans DataTable */}
       <Card padding="md">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Save, Bell, Info, ShieldCheck } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
+import { KeyboardShortcutsSettings } from '../../components/settings/KeyboardShortcutsSettings';
 import { adminService } from '../../lib/adminService';
 import toast from 'react-hot-toast';
 import styles from './GlobalSettings.module.scss';
@@ -47,11 +48,6 @@ export const GlobalSettings: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <h1 className="page-title">System Settings</h1>
-        <p className="text-muted">Configure global thresholds and academy preferences.</p>
-      </header>
-
       <div className={styles.grid}>
         <Card className={styles.section} padding="lg">
           <div className={styles.sectionHeader}>
@@ -109,6 +105,10 @@ export const GlobalSettings: React.FC = () => {
             </div>
           </div>
         </Card>
+      </div>
+
+      <div style={{ marginTop: '20px' }}>
+        <KeyboardShortcutsSettings />
       </div>
 
       <div className={styles.infoFooter}>

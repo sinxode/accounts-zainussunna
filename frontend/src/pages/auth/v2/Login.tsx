@@ -39,8 +39,8 @@ export const LoginV2: React.FC = () => {
   return (
     <AuthLayout>
       <AuthCard 
-        title="Welcome Back" 
-        subtitle="Sign in to your ZLS control tower to continue."
+        title="Sign In" 
+        subtitle="Enter your credentials to access the treasury ledger."
       >
         <form onSubmit={handleLogin}>
           {error && <AuthAlert message={error} />}
@@ -49,10 +49,11 @@ export const LoginV2: React.FC = () => {
             label="Email Address"
             type="email"
             placeholder="admin@zainussunna.com"
-            icon={<Mail size={18} />}
+            icon={<Mail size={16} />}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            autoComplete="email"
           />
 
           <PasswordInput 
@@ -62,18 +63,25 @@ export const LoginV2: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            autoComplete="current-password"
           />
 
-          <Checkbox 
-            label="Remember this device" 
-            id="remember" 
-            checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)}
-          />
+          <div style={{ margin: '14px 0 6px 0' }}>
+            <Checkbox 
+              label="Remember this device" 
+              id="remember" 
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
+          </div>
 
           <AuthButton type="submit" loading={loading}>
             Sign In
           </AuthButton>
+
+          <div style={{ marginTop: '16px', textAlign: 'center', fontSize: '11px', color: 'var(--text-faint)' }}>
+            Authorized Personnel Only · 256-Bit Encrypted
+          </div>
         </form>
       </AuthCard>
     </AuthLayout>

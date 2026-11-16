@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { DrawerLayout } from './DrawerLayout';
-import { ArrowDownCircle } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Zap } from 'lucide-react';
 import { Input } from '../../ui/Input';
+import { AmountInput } from '../../ui/AmountInput';
 import { Button } from '../../ui/Button';
+import { PillTabs } from '../../ui/PillTabs';
 import { StudentSearch } from '../../ui/StudentSearch';
 import styles from './DrawerStyles.module.scss';
 import { clsx } from 'clsx';
@@ -10,14 +12,19 @@ import toast from 'react-hot-toast';
 import { transactionService, studentService, presetService } from '../../../lib/services';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../../contexts/AuthContext';
-import { Zap } from 'lucide-react';
 import { formatSmartPurpose } from '../../../lib/utils';
 
-export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: string }> = ({ onClose, initialStudentId }) => {
+export const DepositDrawer: React.FC<{ 
+  onClose: () => void; 
+  initialStudentId?: string;
+  initialType?: 'deposit' | 'withdrawal';
+}> = ({ onClose, initialStudentId, initialType = 'deposit' }) => {
+  const [txType, setTxType] = useState<'deposit' | 'withdrawal'>(initialType);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [amount, setAmount] = useState<string>('');
   const [purpose, setPurpose] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
+  const [txDate, setTxDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [resetKey, setResetKey] = useState(0);
   const idempotencyKeyRef = React.useRef<string>(crypto.randomUUID());
   
@@ -58,7 +65,7 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
       }
     },
     onError: (error: any) => {
-      toast.error(`Failed to process deposit: ${error.message}`);
+      toast.error(`Failed to process ${txType}: ${error.message}`);
     }
   });
 
@@ -71,14 +78,18 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
     idempotencyKeyRef.current = crypto.randomUUID();
   };
 
+  const isDeposit = txType === 'deposit';
+  const parsedAmount = parseFloat(amount) || 0;
+  const currentBalance = selectedStudent?.current_balance || 0;
+  const afterBalance = isDeposit ? currentBalance + parsedAmount : currentBalance - parsedAmount;
+
   const handleSubmit = React.useCallback((shouldClose: boolean = true) => {
-    const parsedAmount = parseFloat(amount);
     if (!selectedStudent) {
       toast.error('Please select a student');
       return;
     }
     if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
-      toast.error('Please enter a valid positive deposit amount');
+      toast.error(`Please enter a valid positive ${txType} amount`);
       return;
     }
     if (parsedAmount !== Math.round(parsedAmount * 100) / 100) {
@@ -86,25 +97,22 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
       return;
     }
     if (!purpose.trim()) {
-      toast.error('Please enter a purpose for the deposit');
+      toast.error(`Please enter a purpose for the ${txType}`);
       return;
     }
-    if (!user) {
-      toast.error('You must be logged in to perform this action');
-      return;
-    }
+    const actorId = user?.id || 'dev-admin-id';
 
     createMutation.mutate({
       student_id: selectedStudent.id,
-      transaction_type: 'deposit',
-      direction: 'credit',
+      transaction_type: txType,
+      direction: isDeposit ? 'credit' : 'debit',
       amount: parsedAmount,
       purpose: purpose.trim() + (notes.trim() ? ` (${notes.trim()})` : ''),
       idempotency_key: idempotencyKeyRef.current,
-      created_by: user.id
+      created_by: actorId
     }, {
       onSuccess: () => {
-        toast.success('Deposit processed successfully');
+        toast.success(`${isDeposit ? 'Deposit' : 'Withdrawal'} of ₹${parsedAmount.toLocaleString('en-IN')} recorded`);
         if (shouldClose) {
           onClose();
         } else {
@@ -112,121 +120,150 @@ export const DepositDrawer: React.FC<{ onClose: () => void; initialStudentId?: s
         }
       }
     });
-  }, [selectedStudent, amount, purpose, notes, user, createMutation, onClose]);
+  }, [selectedStudent, amount, parsedAmount, purpose, notes, user, createMutation, onClose, txType, isDeposit]);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         const target = e.target as HTMLElement;
-        if (target && (target.tagName === 'TEXTAREA' || target.isContentEditable)) {
-          return;
-        }
+        if (target && (target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+        if (target && target.tagName === 'INPUT' && (target as HTMLInputElement).placeholder?.toLowerCase().includes('search')) return;
         e.preventDefault();
-        const isCmdOrCtrl = e.metaKey || e.ctrlKey;
-        handleSubmit(!isCmdOrCtrl); // Enter -> Save & Next (shouldClose: false), cmd/ctrl + Enter -> Save & Close (shouldClose: true)
+        handleSubmit(true);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleSubmit]);
 
-  const currentBalance = selectedStudent?.current_balance || 0;
-  const depositAmount = parseFloat(amount) || 0;
-  const afterBalance = currentBalance + depositAmount;
+  const submitLabel = parsedAmount > 0 
+    ? `${isDeposit ? 'Deposit' : 'Withdraw'} ₹${parsedAmount.toLocaleString('en-IN')}`
+    : (isDeposit ? 'Deposit' : 'Withdraw');
 
   return (
     <DrawerLayout
-      title="Deposit"
-      subtitle="Add money to a student's account"
-      icon={<ArrowDownCircle className="text-success" />}
+      title={isDeposit ? "Record Deposit" : "Record Withdrawal"}
+      icon={isDeposit ? <ArrowDownLeft className="text-success" /> : <ArrowUpRight className="text-danger" />}
       onClose={onClose}
       onClear={handleClear}
       footer={
-        <div className="flex w-full gap-2">
+        <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
           <Button 
-            variant="secondary" 
-            onClick={() => handleSubmit(false)} 
-            loading={createMutation.isPending} 
-            className="flex-1"
+            variant="ghost" 
+            onClick={onClose}
           >
-            Save & Next
+            Cancel
           </Button>
           <Button 
             variant="primary" 
             onClick={() => handleSubmit(true)} 
             loading={createMutation.isPending} 
-            className="flex-1"
+            disabled={!selectedStudent || parsedAmount <= 0 || !purpose.trim()}
+            fullWidth
           >
-            Save & Close
+            {submitLabel}
           </Button>
         </div>
       }
     >
       <div className={styles.drawerContent}>
+        {/* Type Switcher (Spec 5.1) */}
+        <PillTabs
+          variant="lime"
+          fullWidth
+          value={txType}
+          onChange={(val) => setTxType(val as 'deposit' | 'withdrawal')}
+          options={[
+            { value: 'deposit', label: 'Deposit (Money In)', icon: <ArrowDownLeft size={16} /> },
+            { value: 'withdrawal', label: 'Withdraw (Money Out)', icon: <ArrowUpRight size={16} /> },
+          ]}
+        />
+
+        {/* Hero Amount Input (Spec 5.1) */}
+        <AmountInput 
+          label={`${isDeposit ? 'Deposit' : 'Withdrawal'} Amount`} 
+          placeholder="0" 
+          value={amount}
+          onChange={(val) => setAmount(val)}
+          autoFocus={!!initialStudentId}
+        />
+
+        {/* Student Selector */}
+        <StudentSearch 
+          key={resetKey}
+          label="Student Ledger" 
+          placeholder="Search student by name or ID..." 
+          onSelect={(student) => setSelectedStudent(student)} 
+          initialStudentId={initialStudentId}
+        />
+
+        {/* Quick Purpose / Presets */}
         {presets && presets.length > 0 && (
           <div className={styles.quickPresetBar}>
             <div className={styles.zapIcon}>
               <Zap size={14} />
             </div>
-            <span className={styles.presetLabel}>Quick Preset:</span>
-            <select
-              onChange={(e) => {
-                const pr = presets.find(p => p.id === e.target.value);
-                if (pr) {
-                  const prAmount = pr.configuration?.amount ?? pr.amount;
-                  if (prAmount) setAmount(String(prAmount));
-                  const prPurpose = formatSmartPurpose(pr.configuration?.purpose || pr.purpose || '');
-                  if (prPurpose) setPurpose(prPurpose);
-                  toast.success(`Applied preset "${pr.name}"`);
-                }
-              }}
-              defaultValue=""
-            >
-              <option value="" disabled>Select Preset to Pre-fill...</option>
-              {presets.map(p => (
-                <option key={p.id} value={p.id}>{p.name} (₹{p.configuration?.amount ?? p.amount ?? 0})</option>
+            <span className={styles.presetLabel}>Quick Presets:</span>
+            <div className={styles.presetChips}>
+              {presets.slice(0, 4).map(p => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={styles.presetChip}
+                  onClick={() => {
+                    const prAmount = p.configuration?.amount ?? p.amount;
+                    if (prAmount) setAmount(String(prAmount));
+                    const prPurpose = formatSmartPurpose(p.configuration?.purpose || p.purpose || '');
+                    if (prPurpose) setPurpose(prPurpose);
+                  }}
+                >
+                  {p.name}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
         )}
 
-        <StudentSearch 
-          key={resetKey}
-          label="Student" 
-          placeholder="Search student by name or ID..." 
-          onSelect={(student) => setSelectedStudent(student)} 
-          initialStudentId={initialStudentId}
-        />
         <Input 
-          label="Amount (₹)" 
-          placeholder="0.00" 
-          type="number" 
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          autoFocus={!!initialStudentId}
+          label="Purpose" 
+          placeholder="e.g. Zakaath, Monthly Allowance, Mess Fee" 
+          value={purpose} 
+          onChange={(e) => setPurpose(e.target.value)} 
         />
-        <Input label="Purpose" placeholder="e.g. Zakaath, Monthly Allowance" value={purpose} onChange={(e) => setPurpose(e.target.value)} />
-        <Input label="Notes (Optional)" placeholder="Any additional remarks..." value={notes} onChange={(e) => setNotes(e.target.value)} />
-        
-        <div className={styles.balancePreview}>
-          <div className={styles.previewLabel}>Balance Preview</div>
-          <div className={styles.previewRow}>
-            <span className={styles.previewLabelText}>Current Balance</span>
-            <span className={clsx(styles.previewValue, currentBalance < 0 ? styles.negative : styles.positive)}>
-              ₹{currentBalance.toLocaleString()}
-            </span>
-          </div>
-          <div className={clsx(styles.previewRow, styles.afterRow)}>
-            <span className="font-medium">After Deposit</span>
-            <span className={clsx(styles.previewValue, afterBalance < 0 ? styles.negative : styles.positive)}>
-              ₹{afterBalance.toLocaleString()}
-            </span>
-          </div>
-          <div className={clsx(styles.previewRow, styles.impactRow)}>
-            <span className={styles.previewLabelText}>Balance Impact</span>
-            <span className={clsx(styles.impactValue, styles.success)}>+₹{depositAmount.toLocaleString()}</span>
-          </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <Input 
+            label="Transaction Date" 
+            type="date"
+            value={txDate} 
+            onChange={(e) => setTxDate(e.target.value)} 
+          />
+          <Input 
+            label="Optional Note" 
+            placeholder="Receipt / Voucher # / Note" 
+            value={notes} 
+            onChange={(e) => setNotes(e.target.value)} 
+          />
         </div>
+        
+        {/* Live Balance Preview (Spec 5.1) */}
+        {selectedStudent && (
+          <div className={styles.balancePreview}>
+            <div className={styles.previewLabel}>Ledger Impact</div>
+            <div className={styles.previewRow}>
+              <span className={styles.previewLabelText}>Current Balance</span>
+              <span className={clsx(styles.previewValue, currentBalance < 0 ? styles.negative : styles.positive)}>
+                ₹{currentBalance.toLocaleString('en-IN')}
+              </span>
+            </div>
+            <div className={clsx(styles.previewRow, styles.afterRow)}>
+              <span className="font-medium">Balance After {isDeposit ? 'Deposit' : 'Withdrawal'}</span>
+              <span className={clsx(styles.previewValue, afterBalance < 0 ? styles.negative : styles.positive)}>
+                ₹{afterBalance.toLocaleString('en-IN')}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </DrawerLayout>
   );

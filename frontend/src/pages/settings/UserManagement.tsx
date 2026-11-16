@@ -118,21 +118,18 @@ export const UserManagement: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <div>
-          <h1 className="page-title">User Management</h1>
-          <p className="text-muted">Manage academy staff accounts, permissions and role assignments.</p>
-        </div>
-        {isSuperAdmin && (
+      {isSuperAdmin && (
+        <div className="flex justify-end mb-3">
           <Button 
             variant="primary" 
-            icon={<Plus size={18} />} 
+            size="sm"
+            icon={<Plus size={16} />} 
             onClick={() => setIsModalOpen(true)}
           >
             Add User
           </Button>
-        )}
-      </header>
+        </div>
+      )}
 
       <Card>
         {isLoading ? (

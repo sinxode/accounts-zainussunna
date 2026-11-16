@@ -1,185 +1,257 @@
-@import '../../../styles/design-system/mixins';
+@import '../../../styles/design-system/variables';
+@import '../../../styles/design-system/layout';
 
 .wrapper {
   display: flex;
-  height: 100vh;
-  width: 100vw;
-  background-color: white;
-  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--bg-page);
+  padding: 24px;
+  box-sizing: border-box;
+
+  @include mobile {
+    padding: 16px;
+    align-items: center;
+  }
 }
 
-.brandingPanel {
-  flex: 0 0 40%;
-  background-color: $primary;
-  color: white;
-  padding: 3rem 2.5rem;
+.shell {
+  width: 100%;
+  max-width: 920px;
+  min-height: 540px;
+  background-color: var(--bg-shell);
+  border-radius: var(--radius-shell, 28px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-shell, 0 2px 12px rgba(0, 0, 0, 0.03));
+  display: grid;
+  grid-template-columns: 5fr 6fr;
+  padding: 12px;
+  gap: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    max-width: 460px;
+    padding: 0;
+  }
+
+  @include mobile {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    border-radius: var(--radius-card, 22px);
+    padding: 24px 20px;
+    min-height: auto;
+  }
+}
+
+// 1. Institutional Hero Chamber (Left)
+.heroChamber {
+  background: var(--grad-hero);
+  border-radius: calc(var(--radius-shell, 28px) - 10px);
+  padding: 36px 32px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   position: relative;
   overflow: hidden;
+  color: var(--text-on-dark);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(183, 242, 107, 0.18) 0%, rgba(183, 242, 107, 0) 70%);
+    pointer-events: none;
+  }
 
   @include tablet {
     display: none;
   }
 
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.05), transparent);
-    pointer-events: none;
+  @include mobile {
+    display: none;
   }
 }
 
-.brandingContent {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  z-index: 1;
-}
-
-.brandHeader {
+.heroBrand {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 4rem;
+  gap: 12px;
 }
 
-.logo {
-  width: 44px;
-  height: 44px;
+.logoSquare {
+  width: 42px;
+  height: 42px;
   border-radius: 12px;
-  object-fit: cover;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  background-color: var(--lime-500);
+  color: var(--green-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
 }
 
-.brandText {
+.brandTextGroup {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
-.brandTitle {
-  font-size: 1.75rem;
-  font-weight: 800;
-  line-height: 1;
+.brandName {
+  font-family: var(--font-display);
+  font-size: 19px;
+  line-height: 22px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.brandPill {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--lime-300);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.heroMiddle {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 28px 0;
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: #FFFFFF;
   letter-spacing: -0.02em;
-  color: #e0e7ff; // Light soft blue for ZLS text
+  margin: 0;
 }
 
-.brandTagline {
-  font-size: 0.75rem;
+.heroSubtitle {
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-on-dark-muted);
+  margin: 0;
+}
+
+.glassKpiCard {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-tile, 16px);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  backdrop-filter: blur(10px);
+}
+
+.kpiTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kpiBadge {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--lime-300);
+  letter-spacing: 0.04em;
+}
+
+.kpiValue {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpiSub {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  color: var(--text-on-dark-muted);
+}
+
+.heroFooter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  color: var(--text-on-dark-muted);
+}
+
+// 2. White Sign-In Chamber (Right)
+.formChamber {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px 36px;
+  box-sizing: border-box;
+
+  @include mobile {
+    padding: 0;
+  }
+}
+
+// Mobile top brand badge (Only on mobile/tablet)
+.mobileBrandHeader {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+
+  @include tablet {
+    display: flex;
+  }
+
+  @include mobile {
+    display: flex;
+  }
+}
+
+.mobileLogoSquare {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: var(--green-700);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileBrandName {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-strong);
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.mobileBrandSub {
+  font-family: var(--font-body);
+  font-size: 11px;
   font-weight: 600;
+  color: var(--green-700);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  opacity: 0.6;
-}
-
-.featureGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  flex: 1;
-  overflow-y: auto;
-  @include custom-scrollbar;
-  margin-bottom: 1.5rem;
-}
-
-.featureCard {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: $transition-fast;
-  min-height: 90px;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    transform: translateX(4px);
-  }
-}
-
-.fIcon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.15);
-  color: white;
-  @include flex-center;
-  flex-shrink: 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.fText {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-
-  h4 { font-size: 0.875rem; font-weight: 700; color: white; }
-  p { font-size: 0.75rem; opacity: 0.8; line-height: 1.3; color: rgba(255, 255, 255, 0.9); }
-}
-
-.brandingFooter {
-  margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  p { font-size: 0.7rem; font-weight: 600; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.05em; }
-}
-
-/* Right Panel */
-.authPanel {
-  flex: 1;
-  background-color: $bg-secondary;
-  @include flex-center;
-  padding: 2rem;
-}
-
-.authContainer {
-  width: 100%;
-  max-width: 480px;
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-}
-
-.authFooter {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  padding-top: 2rem;
-}
-
-.statusRow {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.statusItem {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: $text-muted;
-  text-transform: uppercase;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  &.success { background-color: $success; box-shadow: 0 0 8px $success; }
-}
-
-.copy {
-  font-size: 0.75rem;
-  color: $text-muted;
-  font-weight: 500;
 }

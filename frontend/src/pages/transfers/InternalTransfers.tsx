@@ -1,9 +1,8 @@
 import React from 'react';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { Plus, FileText, Download, Wallet, IndianRupee } from 'lucide-react';
+import { Plus, FileText, Wallet, IndianRupee, Download } from 'lucide-react';
 import { clsx } from 'clsx';
 import styles from './InternalTransfers.module.scss';
 import { TransferDashboard } from '../../components/transfers/TransferDashboard';
@@ -16,27 +15,24 @@ export const InternalTransfers: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader 
-        title="Internal Transfers" 
-        subtitle="Student borrowing and repayment management."
-        actions={
-          <div className="flex gap-4 items-center">
-            <Button 
-              variant="soft" 
-              icon={<FileText size={16} />}
-              onClick={() => openDrawer('internalRepayment')}
-            >
-              Record Repayment
-            </Button>
-            <Button 
-              icon={<Plus size={16} />}
-              onClick={() => openDrawer('internal')}
-            >
-              New Transfer
-            </Button>
-          </div>
-        }
-      />
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginBottom: '16px' }}>
+        <Button 
+          variant="outline" 
+          size="sm"
+          icon={<FileText size={15} />}
+          onClick={() => openDrawer('internalRepayment')}
+        >
+          Record Repayment
+        </Button>
+        <Button 
+          variant="primary"
+          size="sm"
+          icon={<Plus size={15} />}
+          onClick={() => openDrawer('internal')}
+        >
+          New Transfer
+        </Button>
+      </div>
 
       <div className={styles.transfersGrid}>
         <div className={styles.kpiSection}>

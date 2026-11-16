@@ -1,0 +1,117 @@
+:root {
+  /* Canvas */
+  --bg-page:        #EEF0EC;   /* outer app background, soft grey-green */
+  --bg-shell:       #FFFFFF;   /* main app shell / sidebar */
+  --bg-surface:     #FFFFFF;   /* cards */
+  --bg-subtle:      #F5F6F3;   /* inputs, table zebra, inactive pills */
+  --bg-muted:       #E9ECE6;   /* tracks, skeletons */
+
+  /* Brand green (from references) */
+  --green-900:      #0B3B26;   /* darkest: hero card base, primary button text-on-light */
+  --green-800:      #12543A;
+  --green-700:      #1A6B49;   /* primary buttons, active nav */
+  --green-600:      #2A8A5E;
+  --green-300:      #8FD6A8;
+  --green-100:      #DDF3E4;   /* soft tint backgrounds, success chips */
+  --lime-500:       #B7F26B;   /* accent: active pill, highlight card, CTA circle */
+  --lime-300:       #D2F79F;
+  --lime-100:       #EEFBD6;
+
+  /* Text */
+  --text-strong:    #0E1A14;
+  --text-body:      #2E3B34;
+  --text-muted:     #6B776F;
+  --text-faint:     #9AA59D;
+  --text-on-dark:   #FFFFFF;
+  --text-on-dark-muted: rgba(255, 255, 255, 0.68);
+
+  /* Semantic (ledger) */
+  --credit:         #1A8F4E;   /* money in */
+  --credit-bg:      #E3F6EA;
+  --debit:          #D9483B;   /* money out */
+  --debit-bg:       #FCE9E6;
+  --warn:           #E58A1F;
+  --warn-bg:        #FEF1DD;
+  --info:           #2F6FED;   /* use sparingly: "Transfer" chips only */
+  --info-bg:        #E6EEFE;
+
+  /* Lines */
+  --border:         #E8EBE5;
+  --border-strong:  #D6DAD3;
+
+  /* Elevation (Minimal, subtle, non-fluffy) */
+  --shadow-none:    none;
+  --shadow-sm:      0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md:      0 2px 6px rgba(0, 0, 0, 0.04);
+  --shadow-lg:      0 10px 28px rgba(0, 0, 0, 0.06);   /* drawers, modals */
+  --shadow-shell:   0 2px 12px rgba(0, 0, 0, 0.03);
+
+  /* Animation & Motion (Smooth cubic-bezier) */
+  --ease-out:       cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:  150ms;
+  --duration-normal: 240ms;
+  --duration-slow:  320ms;
+
+  /* Hero gradient (dark green card in Donezo reference) */
+  --grad-hero: linear-gradient(135deg, #0B3B26 0%, #17603F 55%, #2A8A5E 100%);
+
+  /* Radius */
+  --radius-shell:   28px;
+  --radius-card:    20px;
+  --radius-tile:    14px;
+  --radius-input:   12px;
+  --radius-pill:    999px;
+  --radius-drawer:  24px;
+
+  /* Fonts */
+  --font-display: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Backward Compatibility Aliases */
+  --bg-app: var(--bg-page);
+  --bg-nav: var(--bg-shell);
+  --bg-primary: var(--bg-surface);
+  --bg-secondary: var(--bg-subtle);
+  --bg-tertiary: var(--bg-subtle);
+  --bg-raised: var(--bg-surface);
+  --bg-hover: var(--bg-subtle);
+
+  --primary: var(--green-700);
+  --primary-dark: var(--green-900);
+  --primary-soft: var(--green-100);
+  --primary-hover: var(--green-800);
+  --accent: var(--lime-500);
+  --accent-strong: var(--green-700);
+
+  --text-primary: var(--text-strong);
+  --text-secondary: var(--text-body);
+  --text-tertiary: var(--text-muted);
+
+  --border-color: var(--border);
+  --border-default: var(--border);
+  --border-subtle: var(--border);
+
+  --success: var(--credit);
+  --success-soft: var(--credit-bg);
+  --success-dark: #126336;
+
+  --warning: var(--warn);
+  --warning-soft: var(--warn-bg);
+  --warning-dark: #b56c14;
+
+  --danger: var(--debit);
+  --danger-soft: var(--debit-bg);
+  --danger-dark: #ad3025;
+
+  --neutral: var(--text-muted);
+  --neutral-soft: var(--bg-muted);
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+}

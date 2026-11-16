@@ -1,4 +1,4 @@
-// ZLS Global Variables
+// ZLS Compact Global Variables
 @import "./colors";
 @import "./typography";
 @import "./radius";
@@ -6,12 +6,14 @@
 @import "./animations";
 @import "./spacing";
 
-$sidebar-width: 280px;
-$sidebar-collapsed: 80px;
-$header-height: 80px;
+$sidebar-width: 230px;
+$sidebar-collapsed: 64px;
+$header-height: 48px;
+$bottom-nav-height: 54px;
 
 $z-index-sidebar: 100;
 $z-index-header: 90;
+$z-index-bottom-nav: 95;
 $z-index-drawer: 1000;
 $z-index-modal: 1100;
 $z-index-notification: 1200;

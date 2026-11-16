@@ -1,0 +1,241 @@
+@import '../../styles/design-system/variables';
+@import '../../styles/design-system/mixins';
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(14, 26, 20, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal {
+  background: var(--bg-surface);
+  border-radius: var(--radius-card, 20px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg, 0 20px 50px rgba(11,59,38,.14));
+  width: 100%;
+  max-width: 580px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 14px 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .iconWrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background-color: var(--green-100);
+    color: var(--green-800);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-strong);
+    margin: 0;
+  }
+}
+
+.closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 150ms ease;
+
+  &:hover {
+    background: var(--bg-muted);
+    color: var(--text-strong);
+  }
+}
+
+.searchBar {
+  padding: 12px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-subtle);
+
+  .searchIcon {
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .searchInput {
+    flex: 1;
+    border: none !important;
+    outline: none !important;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-strong);
+
+    &::placeholder {
+      color: var(--text-faint);
+    }
+  }
+}
+
+.filterTabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  @include custom-scrollbar;
+
+  .tabBtn {
+    padding: 4px 12px;
+    border-radius: var(--radius-pill, 999px);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 150ms ease;
+    white-space: nowrap;
+
+    &:hover {
+      background: var(--bg-subtle);
+      color: var(--text-strong);
+    }
+
+    &.active {
+      background: var(--green-900);
+      color: var(--text-on-dark);
+      font-weight: 600;
+    }
+  }
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 22px;
+  @include custom-scrollbar;
+}
+
+.categoryGroup {
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.categoryTitle {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
+.shortcutRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  transition: background 120ms ease;
+
+  &:hover {
+    background: var(--bg-subtle);
+  }
+}
+
+.shortcutMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.shortcutLabel {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.shortcutDesc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 22px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-subtle);
+  font-size: 12px;
+  color: var(--text-muted);
+
+  .settingsLink {
+    color: var(--green-700);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    padding: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .hintEsc {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.emptyState {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}

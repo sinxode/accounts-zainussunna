@@ -5,16 +5,21 @@ import {
   Settings, 
   LogOut, 
   ChevronDown,
-  Shield
+  Shield,
+  Keyboard
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import { useAuth } from '../../contexts/AuthContext';
+import { useUIStore } from '../../store/useUIStore';
+import { KeyBadge } from '../ui/KeyBadge';
+import { ShortcutRegistry } from '../../lib/shortcuts/shortcutRegistry';
 import styles from './UserMenu.module.scss';
 
 export const UserMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { profile, signOut } = useAuth();
+  const { setShortcutReferenceOpen } = useUIStore();
   const navigate = useNavigate();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -32,6 +37,14 @@ export const UserMenu: React.FC = () => {
     navigate(path);
     setIsOpen(false);
   };
+
+  const handleOpenShortcuts = () => {
+    setIsOpen(false);
+    setShortcutReferenceOpen(true);
+  };
+
+  const settingsShortcut = ShortcutRegistry.getShortcutById('global.settings');
+  const helpShortcut = ShortcutRegistry.getShortcutById('global.shortcuts');
 
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
@@ -65,23 +78,39 @@ export const UserMenu: React.FC = () => {
             
             <div className={styles.menu}>
               <button className={styles.item} onClick={() => handleNavigation('/profile')}>
-                <User size={16} />
-                <span>Your Profile</span>
+                <div className={styles.itemLabel}>
+                  <User size={16} />
+                  <span>Your Profile</span>
+                </div>
               </button>
               <button className={styles.item} onClick={() => handleNavigation('/settings')}>
-                <Settings size={16} />
-                <span>Settings</span>
+                <div className={styles.itemLabel}>
+                  <Settings size={16} />
+                  <span>Settings</span>
+                </div>
+                {settingsShortcut && <KeyBadge shortcut={settingsShortcut} size="sm" />}
+              </button>
+              <button className={styles.item} onClick={handleOpenShortcuts}>
+                <div className={styles.itemLabel}>
+                  <Keyboard size={16} />
+                  <span>Shortcuts</span>
+                </div>
+                {helpShortcut && <KeyBadge shortcut={helpShortcut} size="sm" />}
               </button>
               {profile?.role === 'owner' && (
                 <button className={styles.item} onClick={() => handleNavigation('/settings')}>
-                  <Shield size={16} />
-                  <span>Admin Panel</span>
+                  <div className={styles.itemLabel}>
+                    <Shield size={16} />
+                    <span>Admin Panel</span>
+                  </div>
                 </button>
               )}
               <div className={styles.divider} />
               <button className={clsx(styles.item, styles.logout)} onClick={signOut}>
-                <LogOut size={16} />
-                <span>Logout</span>
+                <div className={styles.itemLabel}>
+                  <LogOut size={16} />
+                  <span>Logout</span>
+                </div>
               </button>
             </div>
           </motion.div>

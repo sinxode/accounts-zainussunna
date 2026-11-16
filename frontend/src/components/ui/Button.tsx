@@ -2,8 +2,18 @@ import React from 'react';
 import { clsx } from 'clsx';
 import styles from './Button.module.scss';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'soft' | 'danger' | 'success' | 'ghost' | 'outline';
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 
+    | 'primary' 
+    | 'secondary' 
+    | 'soft' 
+    | 'danger' 
+    | 'success' 
+    | 'ghost' 
+    | 'outline' 
+    | 'lime' 
+    | 'lime-circle' 
+    | 'hero-outline';
   size?: 'sm' | 'md' | 'lg';
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';

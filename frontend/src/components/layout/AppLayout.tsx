@@ -3,7 +3,8 @@ import { useLocation, useOutlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { CommandPalette } from '../ui/CommandPalette';
-import { GlobalFAB } from '../ui/GlobalFAB';
+import { ShortcutReferenceModal } from '../ui/ShortcutReferenceModal';
+import { SequenceIndicator } from '../ui/SequenceIndicator';
 import { NotificationDrawer } from './NotificationDrawer';
 import { DrawerManager } from '../operations/drawers/DrawerManager';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
@@ -20,36 +21,39 @@ export const AppLayout: React.FC = () => {
   useRealtimeSync();
   const location = useLocation();
   const outlet = useOutlet();
-  const { isSidebarCollapsed, confirmationConfig, closeConfirmation } = useUIStore();
+  const { confirmationConfig, closeConfirmation, isSidebarCollapsed } = useUIStore();
 
   return (
-    <div className={styles.wrapper}>
-      <Sidebar />
-      <div className={clsx(styles.main, isSidebarCollapsed && styles.mainWithCollapsedSidebar)}>
-        <Header />
-        <main className={styles.content}>
-          <AnimatePresence mode="wait" initial={true}>
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ 
-                duration: 0.25, 
-                ease: "easeInOut"
-              }}
-              className={styles.pageContainer}
-            >
-              {outlet}
-            </motion.div>
-          </AnimatePresence>
-        </main>
+    <div className={styles.pageWrapper}>
+      <div className={clsx(styles.shell, isSidebarCollapsed && styles.shellCollapsed)}>
+        <Sidebar />
+        <div className={styles.main}>
+          <Header />
+          <main className={styles.content}>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ 
+                  duration: 0.18, 
+                  ease: [0.2, 0.8, 0.2, 1]
+                }}
+                className={styles.pageContainer}
+              >
+                {outlet}
+              </motion.div>
+            </AnimatePresence>
+          </main>
+        </div>
       </div>
       
       <CommandPalette />
+      <ShortcutReferenceModal />
+      <SequenceIndicator />
       <NotificationDrawer />
       <DrawerManager />
-      <GlobalFAB />
       <BottomActionBar />
 
       {confirmationConfig && (

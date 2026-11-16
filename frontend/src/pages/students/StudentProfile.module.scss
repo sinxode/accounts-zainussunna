@@ -1,468 +1,322 @@
 @import '../../styles/design-system/variables';
-@import '../../styles/design-system/layout';
+@import '../../styles/design-system/mixins';
 
-.navBar {
-  @include flex-between;
-  margin-bottom: 2rem;
-}
-
-.backLink {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-weight: 700;
-  color: $text-secondary;
-  transition: $transition-fast;
-  
-  &:hover {
-    color: $primary;
-    transform: translateX(-4px);
-  }
-}
-
-.navActions {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.layout {
-  display: grid;
-  grid-template-columns: 1fr 360px;
-  gap: 2.5rem;
-  align-items: flex-start;
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-
-  @include tablet {
-    grid-template-columns: 1fr;
-  }
-
-  @include mobile {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-}
-
-@include mobile {
-  .main, .sidebar, .stickySection {
-    display: contents;
-  }
-
-  .orderHero { order: 1; }
-  .orderBalance { order: 2; }
-  .orderActions { order: 3; }
-  .orderLedger { order: 4; }
-  .orderInsights { order: 5; }
-  .orderHistory { order: 6; }
-  .orderHealth { display: none; } // Financial Health card hidden or moved as it's a sidebar duplicate
-}
-
-.main {
+.container {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.headerSection {
-  @include flex-between;
-  background-color: white;
-  padding: 2.5rem;
-  border-radius: 32px;
-  border: 1px solid $border-color;
-  box-shadow: $shadow-md;
-  
-  @include mobile {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2rem;
-    padding: 1.5rem;
-  }
-}
-
-.profileInfo {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, $primary, #2a4d7d);
-  color: white;
-  @include flex-center;
-  font-size: 1.5rem;
-  font-weight: 800;
-  box-shadow: 0 8px 20px rgba(30, 58, 95, 0.2);
-}
-
-.details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.name {
-  @include h2;
-  color: $text-primary;
-  margin: 0;
-}
-
-.meta {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.enr {
-  font-weight: 700;
-  color: $text-muted;
-  font-size: 0.875rem;
-}
-
-.dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background-color: $border-color;
-}
-
-.heroBalance {
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  
-  @include mobile {
-    text-align: left;
-  }
-}
-
-.balanceLabel {
-  @include label-text;
-  color: $text-muted;
-  margin-bottom: 0.25rem;
-}
-
-.balanceValue {
-  font-size: 3.5rem;
-  font-weight: 800;
-  color: $primary;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  
-  @include mobile {
-    font-size: 2.5rem;
-  }
-}
-
-.overviewGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-
-  @include mobile {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-}
-
-.mobileOnlyCard {
-  display: none;
-
-  @include mobile {
-    display: block;
-  }
-}
-
-.section {
+  gap: 16px;
   width: 100%;
 }
 
-.actionsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1rem;
-}
-
-.actionBtn {
-  font-weight: 700;
-}
-
-.tableActions {
-  display: flex;
-  gap: 1rem;
-}
-
-.searchBox {
-  position: relative;
+.topNav {
   display: flex;
   align-items: center;
-  
-  svg {
-    position: absolute;
-    left: 0.875rem;
-    color: $text-muted;
+  justify-content: space-between;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green-700);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// 2-Column Layout (Spec 4.5: Span 4 Profile | Span 8 Balance + Tx)
+.profileLayout {
+  display: grid;
+  grid-template-columns: 4fr 8fr;
+  gap: 16px;
+  align-items: flex-start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profileCard {
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-card, 20px);
+  border: 1px solid var(--border);
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profileHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.avatarLarge {
+  width: 72px;
+  height: 72px;
+  font-size: 26px;
+}
+
+.nameBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .studentName {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-strong);
+    margin: 0;
   }
 
-  input {
-    background-color: $bg-tertiary;
-    border: 1px solid transparent;
-    padding: 0.5rem 1rem 0.5rem 2.5rem;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    width: 240px;
-    transition: $transition-fast;
-    
-    &:focus {
-      background-color: white;
-      border-color: $primary;
-      width: 300px;
+  .enrolmentNo {
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+}
+
+.badgeRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.negativeAlert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-tile, 14px);
+  background-color: var(--debit-bg);
+  border: 1px solid rgba(217, 72, 59, 0.25);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--debit);
+}
+
+.contactList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contactRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-tile, 14px);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: all 150ms ease;
+
+  &:hover {
+    background-color: var(--green-100);
+    border-color: var(--green-300);
+  }
+
+  .contactIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-surface);
+    color: var(--green-700);
+    flex-shrink: 0;
+  }
+
+  .contactInfo {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    .contactLabel {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-faint);
+    }
+
+    .contactValue {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-strong);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }
 
-.eventGrid {
+.profileSummaryStrip {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1.25rem;
-}
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
 
-.eventCard {
-  border: 1px solid $border-color;
-  box-shadow: $shadow-sm;
-}
-
-.eHeader {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.eDate {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: $text-muted;
-  flex: 1;
-}
-
-.eName {
-  font-weight: 700;
-  color: $text-primary;
-  margin-bottom: 1.5rem;
-}
-
-.eFooter {
-  @include flex-between;
-  padding-top: 1rem;
-  border-top: 1px solid $bg-tertiary;
-  font-size: 0.8125rem;
-  
-  span { color: $text-muted; font-weight: 600; }
-  strong { font-size: 1rem; }
-}
-
-/* Sidebar / Sticky area */
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.stickySection {
-  position: sticky;
-  top: calc(var(--header-height) + 1.5rem);
-}
-
-.snapshotCard {
-  border: 1px solid $primary;
-  background-color: rgba(30, 58, 95, 0.05); // Reduced opacity locally
-}
-
-.healthInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.healthScore {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.hVal {
-  display: flex;
-  flex-direction: column;
-  
-  strong { font-size: 1.125rem; color: $text-primary; }
-  span { font-size: 0.75rem; color: $text-muted; font-weight: 600; }
-}
-
-.hIcon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  @include flex-center;
-  flex-shrink: 0;
-
-  &.success { background-color: $success-soft; color: $success; }
-}
-
-.eIcon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  @include flex-center;
-  flex-shrink: 0;
-
-  &.primary { background-color: $primary-soft; color: $primary; }
-}
-
-.iIcon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  @include flex-center;
-  flex-shrink: 0;
-
-  &.primary { background-color: $primary-soft; color: $primary; }
-  &.danger { background-color: $danger-soft; color: $danger; }
-}
-
-.healthDesc {
-  font-size: 0.875rem;
-  color: $text-secondary;
-  line-height: 1.5;
-}
-
-.divider {
-  height: 1px;
-  background-color: $border-color;
-  margin: 1.5rem 0;
-}
-
-.snapMeta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.mRow {
-  @include flex-between;
-  font-size: 0.8125rem;
-  
-  span { color: $text-muted; font-weight: 600; }
-  strong { color: $text-primary; }
-}
-
-.snapActions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  position: relative;
-}
-
-.tlItem {
-  display: flex;
-  gap: 1rem;
-  position: relative;
-  z-index: 1;
-}
-
-.tlIcon {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  @include flex-center;
-  background-color: white;
-  box-shadow: $shadow-sm;
-  border: 1px solid $border-color;
-  flex-shrink: 0;
-
-  &.success { color: $success; }
-  &.danger { color: $danger; }
-  &.warning { color: $warning; }
-  &.info { color: $info; }
-}
-
-.tlLine {
-  position: absolute;
-  top: 32px;
-  left: 15px;
-  bottom: -24px;
-  width: 2px;
-  background-color: $bg-tertiary;
-  z-index: 0;
-}
-
-.tlContent {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.tlHeader {
-  @include flex-between;
-}
-
-.tlTitle {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: $text-primary;
-}
-
-.tlTime {
-  font-size: 0.7rem;
-  color: $text-muted;
-  font-weight: 600;
-}
-
-.tlAmount {
-  font-size: 0.8125rem;
-  font-weight: 800;
-}
-
-.insights {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.insightItem {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  border: 1px solid $border-color;
-  
-  .iContent {
+  .summaryItem {
     display: flex;
     flex-direction: column;
+    gap: 2px;
+
+    .summaryLabel {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .summaryValue {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+
+      &.credit { color: var(--credit); }
+      &.debit { color: var(--debit); }
+    }
   }
-  
-  .iLabel {
-    font-size: 0.7rem;
-    color: $text-muted;
-    @include label-text;
-  }
-  
-  strong { font-size: 0.875rem; color: $text-primary; }
 }
 
-.amountVal {
-  font-weight: 800;
+// RIGHT COLUMN
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// Balance Hero Card (Spec 4.5)
+.balanceHeroCard {
+  background: var(--grad-hero);
+  border-radius: var(--radius-card, 20px);
+  padding: 24px 28px;
+  color: var(--text-on-dark);
+  box-shadow: 0 4px 16px rgba(11, 59, 38, 0.08);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(183, 242, 107, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .balanceHeroTop {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+  }
+
+  .balanceCaption {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text-on-dark-muted);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .balanceDisplay {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+
+    .currencySymbol {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    .amountWhole {
+      font-family: var(--font-display);
+      font-size: 38px;
+      line-height: 42px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .heroActionBtns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .balanceStatusRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    font-family: var(--font-body);
+    font-size: 12px;
+    position: relative;
+    z-index: 1;
+
+    .statusIndicator {
+      color: var(--lime-300);
+      font-weight: 600;
+    }
+
+    .entryCount {
+      color: var(--text-on-dark-muted);
+    }
+  }
+}
+
+.txCard {
+  width: 100%;
+}
+
+.emptyTx {
+  padding: 32px;
+  text-align: center;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.txList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }

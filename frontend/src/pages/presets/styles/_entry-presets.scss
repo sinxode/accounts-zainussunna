@@ -1,13 +1,13 @@
 .presetsGrid {
   display: flex;
   flex-direction: column;
-  gap: 36px;
+  gap: 12px;
   width: 100%;
   max-width: $max-page-width;
   margin: 0 auto;
 
   @include mobile {
-    gap: 24px;
+    gap: 10px;
   }
 }
 
@@ -18,7 +18,7 @@
 .workspaceSection {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 24px;
+  gap: 12px;
 
   @include tablet {
     grid-template-columns: repeat(1, 1fr);
@@ -33,7 +33,7 @@
 .secondarySection {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 24px;
+  gap: 12px;
 
   @include mobile {
     display: flex;
@@ -61,23 +61,24 @@
   grid-column: span 6;
   
   @include tablet {
-    grid-column: span 12; /* or stack on tablet */
+    grid-column: span 12;
   }
 }
 
 .searchBar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background-color: var(--bg-secondary);
+  gap: 6px;
+  background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 8px 16px;
-  min-width: 200px;
+  border-radius: 6px;
+  padding: 4px 10px;
+  min-width: 180px;
+  height: 32px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all $transition-fast;
 
   &:hover {
-    border-color: var(--text-secondary);
+    border-color: var(--primary);
   }
 }

@@ -4,12 +4,12 @@ import {
   Eye, 
   EyeOff, 
   AlertCircle,
-  ChevronRight
+  ArrowRight
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { motion } from 'framer-motion';
 import styles from './AuthComponents.module.scss';
-import logoImg from '../../../assets/logo_dark.png';
 
 interface AuthCardProps {
   children: React.ReactNode;
@@ -20,12 +20,11 @@ interface AuthCardProps {
 export const AuthCard: React.FC<AuthCardProps> = ({ children, title, subtitle }) => (
   <motion.div 
     className={styles.card}
-    initial={{ opacity: 0, scale: 0.98, y: 10 }}
-    animate={{ opacity: 1, scale: 1, y: 0 }}
-    transition={{ duration: 0.25 }}
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.2 }}
   >
     <header className={styles.header}>
-      <img src={logoImg} alt="ZLS Logo" className={styles.logo} />
       <h2 className={styles.title}>{title}</h2>
       <p className={styles.subtitle}>{subtitle}</p>
     </header>
@@ -56,28 +55,19 @@ interface PasswordInputProps extends Omit<AuthInputProps, 'icon'> {
 
 export const PasswordInput: React.FC<PasswordInputProps> = ({ label, value, error, showStrength, ...props }) => {
   const [show, setShow] = useState(false);
-  
-  // Simple strength calc
-  const getStrength = (val: string) => {
-    if (!val) return 0;
-    let s = 0;
-    if (val.length > 8) s += 1;
-    if (/[A-Z]/.test(val)) s += 1;
-    if (/[0-9]/.test(val)) s += 1;
-    if (/[^A-Za-z0-9]/.test(val)) s += 1;
-    return s;
-  };
-
-  const strength = getStrength(String(value || ''));
 
   return (
     <div className={styles.inputGroup}>
-      <div className="flex-between">
+      <div className={styles.labelRow}>
         <label className={styles.label}>{label}</label>
-        {props.id === 'password' && <button type="button" className={styles.linkBtn}>Forgot?</button>}
+        {props.id === 'password' && (
+          <Link to="/forgot-password" className={styles.linkBtn}>
+            Forgot?
+          </Link>
+        )}
       </div>
       <div className={clsx(styles.inputWrapper, error && styles.hasError)}>
-        <div className={styles.icon}><Lock size={18} /></div>
+        <div className={styles.icon}><Lock size={17} /></div>
         <input 
           className={styles.input} 
           type={show ? 'text' : 'password'} 
@@ -88,23 +78,11 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({ label, value, erro
           type="button" 
           className={styles.toggleBtn}
           onClick={() => setShow(!show)}
+          aria-label={show ? 'Hide password' : 'Show password'}
         >
-          {show ? <EyeOff size={18} /> : <Eye size={18} />}
+          {show ? <EyeOff size={16} /> : <Eye size={16} />}
         </button>
       </div>
-      {showStrength && value && (
-        <div className={styles.strengthMeter}>
-          <div className={styles.track}>
-            <div 
-              className={clsx(styles.fill, strength >= 1 && styles.weak, strength >= 3 && styles.medium, strength === 4 && styles.strong)} 
-              style={{ width: `${(strength / 4) * 100}%` }}
-            />
-          </div>
-          <span className={styles.strengthText}>
-            {strength <= 1 ? 'Weak' : strength <= 3 ? 'Medium' : 'Strong'}
-          </span>
-        </div>
-      )}
       {error && <span className={styles.errorText}>{error}</span>}
     </div>
   );
@@ -116,7 +94,7 @@ export const AuthAlert: React.FC<{ message: string; type?: 'error' | 'success' }
     initial={{ opacity: 0, height: 0 }}
     animate={{ opacity: 1, height: 'auto' }}
   >
-    <AlertCircle size={18} />
+    <AlertCircle size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
     <span>{message}</span>
   </motion.div>
 );
@@ -126,12 +104,12 @@ export const AuthButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> 
     {loading ? (
       <div className={styles.loaderArea}>
         <div className={styles.spinner} />
-        <span>Signing you in...</span>
+        <span>Verifying credentials...</span>
       </div>
     ) : (
       <>
         <span>{children}</span>
-        <ChevronRight size={20} />
+        <ArrowRight size={17} />
       </>
     )}
   </button>

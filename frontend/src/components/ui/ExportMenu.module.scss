@@ -1,0 +1,166 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.triggerBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill, 999px);
+  color: var(--text-strong);
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-fast, 150ms) ease;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: var(--bg-subtle);
+    border-color: var(--border-hover);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--green-600);
+    box-shadow: 0 0 0 2px var(--green-100);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &.active {
+    background: var(--bg-subtle);
+    border-color: var(--green-600);
+  }
+}
+
+.sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.md {
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+.icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.label {
+  line-height: 1;
+}
+
+.chevron {
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+  margin-left: 1px;
+}
+
+.chevronRotated {
+  transform: rotate(180deg);
+}
+
+.menuPopover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 220px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-tile, 14px);
+  box-shadow: var(--shadow-lg);
+  padding: 6px;
+  z-index: 100;
+  user-select: none;
+}
+
+.menuHeader {
+  padding: 6px 8px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.menuItems {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm, 8px);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease;
+
+  &:hover {
+    background: var(--bg-subtle);
+  }
+}
+
+.menuDivider {
+  height: 1px;
+  background-color: var(--border);
+  margin: 4px 0;
+}
+
+.itemText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+}
+
+.itemTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-strong);
+  line-height: 1.2;
+}
+
+.itemExt {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.excelIcon {
+  color: #1A8F4E;
+  flex-shrink: 0;
+}
+
+.csvIcon {
+  color: #2F6FED;
+  flex-shrink: 0;
+}
+
+.pdfIcon {
+  color: #D9483B;
+  flex-shrink: 0;
+}
+
+.drawerIcon {
+  color: var(--green-700);
+  flex-shrink: 0;
+}

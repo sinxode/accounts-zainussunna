@@ -1,131 +1,297 @@
 @import '../../styles/design-system/variables';
-@import '../../styles/design-system/layout';
+@import '../../styles/design-system/mixins';
 
 .container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 16px;
 }
 
-.filterCard {
-  border: 1px solid $border-color;
-  box-shadow: $shadow-sm;
-}
-
-.filters {
-  @include flex-between;
-  gap: 2rem;
-
-  @include mobile {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
-  }
-}
-
-.searchBox {
-  flex: 1;
-  position: relative;
+.controlsRow {
   display: flex;
   align-items: center;
-  
-  svg {
-    position: absolute;
-    left: 1rem;
-    color: $text-muted;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.navGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.monthNavigator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill, 999px);
+
+  .monthArrow {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 150ms ease;
+
+    &:hover {
+      background-color: var(--bg-surface);
+      color: var(--green-700);
+    }
   }
 
-  input {
+  .monthText {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-strong);
+    user-select: none;
+  }
+}
+
+.actionGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inlineSearch {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill, 999px);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-strong);
+  width: 240px;
+  outline: none;
+  transition: all 150ms ease;
+
+  &::placeholder {
+    color: var(--text-faint);
+  }
+
+  &:focus {
+    border-color: var(--green-600);
+    background-color: var(--bg-surface);
+    box-shadow: 0 0 0 2px var(--green-100);
+  }
+
+  @include mobile {
     width: 100%;
-    background-color: $bg-tertiary;
-    border: 1px solid transparent;
-    padding: 0.625rem 1rem 0.625rem 2.75rem;
-    border-radius: 12px;
-    font-size: 0.9375rem;
-    transition: $transition-fast;
-    
-    &:focus {
-      background-color: white;
-      border-color: $primary;
+  }
+}
+
+.summaryStrip {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-tile, 14px);
+  padding: 12px 20px;
+  gap: 24px;
+  overflow-x: auto;
+
+  @include mobile {
+    gap: 16px;
+    padding: 10px 14px;
+  }
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+
+  .summaryLabel {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+
+  .summaryValue {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+
+    &.credit { color: var(--credit); }
+    &.debit { color: var(--debit); }
+  }
+}
+
+.summaryDivider {
+  width: 1px;
+  height: 28px;
+  background-color: var(--border);
+  flex-shrink: 0;
+}
+
+.summaryCount {
+  margin-left: auto;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.tableCard {
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-card, 20px);
+  border: 1px solid var(--border);
+  overflow: hidden;
+
+  @include mobile {
+    border-radius: var(--radius-tile, 14px);
+  }
+}
+
+.txList,
+.mobileList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+
+  @include mobile {
+    gap: 4px;
+    padding: 6px;
+  }
+}
+
+.paginationBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background-color: var(--bg-surface);
+
+  .pageInfo {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+}
+
+// Receipt Drawer layout
+.receiptContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.receiptHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 16px;
+  background-color: var(--bg-subtle);
+  border-radius: var(--radius-tile, 14px);
+  border: 1px solid var(--border);
+
+  .receiptIcon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: var(--green-100);
+    color: var(--green-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .receiptAmount {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+
+    &.credit { color: var(--credit); }
+    &.debit { color: var(--debit); }
+  }
+}
+
+.receiptDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 4px;
+}
+
+.receiptRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-family: var(--font-body);
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .rowLabel {
+    color: var(--text-muted);
+  }
+
+  .rowValue {
+    font-weight: 600;
+    color: var(--text-strong);
+    text-align: right;
+
+    &.mono {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--text-muted);
     }
   }
 }
 
-.filterActions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.datePicker {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background-color: white;
-  border: 1px solid $border-color;
-  padding: 0.5rem 1rem;
-  border-radius: 10px;
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: $text-primary;
-  cursor: pointer;
-  
-  &:hover {
-    border-color: $text-muted;
-  }
-}
-
-.tableCard {
-  border: 1px solid $border-color;
-  box-shadow: $shadow-sm;
-}
-
-.txId {
-  font-family: monospace;
-  font-weight: 700;
-  color: $primary;
-  font-size: 0.8125rem;
-  background-color: $primary-soft;
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-}
-
-.studentCell {
+.reversalForm {
+  padding: 16px;
+  background-color: var(--debit-bg);
+  border-radius: var(--radius-tile, 14px);
+  border: 1px solid rgba(217, 72, 59, 0.25);
   display: flex;
   flex-direction: column;
-}
+  gap: 8px;
 
-.sName {
-  font-weight: 700;
-  color: $text-primary;
-
-  @include mobile {
-    max-width: 140px;
-    white-space: normal;
-    word-break: break-word;
+  .reversalTitle {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--debit);
   }
-}
 
-.sEnr {
-  font-size: 0.75rem;
-  color: $text-muted;
-}
+  .reversalInput {
+    height: 38px;
+    padding: 0 12px;
+    border-radius: var(--radius-input, 12px);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border);
+    font-size: 13px;
+    outline: none;
 
-.amount {
-  font-weight: 800;
-  font-size: 1rem;
-  white-space: nowrap;
-  display: inline-block;
-  min-width: 5ch; /* Ensure enough space for typical amounts */
-  text-align: right;
-}
-
-.reversedTx {
-  text-decoration: line-through;
-  opacity: 0.5;
-}
-
-.balance {
-  font-weight: 700;
-  color: $text-secondary;
+    &:focus {
+      border-color: var(--debit);
+    }
+  }
 }

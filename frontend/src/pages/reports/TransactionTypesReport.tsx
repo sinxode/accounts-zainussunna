@@ -9,9 +9,9 @@ import {
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { StatCard } from '../../components/ui/StatCard';
+import { StatGrid } from '../../components/ui/StatGrid';
 import { DataTable } from '../../components/ui/DataTable';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { ReportTabs } from '../../components/reports/ReportTabs';
@@ -51,13 +51,12 @@ export const TransactionTypesReport: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title="Transaction Type & Direction Matrix"
-        subtitle="Cross-tabulated analysis of transaction counts, volumes, and reversals across all operational types."
+      <ReportTabs 
         actions={
           <Button 
             variant="soft" 
-            icon={<Download size={16} />} 
+            size="sm"
+            icon={<Download size={15} />} 
             onClick={handleExport} 
             disabled={isLoading || !data?.matrix.length}
           >
@@ -66,52 +65,52 @@ export const TransactionTypesReport: React.FC = () => {
         }
       />
 
-      <ReportTabs />
-
       {/* Historical Type Scope Note */}
-      <div style={{
-        backgroundColor: '#EFF6FF',
-        border: '1px solid #BFDBFE',
-        borderRadius: '8px',
-        padding: '14px 16px',
-        marginBottom: '20px',
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: '12px'
-      }}>
-        <Info size={18} style={{ color: '#2563EB', flexShrink: 0, marginTop: '2px' }} />
-        <div style={{ fontSize: '12.5px', color: '#1E40AF', lineHeight: 1.5 }}>
-          <strong>Historical Classification Notice:</strong> {data?.notes}
+      {data?.notes && (
+        <div style={{
+          backgroundColor: 'var(--bg-subtle)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-tile, 14px)',
+          padding: '10px 14px',
+          marginBottom: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          fontSize: '12px',
+          color: 'var(--text-body)'
+        }}>
+          <Info size={16} style={{ color: 'var(--green-700)', flexShrink: 0 }} />
+          <span><strong>Notice:</strong> {data.notes}</span>
         </div>
-      </div>
+      )}
 
       {/* Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+      <StatGrid columns={4}>
         <StatCard 
           label="Total All-Time Transactions" 
           value={data?.totalTransactions || 0} 
-          icon={<Layers />} 
+          icon={<Layers size={18} />} 
           variant="primary" 
         />
         <StatCard 
           label="Cumulative Ledger Volume" 
           value={`₹${totalVolume.toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
-          icon={<CheckCircle2 />} 
+          icon={<CheckCircle2 size={18} />} 
           variant="success" 
         />
         <StatCard 
           label="Total Reversals Logged" 
           value={totalReversals} 
-          icon={<RotateCcw />} 
+          icon={<RotateCcw size={18} />} 
           variant="warning" 
         />
         <StatCard 
           label="Active Categories Tracked" 
           value={data?.matrix.length || 0} 
-          icon={<Layers />} 
+          icon={<Layers size={18} />} 
           variant="neutral" 
         />
-      </div>
+      </StatGrid>
 
       {/* Matrix DataTable */}
       <Card padding="md">

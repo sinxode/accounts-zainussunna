@@ -15,7 +15,6 @@ import { Card } from '../../components/ui/Card';
 import { StatCard } from '../../components/ui/StatCard';
 import { DataTable } from '../../components/ui/DataTable';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { ReportTabs } from '../../components/reports/ReportTabs';
@@ -80,14 +79,13 @@ export const StudentReports: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title="Student Account Statement"
-        subtitle="Itemized student ledger history with verified running balances and baseline audit disclosures."
+      <ReportTabs 
         actions={
-          <div className="flex gap-2">
+          <div style={{ display: 'flex', gap: '8px' }}>
             <Button 
               variant="soft" 
-              icon={<Download size={16} />} 
+              size="sm"
+              icon={<Download size={15} />} 
               onClick={() => handleExport('statement')} 
               disabled={!selectedStudent || isLoading}
             >
@@ -95,7 +93,8 @@ export const StudentReports: React.FC = () => {
             </Button>
             <Button 
               variant="soft" 
-              icon={<Printer size={16} />} 
+              size="sm"
+              icon={<Printer size={15} />} 
               onClick={() => handleExport('statement')} 
               disabled={!selectedStudent || isLoading}
             >
@@ -104,8 +103,6 @@ export const StudentReports: React.FC = () => {
           </div>
         }
       />
-
-      <ReportTabs />
 
       <div className={styles.filtersRow}>
         <Card className={styles.filterCard} padding="sm">

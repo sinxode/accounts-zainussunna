@@ -1,6 +1,5 @@
 import React from 'react';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Plus } from 'lucide-react';
 import styles from './EntryPresets.module.scss';
@@ -16,20 +15,16 @@ export const EntryPresets: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader 
-        title="Entry Presets" 
-        subtitle="Reusable operation patterns for faster financial workflows."
-        actions={
-          <div className="flex gap-4 items-center">
-            <Button 
-              icon={<Plus size={16} />}
-              onClick={() => openDrawer('preset')}
-            >
-              Create Preset
-            </Button>
-          </div>
-        }
-      />
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+        <Button 
+          variant="primary"
+          size="sm"
+          icon={<Plus size={15} />}
+          onClick={() => openDrawer('preset')}
+        >
+          Create Preset
+        </Button>
+      </div>
 
       <div className={styles.presetsGrid}>
         <div className={styles.fullWidthSection}>

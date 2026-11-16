@@ -10,9 +10,9 @@ import {
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { StatCard } from '../../components/ui/StatCard';
+import { StatGrid } from '../../components/ui/StatGrid';
 import { DataTable } from '../../components/ui/DataTable';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { ReportTabs } from '../../components/reports/ReportTabs';
@@ -56,13 +56,12 @@ export const StudentBalanceSummaryReport: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title="Student Balance Summary"
-        subtitle="Authoritative register of student account balances, health tiers, and permitted negative balances."
+      <ReportTabs 
         actions={
           <Button 
             variant="soft" 
-            icon={<Download size={16} />} 
+            size="sm"
+            icon={<Download size={15} />} 
             onClick={handleExport} 
             disabled={isLoading || !data?.students.length}
           >
@@ -71,63 +70,70 @@ export const StudentBalanceSummaryReport: React.FC = () => {
         }
       />
 
-      <ReportTabs />
-
       {/* Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+      <StatGrid columns={4}>
         <StatCard 
           label="Total Student Accounts" 
           value={data?.summary.totalStudents || 0} 
-          icon={<Users />} 
+          icon={<Users size={18} />} 
           variant="primary" 
         />
         <StatCard 
           label="Positive Balance Surplus" 
           value={`₹${(data?.summary.positiveTotal || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
           subValue={`${data?.summary.positiveCount || 0} accounts`}
-          icon={<CheckCircle2 />} 
+          icon={<CheckCircle2 size={18} />} 
           variant="success" 
         />
         <StatCard 
           label="Negative Balances (Deficit)" 
           value={`-₹${Math.abs(data?.summary.negativeTotal || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
-          subValue={`${data?.summary.negativeCount || 0} accounts requiring recovery`}
-          icon={<AlertCircle />} 
+          subValue={`${data?.summary.negativeCount || 0} requiring recovery`}
+          icon={<AlertCircle size={18} />} 
           variant="danger" 
         />
         <StatCard 
           label="Net Recorded Student Balances" 
           value={`₹${(data?.summary.netRecordedBalances || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
-          icon={<Scale />} 
+          icon={<Scale size={18} />} 
           variant="neutral" 
         />
-      </div>
+      </StatGrid>
 
       {/* Search and Filters Bar */}
-      <Card padding="sm" style={{ marginBottom: '20px' }}>
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
-            <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+      <Card padding="sm" style={{ marginBottom: '16px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ flex: 1, minWidth: '200px', position: 'relative' }}>
+            <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               type="text"
-              placeholder="Search by student name or enrolment no..."
+              placeholder="Search student or enrolment..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
                 width: '100%',
-                padding: '8px 12px 8px 34px',
-                borderRadius: '6px',
-                border: '1px solid #CBD5E1',
-                fontSize: '13px'
+                padding: '7px 12px 7px 34px',
+                borderRadius: 'var(--radius-pill, 999px)',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-subtle)',
+                fontSize: '12.5px',
+                color: 'var(--text-strong)'
               }}
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 'var(--radius-pill, 999px)',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-surface)',
+                fontSize: '12.5px',
+                color: 'var(--text-strong)'
+              }}
             >
               <option value="all">All Statuses</option>
               <option value="active">Active Accounts</option>
@@ -137,7 +143,14 @@ export const StudentBalanceSummaryReport: React.FC = () => {
             <select
               value={healthFilter}
               onChange={(e) => setHealthFilter(e.target.value)}
-              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '13px' }}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 'var(--radius-pill, 999px)',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-surface)',
+                fontSize: '12.5px',
+                color: 'var(--text-strong)'
+              }}
             >
               <option value="all">All Health Tiers</option>
               <option value="healthy">Healthy (Above ₹500)</option>

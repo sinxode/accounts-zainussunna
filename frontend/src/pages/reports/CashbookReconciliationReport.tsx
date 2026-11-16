@@ -12,9 +12,9 @@ import {
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { StatCard } from '../../components/ui/StatCard';
+import { StatGrid } from '../../components/ui/StatGrid';
 import { DataTable } from '../../components/ui/DataTable';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { ReportTabs } from '../../components/reports/ReportTabs';
@@ -57,13 +57,12 @@ export const CashbookReconciliationReport: React.FC = () => {
 
   return (
     <PageContainer>
-      <PageHeader
-        title="Cashbook & Reconciliation Report"
-        subtitle="Authoritative double-entry cashbook ledger, arithmetic verification, and real-world cash reconciliation status."
+      <ReportTabs 
         actions={
           <Button 
             variant="soft" 
-            icon={<Download size={16} />} 
+            size="sm"
+            icon={<Download size={15} />} 
             onClick={handleExport} 
             disabled={isLoading || !data?.transactions.length}
           >
@@ -71,8 +70,6 @@ export const CashbookReconciliationReport: React.FC = () => {
           </Button>
         }
       />
-
-      <ReportTabs />
 
       {/* Date Range Selector */}
       <Card padding="sm" style={{ marginBottom: '20px' }}>
@@ -140,32 +137,32 @@ export const CashbookReconciliationReport: React.FC = () => {
       </div>
 
       {/* Period Summary Numbers */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+      <StatGrid columns={4}>
         <StatCard 
           label="Total Cashbook Inflows" 
           value={`+₹${(data?.arithmetic.totalInflows || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
-          icon={<ArrowDownLeft />} 
+          icon={<ArrowDownLeft size={18} />} 
           variant="success" 
         />
         <StatCard 
           label="Total Cashbook Outflows" 
           value={`-₹${(data?.arithmetic.totalOutflows || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
-          icon={<ArrowUpRight />} 
+          icon={<ArrowUpRight size={18} />} 
           variant="error" 
         />
         <StatCard 
           label="Net Recorded Movement" 
           value={`${(data?.arithmetic.netLedgerMovement || 0) >= 0 ? '+' : ''}₹${(data?.arithmetic.netLedgerMovement || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
-          icon={<TrendingUp />} 
+          icon={<TrendingUp size={18} />} 
           variant="primary" 
         />
         <StatCard 
           label="Traceable Entries" 
           value={`${data?.traceability.withOperationId || 0} / ${data?.traceability.totalTransactions || 0}`} 
-          icon={<ShieldCheck />} 
+          icon={<ShieldCheck size={18} />} 
           variant="neutral" 
         />
-      </div>
+      </StatGrid>
 
       {/* Itemized Cashbook DataTable */}
       <Card padding="md">

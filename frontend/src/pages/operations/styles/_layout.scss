@@ -1,37 +1,40 @@
 .homeScreenLayout {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  max-width: $max-page-width;
+  gap: 16px;
+  max-width: 1400px;
   margin: 0 auto;
   width: 100%;
-  padding-bottom: 64px;
+  padding-bottom: 24px;
 
   @include mobile {
-    gap: 24px;
-    padding-bottom: 80px;
+    gap: 12px;
+    padding-bottom: 64px;
   }
 }
 
 .sectionHeader {
   @include flex-between;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .sectionTitle {
-  font-size: 16px;
+  font-family: var(--font-body);
+  font-size: 12px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-strong);
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .twoColumnGrid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 16px;
 
   @include tablet {
     grid-template-columns: 1fr;
@@ -41,7 +44,7 @@
 .sideColumn {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 
   @include mobile {
     display: contents;
@@ -49,9 +52,7 @@
 }
 
 .presetsWrapper {
-  display: block;
-
-  @include mobile {
-    display: none !important;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }

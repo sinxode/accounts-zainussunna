@@ -1,0 +1,54 @@
+@import '../../styles/design-system/variables';
+
+.indicatorWrapper {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1500;
+  pointer-events: none;
+}
+
+.indicatorPill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--green-900);
+  color: var(--text-on-dark);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill, 999px);
+  box-shadow: 0 10px 30px rgba(11, 59, 38, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.sequenceTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--lime-300);
+  font-weight: 700;
+  font-family: var(--font-display);
+}
+
+.targetsList {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-on-dark-muted);
+  font-size: 12px;
+
+  strong {
+    color: var(--text-on-dark);
+    font-weight: 600;
+  }
+}
+
+.cancelNote {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  padding-left: 8px;
+}

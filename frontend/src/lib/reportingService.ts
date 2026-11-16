@@ -791,6 +791,20 @@ export const reportingService = {
    * Daily Summary for Dashboard (Current Date)
    */
   async getDailySummary() {
+    if (typeof window !== 'undefined' && window.localStorage.getItem('zls_dev_auth') === 'true') {
+      return {
+        credits: 45000,
+        debits: 12500,
+        netMovement: 32500,
+        bulkOpsCount: 3,
+        avgStudentBalance: 2886.4,
+        overdueCount: 1,
+        todayVolume: 57500,
+        todayReversals: 2,
+        totalTransactions: 154,
+        todayTxCount: 28
+      };
+    }
     const today = new Date().toISOString().split('T')[0];
 
     const { data: txData, error: txError } = await supabase

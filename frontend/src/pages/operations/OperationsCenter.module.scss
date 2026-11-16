@@ -1,11 +1,586 @@
 @import '../../styles/design-system/variables';
 @import '../../styles/design-system/layout';
-@import '../../styles/design-system/mixins';
-@import '../../styles/design-system/typography';
 
-@import './styles/layout';
-@import './styles/summary-cards';
-@import './styles/quick-actions';
-@import './styles/recent-ops';
-@import './styles/tasks';
-@import './styles/drawers';
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// 1. Treasury Row (Siburian Finance Benchmark)
+.treasuryRow {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 16px;
+
+  @include laptop {
+    grid-template-columns: 1fr;
+  }
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+// Left: Active Cash Vault Hero
+.heroCard {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card, 22px);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+
+  @include mobile {
+    padding: 18px 16px;
+    gap: 16px;
+    border-radius: var(--radius-card, 18px);
+  }
+}
+
+.heroTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.accountBadgeGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.currencyPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill, 999px);
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.accountMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.balanceBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.balanceLabel {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.balanceAmountRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.balanceAmount {
+  font-family: var(--font-display);
+  font-size: 38px;
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--text-strong);
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+
+  @include mobile {
+    font-size: 30px;
+  }
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  @include mobile {
+    gap: 8px;
+  }
+}
+
+.primaryActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  @include mobile {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+
+    button {
+      padding: 8px 6px;
+      font-size: 12px;
+      justify-content: center;
+    }
+  }
+}
+
+.circleLinkBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--lime-500);
+  color: var(--green-900);
+  border: 1px solid var(--lime-500);
+  cursor: pointer;
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
+
+  &:hover {
+    transform: scale(1.05);
+    background-color: var(--lime-300);
+  }
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// Right: Capital Allocation (Lime Card)
+.capitalCard {
+  background-color: var(--lime-100);
+  border: 1px solid var(--green-300);
+  border-radius: var(--radius-card, 22px);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+
+  @include mobile {
+    padding: 18px 16px;
+    gap: 14px;
+    border-radius: var(--radius-card, 18px);
+  }
+}
+
+.capitalTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.capitalLabel {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green-900);
+  opacity: 0.85;
+}
+
+.capitalAmountRow {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.capitalAmount {
+  font-family: var(--font-display);
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--green-900);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+
+  @include mobile {
+    font-size: 28px;
+  }
+}
+
+.capitalDelta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill, 999px);
+  background-color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--green-900);
+}
+
+.capitalTiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.capitalTile {
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius-tile, 14px);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  transition: all var(--duration-fast, 150ms) var(--ease-out);
+
+  &:hover {
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
+  }
+
+  @include mobile {
+    padding: 10px 12px;
+  }
+}
+
+.tileHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tileLabel {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tileValue {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.tileSub {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+// 2. Secondary Operations Toolbar
+.operationsToolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+
+  @include mobile {
+    gap: 6px;
+  }
+}
+
+// 3. Split Layout: Journal + Sidecard
+.workspaceLayout {
+  display: grid;
+  grid-template-columns: 8fr 4fr;
+  gap: 16px;
+
+  @include laptop {
+    grid-template-columns: 1fr;
+  }
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.journalCard {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card, 20px);
+  overflow: hidden;
+}
+
+.journalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.journalTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-strong);
+  letter-spacing: -0.01em;
+}
+
+.viewAllLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--green-700);
+  text-decoration: none;
+  transition: color 150ms ease;
+
+  &:hover {
+    color: var(--green-800);
+    text-decoration: underline;
+  }
+}
+
+.journalList {
+  display: flex;
+  flex-direction: column;
+}
+
+.emptyState {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+}
+
+// Side Column
+.sideColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.integrityCard {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card, 18px);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.integrityHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.integrityTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.integrityRows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.integrityRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+
+  .iLabel {
+    color: var(--text-muted);
+  }
+
+  .iVal {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+
+    &.credit {
+      color: var(--credit);
+    }
+
+    &.debit {
+      color: var(--debit);
+    }
+  }
+}
+
+.integrityDivider {
+  height: 1px;
+  background-color: var(--border);
+  margin: 4px 0;
+}
+
+.navCard {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card, 18px);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.navCardTitle {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.workspaceLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text-strong);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all var(--duration-fast, 150ms) ease;
+
+  &:hover {
+    background-color: var(--bg-subtle);
+    color: var(--green-700);
+  }
+
+  .wLinkLeft {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: inherit;
+  }
+}
+
+// Minimal Drawer Receipt
+.drawerReceiptBody {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px 0;
+}
+
+.receiptHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 24px 16px;
+  background-color: var(--bg-subtle);
+  border-radius: var(--radius-card, 18px);
+  border: 1px solid var(--border);
+}
+
+.receiptIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--green-100);
+  color: var(--green-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.receiptAmount {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-strong);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.receiptPurpose {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.receiptMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-tile, 14px);
+  padding: 16px;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: 13px;
+
+  span {
+    color: var(--text-muted);
+  }
+
+  strong {
+    color: var(--text-strong);
+  }
+}

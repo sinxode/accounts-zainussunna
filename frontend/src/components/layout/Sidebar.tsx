@@ -1,153 +1,115 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  Users, 
   ArrowLeftRight,
+  Wallet,
+  GraduationCap,
   HandCoins,
-  Receipt,
-  BarChart3, 
   Settings,
-  ShieldCheck,
-  Workflow,
-  X,
-  PanelLeftClose,
-  PanelRightClose,
-  LayoutTemplate,
-  UsersRound,
+  LogOut,
+  BarChart3,
+  BookOpen
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
-import { useUIStore } from '../../store/useUIStore';
-import styles from './Sidebar.module.scss';
-import { useWindowSize } from '../../hooks/useWindowSize';
-import { Button } from '../ui/Button';
-import logoImg from '../../assets/logo_dark.png';
 import { useAuth } from '../../contexts/AuthContext';
-import type { Database } from '../../types/database';
-
-type Role = Database['public']['Tables']['profiles']['Row']['role'];
-
-interface NavItem {
-  title: string;
-  icon: React.ReactNode;
-  path: string;
-  roles?: Role[];
-}
-
-const navigation: NavItem[] = [
-  { title: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
-  { title: 'Operations Center', icon: <Workflow size={20} />, path: '/operations', roles: ['super_admin', 'admin', 'owner', 'manager'] },
-  { title: 'Students', icon: <Users size={20} />, path: '/students' },
-  { title: 'Internal Transfers', icon: <ArrowLeftRight size={20} />, path: '/internal-transfers', roles: ['super_admin', 'admin', 'owner', 'manager'] },
-  { title: 'Batches', icon: <UsersRound size={20} />, path: '/batches', roles: ['super_admin', 'admin', 'owner', 'manager'] },
-  { title: 'Entry Presets', icon: <LayoutTemplate size={20} />, path: '/presets', roles: ['super_admin', 'admin', 'owner', 'manager'] },
-  { title: 'Borrowers', icon: <HandCoins size={20} />, path: '/borrowers', roles: ['super_admin', 'admin', 'owner', 'manager'] },
-  { title: 'Transactions', icon: <Receipt size={20} />, path: '/transactions' },
-  { title: 'Reports', icon: <BarChart3 size={20} />, path: '/reports', roles: ['super_admin', 'admin', 'faculty', 'owner', 'manager', 'staff'] },
-  { title: 'Administration', icon: <ShieldCheck size={20} />, path: '/administration', roles: ['super_admin', 'owner'] },
-  { title: 'Settings', icon: <Settings size={20} />, path: '/settings', roles: ['super_admin', 'admin', 'owner', 'manager'] },
-];
+import { Avatar } from '../ui/Avatar';
+import styles from './Sidebar.module.scss';
 
 export const Sidebar: React.FC = () => {
-  const { role } = useAuth();
-  const { isSidebarOpen, setSidebarOpen, isSidebarCollapsed, setSidebarCollapsed } = useUIStore();
-  const { width } = useWindowSize();
-  const isMobile = width < 768;
+  const { profile, user, signOut } = useAuth();
 
-  const visibleNavigation = navigation.filter(item => {
-    if (!item.roles) return true;
-    if (!role) return false;
-    return item.roles.includes(role);
-  });
+  const menuItems = [
+    { title: 'Dashboard', icon: <LayoutDashboard size={20} strokeWidth={1.75} />, path: '/' },
+    { title: 'Transactions', icon: <ArrowLeftRight size={20} strokeWidth={1.75} />, path: '/transactions' },
+    { title: 'Accounts', icon: <Wallet size={20} strokeWidth={1.75} />, path: '/operations' },
+    { title: 'Students', icon: <GraduationCap size={20} strokeWidth={1.75} />, path: '/students' },
+    { title: 'Debts', icon: <HandCoins size={20} strokeWidth={1.75} />, path: '/borrowers' },
+  ];
 
-  // Auto-collapse sidebar on tablet screen widths to optimize workspace layout
-  useEffect(() => {
-    if (width < 768) {
-      setSidebarCollapsed(false);
-    } else if (width >= 768 && width < 1024) {
-      setSidebarCollapsed(true);
-    } else if (width >= 1024) {
-      setSidebarCollapsed(false);
-    }
-  }, [width, setSidebarCollapsed]);
+  const generalItems = [
+    { title: 'Reports', icon: <BarChart3 size={20} strokeWidth={1.75} />, path: '/reports' },
+    { title: 'Settings', icon: <Settings size={20} strokeWidth={1.75} />, path: '/settings' },
+  ];
 
-  const handleToggleCollapse = () => setSidebarCollapsed(!isSidebarCollapsed);
+  const displayName = profile?.full_name || user?.email?.split('@')[0] || 'Administrator';
+  const roleDisplay = profile?.role ? profile.role.replace('_', ' ') : 'Manager';
 
   return (
-    <>
-      <AnimatePresence>
-        {isMobile && isSidebarOpen && (
-          <motion.div 
-            className={styles.overlay}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-      </AnimatePresence>
+    <aside className={styles.sidebar}>
+      {/* Top Logo Mark */}
+      <div className={styles.logoArea}>
+        <Link to="/" className={styles.logo}>
+          <div className={styles.logoMark}>
+            <BookOpen size={18} strokeWidth={2.2} />
+          </div>
+          <div className={styles.logoText}>
+            <span className={styles.brandName}>Zainussunna</span>
+            <span className={styles.brandCaption}>Ledger</span>
+          </div>
+        </Link>
+      </div>
 
-      <aside 
-        className={clsx(
-          styles.sidebar, 
-          isMobile && isSidebarOpen && styles.isOpen,
-          !isMobile && isSidebarCollapsed && styles.collapsed
-        )}
-      >
-        <div className={styles.logoArea}>
-          <Link to="/" className={styles.logo}>
-            <img src={logoImg} alt="ZLS Logo" className={styles.logoIcon} />
-            <AnimatePresence>
-              {(isMobile || !isSidebarCollapsed) && (
-                <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className={styles.logoContent}>
-                  <span className={styles.brand}>ZLS</span>
-                  <span className={styles.tagline}>Financial Platform</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </Link>
-          {isMobile && (
-            <button className={styles.closeBtn} onClick={() => setSidebarOpen(false)}>
-              <X size={20} />
-            </button>
-          )}
-        </div>
-
-        <div className={styles.scrollArea}>
-          <nav className={styles.nav}>
-            {visibleNavigation.map((item) => (
-              <NavLink 
+      {/* Nav List */}
+      <div className={styles.navSection}>
+        <div className={styles.group}>
+          <span className={styles.groupLabel}>MENU</span>
+          <nav className={styles.navGroup}>
+            {menuItems.map((item) => (
+              <NavLink
                 key={item.path}
                 to={item.path}
-                title={item.title}
-                onClick={() => isMobile && setSidebarOpen(false)}
                 className={({ isActive }) => clsx(styles.navItem, isActive && styles.active)}
+                title={item.title}
               >
+                <div className={styles.indicator} />
                 <span className={styles.icon}>{item.icon}</span>
-                <AnimatePresence>
-                  {(isMobile || !isSidebarCollapsed) && (
-                     <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className={styles.title}>{item.title}</motion.span>
-                  )}
-                </AnimatePresence>
+                <span className={styles.title}>{item.title}</span>
               </NavLink>
             ))}
           </nav>
         </div>
 
-        <div className={styles.footer}>
-          {!isMobile && (
-            <Button 
-              variant="ghost" 
-              className={styles.collapseBtn}
-              onClick={handleToggleCollapse}
+        <div className={styles.group}>
+          <span className={styles.groupLabel}>GENERAL</span>
+          <nav className={styles.navGroup}>
+            {generalItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) => clsx(styles.navItem, isActive && styles.active)}
+                title={item.title}
+              >
+                <div className={styles.indicator} />
+                <span className={styles.icon}>{item.icon}</span>
+                <span className={styles.title}>{item.title}</span>
+              </NavLink>
+            ))}
+
+            <button
+              type="button"
+              className={clsx(styles.navItem, styles.logoutBtn)}
+              onClick={() => signOut()}
+              title="Logout"
             >
-              {isSidebarCollapsed ? <PanelRightClose size={18} /> : <PanelLeftClose size={18} />}
-            </Button>
-          )}
-          <div className={styles.version}>v2.0.0</div>
+              <div className={styles.indicator} />
+              <span className={styles.icon}><LogOut size={20} strokeWidth={1.75} /></span>
+              <span className={styles.title}>Logout</span>
+            </button>
+          </nav>
         </div>
-      </aside>
-    </>
+      </div>
+
+      {/* User Chip */}
+      <div className={styles.userSection}>
+        <Link to="/profile" className={styles.userChip}>
+          <Avatar name={displayName} size="md" />
+          <div className={styles.userInfo}>
+            <span className={styles.userName}>{displayName}</span>
+            <span className={styles.userRole}>{roleDisplay}</span>
+          </div>
+        </Link>
+      </div>
+    </aside>
   );
 };

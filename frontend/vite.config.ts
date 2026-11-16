@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import path from 'path'
+import { fileURLToPath } from 'node:url'
+
+const variablesPath = fileURLToPath(new URL('./src/styles/design-system/variables.scss', import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,8 +15,8 @@ export default defineConfig({
     },
     preprocessorOptions: {
       scss: {
-        // additionalData can import variables globally if needed
-        additionalData: `@import "${path.resolve('src/styles/design-system/variables.scss')}";`
+        // additionalData imports variables globally
+        additionalData: `@import "${variablesPath}";\n`
       },
     },
   },
